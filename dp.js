@@ -1687,7 +1687,7 @@ var route = function(){
 
             if(record.recordtype_detail != null){
                 for (var i = 0; i < record.recordtype_detail.length; i++) {
-                    if(record.recordtype_detail[i].fullName != null && record.recordtype_detail[i].fullName.indexOf(record.recordtypename) >= 0){
+                    if(record.recordtype_detail[i].fullName != null && record.recordtype_detail[i].label == record.recordtypename){
                         bp_values = record.recordtype_detail[i].picklistValues;
                         record.selected_recordtype_detail = record.recordtype_detail[i];
                         break;
@@ -2453,7 +2453,7 @@ var route = function(){
 
             if(record.recordtype_detail != null){
                 for (var i = 0; i < record.recordtype_detail.length; i++) {
-                    if(record.recordtype_detail[i].fullName != null && record.recordtype_detail[i].fullName.indexOf(record.recordtypename) >= 0){
+                    if(record.recordtype_detail[i].fullName != null && record.recordtype_detail[i].label == record.recordtypename){
                         bp_values = record.recordtype_detail[i].picklistValues;
                         record.selected_recordtype_detail = record.recordtype_detail[i];
                         break;
