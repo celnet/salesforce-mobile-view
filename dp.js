@@ -949,8 +949,8 @@ var route = function(){
 
         function handleDescribe(){
             sobject.describe = raw.sobjectdescribe;
-            document.title = sobject.describe.label;
             document.querySelector('#jqm-page-title').innerHTML = context.labels.listview;
+            document.title = sobject.describe.label;
 
             var sobject_fields = sobject.describe.fields;
 
@@ -1454,9 +1454,9 @@ var route = function(){
         var recordnew_page = templates.record_page_structure;
         //recordnew_page = recordnew_page.replace(/{{page}}/g,'new');
         document.querySelector('body').innerHTML = recordnew_page + templates.page_lookup;
-
-        document.title = sobject.describe.label;
+        
         document.querySelector('#jqm-page-title').innerHTML = context.labels.new;
+        document.title = sobject.describe.label;
         document.querySelector('#jqm-header-left-button')['href'] = 'javascript:UserAction.cancel()';
         document.querySelector('#jqm-header-right-button')['href'] = 'javascript:UserAction.saveRecord()';
         document.querySelector('#jqm-header-left-button').innerHTML = context.labels.cancel;
@@ -2414,9 +2414,9 @@ var route = function(){
             var response = raw.recorddetail;
             console.log(response);
             record.detail = response;
-
-            document.title = sobject.describe.label;
+        
             document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
+            document.title = sobject.describe.label;
         }
 
         function retrieveWelinkLayoutDetail(layout_endpoint){
@@ -3217,9 +3217,9 @@ var route = function(){
         function handleRecordDetail(){
             var response = raw.recorddetail;
             record.detail = response;
-
-            document.title = sobject.describe.label;
+            
             document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
+            document.title = sobject.describe.label;
         }
 
         function handleWelinkLayoutId(){
