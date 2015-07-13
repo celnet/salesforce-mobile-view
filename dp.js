@@ -3389,8 +3389,12 @@ var route = function(){
                     if(_field_value != null)
                     switch(_p_tmp[i].rows[j].type){
                         case 'reference':
-                            _field_value = record.references[_p_tmp[i].rows[j].name].Name || '';
-
+                            if(record.references[_p_tmp[i].rows[j].name] != null){
+                                    _field_value = record.references[_p_tmp[i].rows[j].name].Name || '';
+                            } else {
+                                    _field_value = '';
+                            }
+                            
                             if(setup_objects.indexOf(_p_tmp[i].rows[j].referenceTo[0]) < 0 || _p_tmp[i].rows[j].referenceTo[0] == 'User'){
                                 _field_value = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + _p_tmp[i].rows[j].referenceTo[0] + '&id=' + record.detail[_p_tmp[i].rows[j].name] + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + _field_value + '</a>';
                             }
@@ -3520,7 +3524,11 @@ var route = function(){
                     if(_field_value != null)
                     switch(_field_type){
                         case 'reference':
-                            _field_value = record.references[_field_name].Name || '';
+                            if(record.references[_field_name] != null){
+                                    _field_value = record.references[_field_name].Name || '';
+                            } else {
+                                    _field_value = '';
+                            }
 
                             if(setup_objects.indexOf(sobject.fields[_field_name].describe.referenceTo[0]) < 0 || sobject.fields[_field_name].describe.referenceTo[0] == 'User'){
                                 _field_value = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + sobject.fields[_field_name].describe.referenceTo[0] + '&id=' + record.detail[_field_name] + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + _field_value + '</a>';
