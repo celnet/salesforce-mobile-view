@@ -278,7 +278,7 @@ var route = function(){
 
             animateLoading:function(loading_text, jqm_page_id){
                 document.querySelector('#' + jqm_page_id).classList.add('ui-state-disabled');
-                var loading_image_src = "{!URLFOR($Resource.DPResource, '/DPResource/welinklogo.png')}";
+                var loading_image_src = context.welink_logo_src;//"{!URLFOR($Resource.DPResource, '/DPResource/welinklogo.png')}";
                 
                 $j.mobile.loading( 'show', {
                     text: loading_text,
