@@ -41,6 +41,7 @@ var route = function(){
     };
 
     var getTemplates = function(){
+        alert(window.location.search);
         templates = {
             // ListView
             listview_page_structure:document.querySelector('#template-listview-page-structure').text,
