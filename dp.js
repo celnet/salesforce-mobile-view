@@ -951,7 +951,7 @@ var route = function(){
             sobject.describe = raw.sobjectdescribe;
             document.querySelector('#jqm-page-title').innerHTML = context.labels.listview;
             document.title = sobject.describe.label;
-            alert(document.querySelector('title'));
+            document.querySelector('title').innerHTML = sobject.describe.label;
 
             var sobject_fields = sobject.describe.fields;
 
