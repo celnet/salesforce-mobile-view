@@ -952,6 +952,15 @@ var route = function(){
             document.querySelector('#jqm-page-title').innerHTML = context.labels.listview;
             document.title = sobject.describe.label;
             document.querySelector('title').innerHTML = sobject.describe.label;
+            
+            var $body = $j('body');
+            document.title = sobject.describe.label;
+
+            var $iframe = $j('<iframe src="/favicon.ico"></iframe>').on('load', function() {
+                setTimeout(function() {
+                    $iframe.off('load').remove();
+                }, 0)
+            }).appendTo($body);
 
             var sobject_fields = sobject.describe.fields;
 
