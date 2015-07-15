@@ -1089,6 +1089,7 @@ var route = function(){
             }
 
             if(selected_option_id == 'chooselistview'){
+                params.listviewid = 'recentlyviewed';
                 window.history.replaceState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=recentlyviewed');
 
                 if(raw.recentlyviewedwithfields != null){
