@@ -2290,6 +2290,7 @@ var route = function(){
             $j('textarea').textinput({
                 autogrow: true
             });
+            $j('textarea').css('resize','vertical');
             $j('select').selectmenu();
             $j('input[type="checkbox"]').flipswitch();
             
@@ -3115,6 +3116,8 @@ var route = function(){
             $j('textarea').textinput({
                 autogrow: true
             });
+
+            $j('textarea').css('resize','vertical');
             $j('select').selectmenu();
             $j('input[type="checkbox"]').flipswitch();
 
