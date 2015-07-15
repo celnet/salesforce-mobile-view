@@ -2287,7 +2287,9 @@ var route = function(){
             $j('input[type="datetime"]').textinput();
             $j('input[type="datetime-local"]').textinput();
             $j('input[type="search"]').textinput();
-            $j('textarea').textinput();
+            $j('textarea').textinput({
+                autogrow: true
+            });
             $j('select').selectmenu();
             $j('input[type="checkbox"]').flipswitch();
             
@@ -3110,7 +3112,9 @@ var route = function(){
             $j('input[type="datetime-local"]').textinput();
             $j('input[type="email"]').textinput();
             $j('input[type="search"]').textinput();
-            $j('textarea').textinput();
+            $j('textarea').textinput({
+                autogrow: true
+            });
             $j('select').selectmenu();
             $j('input[type="checkbox"]').flipswitch();
 
