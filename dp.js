@@ -951,11 +951,6 @@ var route = function(){
     var AjaxPools = (function(){
 
         function retrieveRecord(sobjectName, recordId, callbackFunction){
-            if(AjaxResponses.has_retrieved_record_related && params.mode == 'edit'){
-                callbackFunction();
-                return;
-            }
-
             Ajax.get(
                 '/sobjects/' + sobjectName + '/' + record.id, 
                 function(response){
@@ -2442,28 +2437,36 @@ var route = function(){
             window.retrieveBySobjectName(function(){
                 handleDescribe();
 
-                AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
-                    record.detail = AjaxResponses.record;
-
-                    document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
-                    document.title = sobject.describe.label;
-
-                    sobject.welink_layout = AjaxResponses.welinklayout;
-                    record.layout = AjaxResponses.layout;
-
-                    if(sobject.welink_layout != null){
-                        processWelinkRecordLayout();
-                    } else {
-                        record.processed = processRecordLayout();
-                    }
-
-                    Model.retrieveReferences(function(){
-                        displayLayout();
+                if(AjaxResponses.has_retrieved_record_related){
+                    processRecordRelated();
+                } else {
+                    AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
+                        processRecordRelated();
                     });
-                });
+                }
             });
         }
 
+        function processRecordRelated(){
+            record.detail = AjaxResponses.record;
+
+            document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
+            document.title = sobject.describe.label;
+
+            sobject.welink_layout = AjaxResponses.welinklayout;
+            record.layout = AjaxResponses.layout;
+
+            if(sobject.welink_layout != null){
+                processWelinkRecordLayout();
+            } else {
+                record.processed = processRecordLayout();
+            }
+
+            Model.retrieveReferences(function(){
+                displayLayout();
+            });
+        }
+/*
         function processSobjectData(){
             if(raw.recorddetail_retrieved && raw.welinklayoutid_retrieved){
                 handleRecordDetail();
@@ -2559,7 +2562,7 @@ var route = function(){
                 }
             );
         }
-
+*/
         function handleRecordTypeDetail(){
             var result = raw.recordtype;
             console.log('record type detail');
