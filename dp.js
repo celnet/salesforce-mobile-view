@@ -951,7 +951,7 @@ var route = function(){
     var AjaxPools = (function(){
 
         function retrieveRecord(sobjectName, recordId, callbackFunction){
-            if(AjaxResponses.has_retrieved_record_related){
+            if(AjaxResponses.has_retrieved_record_related && params.mode == 'edit'){
                 callbackFunction();
                 return;
             }
@@ -2442,14 +2442,25 @@ var route = function(){
             window.retrieveBySobjectName(function(){
                 handleDescribe();
 
-                //handleWelinkLayoutId();
-                if(raw.recorddetail_retrieved && raw.welinklayoutid_retrieved){
-                    processSobjectData();
-                    return;
-                }
+                AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
+                    record.detail = AjaxResponses.record;
 
-                retrieveRecordDetail();
-                retrieveWelinkLayoutId();
+                    document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
+                    document.title = sobject.describe.label;
+
+                    sobject.welink_layout = AjaxResponses.welinklayout;
+                    record.layout = AjaxResponses.layout;
+
+                    if(sobject.welink_layout != null){
+                        processWelinkRecordLayout();
+                    } else {
+                        record.processed = processRecordLayout();
+                    }
+
+                    Model.retrieveReferences(function(){
+                        displayLayout();
+                    });
+                });
             });
         }
 
@@ -3311,7 +3322,7 @@ var route = function(){
                 });
             });
         }
-
+/*
         function processSobjectData(){
             if(raw.recorddetail_retrieved && raw.welinklayoutid_retrieved){
                 handleRecordDetail();
@@ -3408,7 +3419,7 @@ var route = function(){
                 );
             }
         }
-
+*/
         function processWelinkRecordLayout(){
             var _welink_processed = [];
             if(sobject.welink_layout.layoutSections == undefined)
