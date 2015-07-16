@@ -1079,11 +1079,11 @@ var route = function(){
                 function(result){
                     raw.sobjectmetadata = result;
                     AjaxResponses.metadata = result;
-                    retrieveSearchLayout(sobject.Name, doFinish);
+                    retrieveSearchLayout(sobjectName, doFinish);
                 },
                 function(result){
                     sobject.ordered_listviews = sobject.listviews.listviews;
-                    retrieveSearchLayout(sobject.Name, doFinish);
+                    retrieveSearchLayout(sobjectName, doFinish);
                 }
             );
         };
