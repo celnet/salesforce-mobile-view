@@ -924,7 +924,6 @@ var route = function(){
                     record.references[ref_fields[i]] = refvalue;
                 }
             }
-            //displayLayout(isWelink);
             doFinish();
             View.stopLoading('jqm-record');
         },
@@ -951,6 +950,8 @@ var route = function(){
     var AjaxPools = (function(){
 
         function retrieveRecord(sobjectName, recordId, callbackFunction){
+            record.references = {};
+            
             Ajax.get(
                 '/sobjects/' + sobjectName + '/' + record.id, 
                 function(response){
@@ -2424,18 +2425,14 @@ var route = function(){
 
     var initRecordEdit = function(){
 
-        function handleDescribe(){
-            sobject.describe = raw.sobjectdescribe;
-
-            for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
-                sobject.fields[sobject.describe.fields[i].name] = sobject.fields[sobject.describe.fields[i].name] || {};
-                sobject.fields[sobject.describe.fields[i].name].describe = sobject.describe.fields[i];
-            };
-        }
-
         function retrieveSobjectData(){
             window.retrieveBySobjectName(function(){
-                handleDescribe();
+                sobject.describe = raw.sobjectdescribe;
+
+                for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
+                    sobject.fields[sobject.describe.fields[i].name] = sobject.fields[sobject.describe.fields[i].name] || {};
+                    sobject.fields[sobject.describe.fields[i].name].describe = sobject.describe.fields[i];
+                };
 
                 if(AjaxResponses.has_retrieved_record_related){
                     processRecordRelated();
@@ -2457,7 +2454,7 @@ var route = function(){
             record.layout = AjaxResponses.layout;
 
             if(sobject.welink_layout != null){
-                processWelinkRecordLayout();
+                record.welink_processed = processWelinkRecordLayout();
             } else {
                 record.processed = processRecordLayout();
             }
@@ -2466,103 +2463,7 @@ var route = function(){
                 displayLayout();
             });
         }
-/*
-        function processSobjectData(){
-            if(raw.recorddetail_retrieved && raw.welinklayoutid_retrieved){
-                handleRecordDetail();
-                handleWelinkLayoutId();
-            }
-        }
 
-        function retrieveWelinkLayoutId(){
-            if(raw.welinklayoutid_retrieved){
-                processSobjectData();
-                return;
-            }
-
-            Ajax.remoting(
-                'retrieveSobjectWelinkLayoutId',
-                [sobject.name || '', record.id || ''],
-                function(result, event){
-                    raw.welinklayoutid = result;
-                    raw.welinklayoutid_retrieved = true;
-                    processSobjectData();
-                },
-                function(result, event){
-                    console.log(event);
-                }
-            );
-        }
-
-        function retrieveRecordDetail(){
-            if(raw.recorddetail_retrieved){
-                processSobjectData();
-                return;
-            }
-            Ajax.get(
-                '/sobjects/' + sobject.name + '/' + record.id, 
-                function(response){
-                    raw.recorddetail = response;
-                    raw.recorddetail_retrieved = true;
-                    processSobjectData();
-                }
-            );
-        }
-
-        function handleWelinkLayoutId(){
-            var result = raw.welinklayoutid;
-            console.log('==== remoting ===');
-            console.log(result);
-
-            if(result == '' || result.indexOf('exception') >= 0){
-                retrieveRecordLayout();
-            } else {
-                if(sobject.has_welink_layout){
-                    processWelinkRecordLayout();
-
-                    Model.retrieveReferences(function(){
-                        displayLayout();
-                    });
-                } else {
-                    retrieveWelinkLayoutDetail('/tooling/sobjects/Layout/' + result);
-                }
-            }
-        }
-
-        function handleRecordDetail(){
-            var response = raw.recorddetail;
-            console.log(response);
-            record.detail = response;
-        
-            document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
-            document.title = sobject.describe.label;
-        }
-
-        function retrieveWelinkLayoutDetail(layout_endpoint){
-            if(sobject.has_welink_layout){
-                processWelinkRecordLayout();
-
-                Model.retrieveReferences(function(){
-                    displayLayout();
-                });
-                return;
-            }
-
-            Ajax.get(
-                layout_endpoint, 
-                function(response){
-                    console.log(response);
-                    sobject.welink_layout = response.Metadata;
-                    sobject.has_welink_layout = true;
-                    processWelinkRecordLayout();
-
-                    Model.retrieveReferences(function(){
-                        displayLayout();
-                    });
-                }
-            );
-        }
-*/
         function handleRecordTypeDetail(){
             var result = raw.recordtype;
             console.log('record type detail');
@@ -2636,32 +2537,6 @@ var route = function(){
             }
         }
 
-        function retrieveRecordLayout(){
-            if(record.detail.RecordTypeId == undefined){ // call sobject layout
-                Ajax.get(
-                    '/sobjects/' + sobject.name + '/describe/layouts/', 
-                    function(response){
-                        record.layout = response.layouts[0];
-                        record.processed = processRecordLayout();
-                        Model.retrieveReferences(function(){
-                            displayLayout();
-                        });
-                    }
-                );
-            } else { // call recordtype layout
-                Ajax.get(
-                    '/sobjects/' + sobject.name + '/describe/layouts/' + record.detail.RecordTypeId,
-                    function(response){
-                        record.layout = response;
-                        record.processed = processRecordLayout();
-                        Model.retrieveReferences(function(){
-                            displayLayout();
-                        });
-                    }
-                );
-            }
-        }
-
         function processWelinkRecordLayout(){
             var _welink_processed = [];
             if(sobject.welink_layout.layoutSections == undefined)
@@ -2708,7 +2583,7 @@ var route = function(){
 
                 }
             };
-            record.welink_processed = _welink_processed;
+            return _welink_processed;
         }
 
         function processRecordLayout(){
@@ -3312,117 +3187,20 @@ var route = function(){
                         record.welink_processed = processWelinkRecordLayout();
 
                         Model.retrieveReferences(function(){
-                            displayLayout(true);
+                            displayWelinkLayout();
                         });
                     } else {
                         record.layout = AjaxResponses.layout;
                         record.processed = processRecordLayout();
 
                         Model.retrieveReferences(function(){
-                            displayLayout(false);
+                            displayLayout();
                         });
                     }
                 });
             });
         }
-/*
-        function processSobjectData(){
-            if(raw.recorddetail_retrieved && raw.welinklayoutid_retrieved){
-                handleRecordDetail();
-                handleWelinkLayoutId();
-            }
-        }
 
-        function retrieveRecordDetail(){
-            Ajax.get(
-                '/sobjects/' + sobject.name + '/' + record.id, 
-                function(response){
-                    raw.recorddetail = response;
-                    raw.recorddetail_retrieved = true;
-                    processSobjectData();
-                }
-            );
-        }
-
-        function retrieveWelinkLayoutId(){
-            Ajax.remoting(
-                'retrieveSobjectWelinkLayoutId',
-                [sobject.name || '',record.id || ''],
-                function(result){
-                    raw.welinklayoutid = result;
-                    raw.welinklayoutid_retrieved = true;
-                    processSobjectData();
-                },
-                function(result, event){
-                    //retrieveRecordLayout();
-                }
-            );
-        }
-
-        function handleRecordDetail(){
-            var response = raw.recorddetail;
-            record.detail = response;
-            
-            document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
-            document.title = sobject.describe.label;
-        }
-
-        function handleWelinkLayoutId(){
-            var result = raw.welinklayoutid;
-            console.log(result);
-
-            if(result == '' || result.indexOf('exception') >= 0){
-                retrieveRecordLayout();
-            } else {
-                var layoutsoql = '/tooling/sobjects/Layout/' + result;
-                retrieveWelinkLayoutDetail(layoutsoql);
-            }
-        }
-
-        function retrieveWelinkLayoutDetail(layout_endpoint){
-            Ajax.get(
-                layout_endpoint, 
-                function(response){
-                    console.log(response);
-                    sobject.welink_layout = response.Metadata;
-                    sobject.has_welink_layout = true;
-                    record.welink_processed = processWelinkRecordLayout();
-
-                    Model.retrieveReferences(function(){
-                        displayLayout(true);
-                    });
-                }
-            );
-        }
-
-        function retrieveRecordLayout(){
-            if(record.detail.RecordTypeId == undefined){ // call sobject layout
-                Ajax.get(
-                    '/sobjects/' + sobject.name + '/describe/layouts/', 
-                    function(response){
-                        record.layout = response.layouts[0];
-                        record.processed = processRecordLayout();
-
-                        Model.retrieveReferences(function(){
-                            displayLayout(false);
-                        });
-                    }
-                );
-            } else { // call recordtype layout
-                Ajax.get(
-                    '/sobjects/' + sobject.name + '/describe/layouts/' + record.detail.RecordTypeId, 
-                    function(response){
-                        record.layout = response;
-                        record.processed = processRecordLayout();
-
-                        Model.retrieveReferences(function(){
-                            displayLayout(false);
-                        });
-                    }
-                );
-            }
-        }
-*/
         function processWelinkRecordLayout(){
             var _welink_processed = [];
             if(sobject.welink_layout.layoutSections == undefined)
@@ -3510,11 +3288,7 @@ var route = function(){
             return _items;
         }
 
-        function displayLayout(_is_welink_layout){
-            if(_is_welink_layout){
-                displayWelinkLayout();
-                return;
-            }
+        function displayLayout(){
 
             var _p_tmp = record.processed;
             var section_template = templates.view_section;
