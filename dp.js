@@ -1,4 +1,6 @@
-alert(window.location.search);
+if(window.location.search.indexOf('sobject') > -1 && window.location.search.indexOf('mode') < 0){
+    window.location.replaceState('DPListView','DPListView','DP' + window.location.search + '&mode=list');
+}
 
 var route = function(){
         getParams();
