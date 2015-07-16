@@ -979,7 +979,7 @@ var route = function(){
                 function(result){
                     AjaxResponses.welinklayoutid = result;
                     
-                    if(result != null && result != '' && result.indexOf('exception') > -1){
+                    if(result != null && result != '' && result.indexOf('exception') < 0){
                         retrieveWelinkLayout(welinkLayoutId, callbackFunction);
                     } else if(AjaxResponses.record.RecordTypeId != null){
                         retrieveLayoutByRecordType(sobjectName, AjaxResponses.record.RecordTypeId, callbackFunction);
