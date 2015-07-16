@@ -197,6 +197,8 @@ var route = function(){
 
         window.AjaxResponses = {
 
+            has_retrieved_sobject_related:false,
+            
             bySobjectName:{
                 has_retrieved:false,
 
@@ -1161,7 +1163,11 @@ var route = function(){
             },
 
             retrieveSobjectRelated:function(sobjectName, callbackFunction){
-                retrieveDescribe(sobjectName, callbackFunction);
+                if(AjaxResponses.has_retrieved_sobject_related){
+                    callbackFunction();
+                } else {
+                    retrieveDescribe(sobjectName, callbackFunction);
+                }
             }
         };
     })();
