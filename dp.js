@@ -195,7 +195,7 @@ var route = function(){
 
         window.templates = {};
 
-        window.AjaxResponse = {
+        window.AjaxResponses = {
 
             bySobjectName:{
                 has_retrieved:false,
@@ -208,9 +208,12 @@ var route = function(){
 
             },
 
-            record:{
-                has_retrieved:false
-            },
+            // chain by record id and sobject name
+            has_retrieved_record_related:false,
+            record:null,
+            welinklayoutid:null,
+            welinklayout:null,
+            layout:null,
 
             byRecentlyViewed:{
                 has_retrieved:false,
@@ -252,6 +255,8 @@ var route = function(){
             sobjectlayout_retrieved:false,
             references:null
         };
+
+
 
         window.setup_objects = [
             'AccountTerritoryAssignmentRule','AccountTerritoryAssignmentRuleItem','ApexComponent','ApexPage','BusinessHours','BusinessProcess','CategoryNode','CurrencyType','DatedConversionRate','NetworkMember','ProcessInstance','Profile','RecordType','SelfServiceUser','StaticResource','Territory2','UserAccountTeamMember','UserTerritory','WebLink','FieldPermissions','Group','GroupMember','ObjectPermissions','PermissionSet','PermissionSetAssignment','QueueSObject','ObjectTerritory2AssignmentRule','ObjectTerritory2AssignmentRuleItem','RuleTerritory2Association','SetupEntityAccess','Territory2','Territory2Model','UserTerritory2Association','User','UserRole','UserTerritory','Territory'
@@ -922,8 +927,126 @@ var route = function(){
             //displayLayout(isWelink);
             doFinish();
             View.stopLoading('jqm-record');
+        },
+
+        retrieveLayoutWithoutRecordType:function(){
+            Ajax.get(
+                '/sobjects/' + sobject.name + '/describe/layouts/', 
+                function(response){
+                    record.layout = response.layouts[0];
+                }
+            );
+        },
+
+        retrieveLayoutByRecordType:function(recordTypeId){
+            Ajax.get(
+                '/sobjects/' + sobject.name + '/describe/layouts/' + recordTypeId, 
+                function(response){
+                    record.layout = response;
+                }
+            );
         }
     };
+
+    var AjaxPools = (function(){
+
+        function retrieveRecord(sobjectName, recordId, callbackFunction){
+            if(AjaxResponses.has_retrieved_record_related){
+                callbackFunction();
+                return;
+            }
+
+            Ajax.get(
+                '/sobjects/' + sobjectName + '/' + record.id, 
+                function(response){
+                    AjaxResponses.record = response;
+                    retrieveWelinkLayoutId(sobjectName, recordId, callbackFunction);
+                    /* if without welink layout, use this
+                    if(response.RecordTypeId != null){
+                        retrieveLayoutByRecordType(sobjectName, response.RecordTypeId, callbackFunction);
+                    } else {
+                        retrieveLayoutWithoutRecordType(sobjectName, callbackFunction);
+                    }
+                    */
+                }
+            );
+        }
+
+        function retrieveWelinkLayoutId(sobjectName, recordId, callbackFunction){
+            Ajax.remoting(
+                'retrieveSobjectWelinkLayoutId',
+                [sobjectName || '',recordId || ''],
+                function(result){
+                    AjaxResponses.welinklayoutid = result;
+                    
+                    if(result != null && result != '' && result.indexOf('exception') > -1){
+                        retrieveWelinkLayout(welinkLayoutId, callbackFunction);
+                    } else if(AjaxResponses.record.RecordTypeId != null){
+                        retrieveLayoutByRecordType(sobjectName, AjaxResponses.record.RecordTypeId, callbackFunction);
+                    } else {
+                        retrieveLayoutWithoutRecordType(sobjectName, callbackFunction);
+                    }
+                },
+                function(result, event){
+                    if(AjaxResponses.record.RecordTypeId != null){
+                        retrieveLayoutByRecordType(sobjectName, AjaxResponses.record.RecordTypeId, callbackFunction);
+                    } else {
+                        retrieveLayoutWithoutRecordType(sobjectName, callbackFunction);
+                    }
+                }
+            );
+        }
+
+        function retrieveWelinkLayoutIdByRecordTypeId(sobjectName, recordTypeId, callbackFunction){
+            Ajax.remoting(
+                'retrieveSobjectWelinkLayoutIdByRecordTypeId',
+                [sobjectName || '',recordTypeId || ''],
+                function(result){
+                    AjaxResponses.welinklayoutid = result;
+                },
+                function(result, event){
+                    console.log(event);
+                }
+            );
+        }
+
+        function retrieveWelinkLayout(welinkLayoutId, callbackFunction){
+            Ajax.get(
+                '/tooling/sobjects/Layout/' + welinkLayoutId, 
+                function(response){
+                    AjaxResponses.welinklayout = response.Metadata;
+                    AjaxResponses.has_retrieved_record_related = true;
+                    callbackFunction();
+                }
+            );
+        }
+
+        function retrieveLayoutWithoutRecordType(sobjectName, callbackFunction){
+            Ajax.get(
+                '/sobjects/' + sobjectName + '/describe/layouts/', 
+                function(response){
+                    AjaxResponses.layout = response.layouts[0];
+                    AjaxResponses.has_retrieved_record_related = true;
+                    callbackFunction();
+                }
+            );
+        }
+
+        function retrieveLayoutByRecordType(sobjectName, recordTypeId, callbackFunction){
+            Ajax.get(
+                '/sobjects/' + sobjectName + '/describe/layouts/' + recordTypeId, 
+                function(response){
+                    AjaxResponses.layout = response;
+                    AjaxResponses.has_retrieved_record_related = true;
+                    callbackFunction();
+                }
+            );
+        }
+
+        return {
+            retrieveRecordRelated:retrieveRecord
+        }
+    })();
 
     var ListView;
 
@@ -1463,7 +1586,7 @@ var route = function(){
         RecordNew = initRecordNew();
 
         var recordnew_page = templates.record_page_structure;
-        //recordnew_page = recordnew_page.replace(/{{page}}/g,'new');
+
         document.querySelector('body').innerHTML = recordnew_page + templates.page_lookup;
         
         document.querySelector('#jqm-page-title').innerHTML = context.labels.new;
@@ -1649,39 +1772,7 @@ var route = function(){
                 }
             );
         }
-/*
-        function retrieveRecordTypeDetail(){
-            Ajax.remoting(
-                'retrieveMetadataRecordType',
-                [sobject.name],
-                function(result){
-                    raw.recordtype = result;
-                    raw.recordtype_retrieved = true;
-                    processRecordTypeData();
-                },
-                function(){
-                    console.log(result);
-                    console.log(event);
-                }
-            );
-        }
 
-        function retrieveBusinessProcessDetail(){
-            Ajax.remoting(
-                'retrieveMetadataBusinessProcess',
-                [sobject.name],
-                function(result){
-                    raw.businessprocess = result;
-                    raw.businessprocess_retrieved = true;
-                    processRecordTypeData();
-                },
-                function(result,event){
-                    console.log(result);
-                    console.log(event);
-                }
-            );
-        }
-*/
         function handleSobjectLayoutByRecordTypeId(){
             var response = raw.sobjectlayout;
 
@@ -3194,8 +3285,30 @@ var route = function(){
         function retrieveSobjectData(){
             window.retrieveBySobjectName(function(){
                 handleDescribe();
-                retrieveRecordDetail();
-                retrieveWelinkLayoutId();
+                AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
+                    raw.recorddetail = AjaxResponses.record;
+                    raw.welinklayoutid = AjaxResponses.welinklayoutid;
+                    
+                    record.detail = raw.recorddetail;
+                    document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
+                    document.title = sobject.describe.label;
+
+                    if(AjaxResponses.welinklayout != null){
+                        sobject.welinklayout = AjaxResponses.welinklayout;
+                        record.welink_processed = processWelinkRecordLayout();
+
+                        Model.retrieveReferences(function(){
+                            displayLayout(true);
+                        });
+                    } else {
+                        record.layout = AjaxResponses.layout;
+                        record.processed = processRecordLayout();
+
+                        Model.retrieveReferences(function(){
+                            displayLayout(false);
+                        });
+                    }
+                });
             });
         }
 
