@@ -3294,7 +3294,7 @@ var route = function(){
                     document.title = sobject.describe.label;
 
                     if(AjaxResponses.welinklayout != null){
-                        sobject.welinklayout = AjaxResponses.welinklayout;
+                        sobject.welink_layout = AjaxResponses.welinklayout;
                         record.welink_processed = processWelinkRecordLayout();
 
                         Model.retrieveReferences(function(){
