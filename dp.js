@@ -951,7 +951,7 @@ var route = function(){
 
         function retrieveRecord(sobjectName, recordId, callbackFunction){
             record.references = {};
-            
+
             Ajax.get(
                 '/sobjects/' + sobjectName + '/' + record.id, 
                 function(response){
@@ -1039,9 +1039,131 @@ var route = function(){
             );
         }
 
+        var retrieveDescribe = function(sobjectName, doFinish){
+            Ajax.get(
+                '/sobjects/' + sobjectName + '/describe', 
+                function(response){
+                    raw.sobjectdescribe = response;
+                    AjaxResponses.sobjectdescribe = response;
+                    retrieveListViews(sobject.name, doFinish);
+                }
+            );
+        };
+
+        var retrieveListViews = function(sobjectName, doFinish){
+            Ajax.get(
+                '/sobjects/' + sobjectName + '/listviews', 
+                function(response){
+                    raw.listviews = response;
+                    AjaxResponses.listviews = response;
+                    retrieveLayouts(sobjectName, doFinish);
+                }
+            );
+        };
+
+        var retrieveLayouts = function(sobjectName, doFinish){
+            Ajax.get(
+                '/sobjects/' + sobjectName + '/describe/layouts/', 
+                function(response){
+                    raw.sobjectlayouts = response;
+                    AjaxResponses.layouts = response;
+                    retrieveMetadata(sobjectName, doFinish);
+                }
+            );
+        };
+
+        var retrieveMetadata = function(sobjectName, doFinish){
+            Ajax.remoting(
+                'retrieveSobjectMetadata',
+                [sobjectName],
+                function(result){
+                    raw.sobjectmetadata = result;
+                    AjaxResponses.metadata = result;
+                    retrieveSearchLayout(sobject.Name, doFinish);
+                },
+                function(result){
+                    sobject.ordered_listviews = sobject.listviews.listviews;
+                    retrieveSearchLayout(sobject.Name, doFinish);
+                }
+            );
+        };
+
+        var retrieveSearchLayout = function(sobjectName, doFinish){
+            Ajax.get(
+                '/search/layout/?q=' + sobjectName, 
+                function(response){
+                    raw.searchlayout = response;
+                    AjaxResponses.searchlayout = response;
+                    retrieveRecentlyViewed(sobjectName, doFinish);
+                }
+            );
+        };
+
+        var retrieveRecentlyViewed = function(sobjectName, doFinish){
+            Ajax.get(
+                '/query?q=' + window.encodeURIComponent("Select Id From RecentlyViewed Where Type='" + sobjectName + "'"),
+                function(response){
+                    raw.recentlyviewed = response;
+                    AjaxResponses.recentlyviewed = response;
+                    retrieveRecordTypes(sobjectName, doFinish);
+                }
+            );
+        };
+
+        var retrieveRecordTypes = function(sobjectName, doFinish){
+            Ajax.remoting(
+                'retrieveMetadataRecordType',
+                [sobjectName],
+                function(result){
+                    raw.recordtype = result;
+                    AjaxResponses.recordtype = result;
+                    retrieveBusinessProcess(sobjectName, doFinish);
+                },
+                function(){
+                    console.log(result);
+                    console.log(event);
+                    retrieveBusinessProcess(sobjectName, doFinish);
+                }
+            );
+        };
+
+        var retrieveBusinessProcess = function(sobjectName, doFinish){
+            if(sobjectName != 'Opportunity'){
+                raw.has_retrieved_sobject_related = true;
+                AjaxResponses.has_retrieved_sobject_related = true;
+                doFinish();
+                return;
+            }
+
+            Ajax.remoting(
+                'retrieveMetadataBusinessProcess',
+                [sobjectName],
+                function(result){
+                    raw.businessprocess = result;
+                    AjaxResponses.businessprocess = result;
+                    AjaxResponses.has_retrieved_sobject_related = true;
+                    raw.has_retrieved_sobject_related = true;
+                    doFinish();
+                },
+                function(result,event){
+                    console.log(result);
+                    console.log(event);
+                    AjaxResponses.has_retrieved_sobject_related = true;
+                    raw.has_retrieved_sobject_related = true;
+                    doFinish();
+                }
+            );
+        };
+
         return {
-            retrieveRecordRelated:retrieveRecord
-        }
+            retrieveRecordRelated:function(sobjectName, recordId, callbackFunction){
+                retrieveRecord(sobjectName, recordId, callbackFunction);
+            },
+
+            retrieveSobjectRelated:function(sobjectName, callbackFunction){
+                retrieveDescribe(sobjectName, callbackFunction);
+            }
+        };
     })();
 
     var ListView;
@@ -1161,7 +1283,7 @@ var route = function(){
         }
 
         function retrieveSobjectData(){
-            window.retrieveBySobjectName(function(){
+            AjaxPools.retrieveSobjectRelated(sobject.name, function(){
 
                 handleDescribe();
                 handleListViews();
@@ -1604,7 +1726,7 @@ var route = function(){
 
     var initRecordNew = function(){
         function retrieveSobjectData(){
-            window.retrieveBySobjectName(function(){
+            AjaxPools.retrieveSobjectRelated(sobject.name, function(){
                 handleDescribe();
                 handleSobjectLayouts();
                 checkRecordType();
@@ -2426,7 +2548,7 @@ var route = function(){
     var initRecordEdit = function(){
 
         function retrieveSobjectData(){
-            window.retrieveBySobjectName(function(){
+            AjaxPools.retrieveSobjectRelated(sobject.name, function(){
                 sobject.describe = raw.sobjectdescribe;
 
                 for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
@@ -3172,13 +3294,10 @@ var route = function(){
         }
 
         function retrieveSobjectData(){
-            window.retrieveBySobjectName(function(){
+            AjaxPools.retrieveSobjectRelated(sobject.name, function(){
                 handleDescribe();
                 AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
-                    raw.recorddetail = AjaxResponses.record;
-                    raw.welinklayoutid = AjaxResponses.welinklayoutid;
-                    
-                    record.detail = raw.recorddetail;
+                    record.detail = AjaxResponses.record;
                     document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
                     document.title = sobject.describe.label;
 
