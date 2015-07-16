@@ -198,7 +198,7 @@ var route = function(){
         window.AjaxResponses = {
 
             has_retrieved_sobject_related:false,
-            
+
             bySobjectName:{
                 has_retrieved:false,
 
@@ -305,20 +305,6 @@ var route = function(){
             }
         };
 
-    var retrieveBySobjectName = function(doFinish){ // sobject name
-        if(raw.has_retrieved_sobject_related) {
-            doFinish();
-            return;
-        }
-        retrieveDescribe(doFinish);
-    };
-
-
-
-    var retrieveByRecordId = function(doFinish){ // sobject name, record id
-
-    };
-
     var retrieveByRecentlyViewed = function(doFinish){ // sobject name, search layouts, recentlyviewed ids
         if(raw.recentlyviewedwithfields_retrieved){
             doFinish();
@@ -333,113 +319,6 @@ var route = function(){
 
     var retrieveByWelinkLayoutId = function(doFinish){ // welink layout id
 
-    };
-
-    var processSobjectData = function(doFinish){
-        raw.has_retrieved_sobject_related = true;
-        doFinish();
-    };
-
-    var retrieveDescribe = function(doFinish){
-        Ajax.get(
-            '/sobjects/' + sobject.name + '/describe', 
-            function(response){
-                raw.sobjectdescribe = response;
-                retrieveListViews(doFinish);
-            }
-        );
-    };
-
-    var retrieveListViews = function(doFinish){
-        Ajax.get(
-            '/sobjects/' + sobject.name + '/listviews', 
-            function(response){
-                raw.listviews = response;
-                retrieveLayouts(doFinish);
-            }
-        );
-    };
-
-    var retrieveLayouts = function(doFinish){
-        Ajax.get(
-            '/sobjects/' + sobject.name + '/describe/layouts/', 
-            function(response){
-                raw.sobjectlayouts = response;
-                retrieveMetadata(doFinish);
-            }
-        );
-    };
-
-    var retrieveMetadata = function(doFinish){
-        Ajax.remoting(
-            'retrieveSobjectMetadata',
-            [sobject.name],
-            function(result){
-                raw.sobjectmetadata = result;
-                retrieveSearchLayout(doFinish);
-            },
-            function(result){
-                sobject.ordered_listviews = sobject.listviews.listviews;
-                retrieveSearchLayout(doFinish);
-            }
-        );
-    };
-
-    var retrieveSearchLayout = function(doFinish){
-        Ajax.get(
-            '/search/layout/?q=' + sobject.name, 
-            function(response){
-                raw.searchlayout = response;
-                retrieveRecentlyViewed(doFinish);
-            }
-        );
-    };
-
-    var retrieveRecentlyViewed = function(doFinish){
-        Ajax.get(
-            '/query?q=' + window.encodeURIComponent("Select Id From RecentlyViewed Where Type='" + sobject.name + "'"),
-            function(response){
-                raw.recentlyviewed = response;
-                retrieveRecordTypes(doFinish);
-            }
-        );
-    };
-
-    var retrieveRecordTypes = function(doFinish){
-        Ajax.remoting(
-            'retrieveMetadataRecordType',
-            [sobject.name],
-            function(result){
-                raw.recordtype = result;
-                retrieveBusinessProcess(doFinish);
-            },
-            function(){
-                console.log(result);
-                console.log(event);
-                retrieveBusinessProcess(doFinish);
-            }
-        );
-    };
-
-    var retrieveBusinessProcess = function(doFinish){
-        if(sobject.name != 'Opportunity'){
-            processSobjectData(doFinish);
-            return;
-        }
-
-        Ajax.remoting(
-            'retrieveMetadataBusinessProcess',
-            [sobject.name],
-            function(result){
-                raw.businessprocess = result;
-                processSobjectData(doFinish);
-            },
-            function(result,event){
-                console.log(result);
-                console.log(event);
-                processSobjectData(doFinish);
-            }
-        );
     };
 
     var constructSoqlStatement = function(){
