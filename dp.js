@@ -1,3 +1,5 @@
+alert(window.location.search);
+
 var route = function(){
         getParams();
 
@@ -196,31 +198,24 @@ var route = function(){
         window.templates = {};
 
         window.AjaxResponses = {
-
             has_retrieved_sobject_related:false,
+            sobjectdescribe:null,
+            listviews:null,
+            layouts:null,
+            metadata:null,
+            searchlayout:null,
+            recentlyviewed:null,
+            recordtype:null,
+            businessprocess:null,
 
-            bySobjectName:{
-                has_retrieved:false,
-
-                describe:null,
-                listviews:null,
-                metadata:null,
-                searchlayout:null,
-                recentlyviewedids:null,
-
-            },
-
-            // chain by record id and sobject name
             has_retrieved_record_related:false,
             record:null,
             welinklayoutid:null,
             welinklayout:null,
             layout:null,
 
-            byRecentlyViewed:{
-                has_retrieved:false,
-                recentlyviewedwithfields:null
-            }
+            has_retrieved_recentlyviewed:false,
+            recentlyviewedwithfields:null
         };
 
         window.raw = {
@@ -1031,6 +1026,44 @@ var route = function(){
                     console.log(event);
                     AjaxResponses.has_retrieved_sobject_related = true;
                     raw.has_retrieved_sobject_related = true;
+                    doFinish();
+                }
+            );
+        };
+
+        var constructSoqlStatement = function(){
+            var fields = '';
+
+            for (var i = 0; i < sobject.search_layout_fields.length; i++) {
+                if(sobject.search_layout_fields[i].name != 'Name'){
+                    fields += ',';
+                    fields += sobject.search_layout_fields[i].name;
+                }
+            };
+
+            if(sobject.name != 'Case' && sobject.name != 'Solution' && sobject.name != 'Contract' && sobject.name != 'Idea'){
+                fields += ',Name';
+            }
+
+            var soql = 'Select Id' + fields + ' From ' + sobject.name + " Where ";
+            if(sobject.recentlyviewed_ids != ''){
+                soql += "Id IN (";
+                soql += sobject.recentlyviewed_ids;
+                soql += ") And (LastViewedDate != null Or LastReferencedDate != null)";
+            } else {
+                soql += "LastViewedDate != null Or LastReferencedDate != null";
+            }
+            soql += " Order By LastViewedDate asc,LastReferencedDate asc";
+
+            return soql;
+        };
+
+        var retrieveRecentlyViewedwithFields = function(doFinish){
+            Ajax.get(
+                '/query?q=' + window.encodeURIComponent(constructSoqlStatement()), 
+                function(response){
+                    raw.recentlyviewedwithfields = response;
+                    raw.recentlyviewedwithfields_retrieved = true;
                     doFinish();
                 }
             );
