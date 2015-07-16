@@ -980,7 +980,7 @@ var route = function(){
                     AjaxResponses.welinklayoutid = result;
                     
                     if(result != null && result != '' && result.indexOf('exception') < 0){
-                        retrieveWelinkLayout(welinkLayoutId, callbackFunction);
+                        retrieveWelinkLayout(result, callbackFunction);
                     } else if(AjaxResponses.record.RecordTypeId != null){
                         retrieveLayoutByRecordType(sobjectName, AjaxResponses.record.RecordTypeId, callbackFunction);
                     } else {
