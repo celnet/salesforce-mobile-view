@@ -217,7 +217,7 @@ var route = function(){
             layout:null,
 
             has_retrieved_recentlyviewed:false,
-            recentlyviewedwithfields:null
+            recentlyviewedwithfields:null,
 
             has_retrieved_references:false,
             references:null
