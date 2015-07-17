@@ -1806,7 +1806,7 @@ var route = function(){
                     document.querySelector('#jqm-header-right-button').href = 'javascript:UserAction.saveRecord()';
                     record.recordtypeid = recordtype_options[i].value;
                     record.recordtypename = recordtype_options[i].label;
-                    retrieveRecordTypeData();
+                    retrieveLayoutByRecordTypeId();
                 }
             }
         }
