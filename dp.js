@@ -1663,7 +1663,11 @@ var route = function(){
                 function(response){
                     raw.sobjectlayout = response;
                     raw.sobjectlayout_retrieved = true;
-                    handleSobjectLayoutByRecordTypeId();
+
+                    sobject.layout = response;
+                    record.processed = processLayoutSection();
+
+                    //handleSobjectLayoutByRecordTypeId();
                     handleRecordTypeDetail();
                     handleBusinessProcessDetail();
 
