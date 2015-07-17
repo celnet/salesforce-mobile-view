@@ -1843,7 +1843,23 @@ var route = function(){
                     document.querySelector('#jqm-header-right-button').href = 'javascript:UserAction.saveRecord()';
                     record.recordtypeid = recordtype_options[i].value;
                     record.recordtypename = recordtype_options[i].label;
-                    retrieveLayoutByRecordTypeId();
+                    //retrieveLayoutByRecordTypeId();
+
+                    AjaxPools.retrieveLayoutBySelectedRecordType(sobject.name, record.recordtypeid, function(){
+                        sobject.layout = AjaxResponses.layout;
+                        record.processed = processLayoutSection();
+
+                        //handleSobjectLayoutByRecordTypeId();
+                        handleRecordTypeDetail();
+                        handleBusinessProcessDetail();
+
+                        if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
+                            sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
+                            processWelinkRecordLayout();
+                        }
+
+                        renderLayout();
+                    });
                 }
             }
         }
