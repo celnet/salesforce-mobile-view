@@ -1038,7 +1038,6 @@ var route = function(){
                 function(response){
                     AjaxResponses.listviews[listviewId] = {};
                     AjaxResponses.listviews[listviewId].describe = response;
-                    raw.listviewdescribe[listview_id] = response;
 
                     retrieveListViewResultByQuery(sobjectName, listviewId, response.query, callbackFunction);
                 }
@@ -1050,26 +1049,11 @@ var route = function(){
                 '/query/?q=' + window.encodeURIComponent(queryString), 
                 function(response){
                     AjaxResponses.listviews[listviewId].result = response;
-                    raw.listviewqueryresult = response;
 
                     callbackFunction();
                 }
             );
         };
-
-        function handleListViewDescribe(listview_id){
-            var response = raw.listviewdescribe[listview_id];
-            for (var i = response.columns.length - 1; i >= 0; i--) {
-                listview.recordType[response.columns[i].fieldNameOrPath] = response.columns[i].type;
-                listview.recordLabel[response.columns[i].fieldNameOrPath] = response.columns[i].label;
-            };
-        }
-
-        function handleListViewResultBySoql(){
-            listview.queryresult = raw.listviewqueryresult;
-            renderListViewResultList(25);
-            View.stopLoading('jqm-list');
-        }
 
         return {
             retrieveRecordRelated:function(sobjectName, recordId, callbackFunction){
@@ -1218,7 +1202,18 @@ var route = function(){
                 if(params.listviewid != 'recentlyviewed'){
                     //View.animateLoading(context.labels.loading,'jqm-list');
                     renderListViewSelects();
-                    retrieveSelectListView(params.listviewid);
+                    //retrieveSelectListView(params.listviewid);
+                    AjaxPools.retrieveSelectedListView(sobject.name, params.listviewid, function(){
+                        var response = AjaxResponses.listviews[selected_option_id].describe;
+                        for (var i = response.columns.length - 1; i >= 0; i--) {
+                            listview.recordType[response.columns[i].fieldNameOrPath] = response.columns[i].type;
+                            listview.recordLabel[response.columns[i].fieldNameOrPath] = response.columns[i].label;
+                        };
+
+                        listview.queryresult = AjaxResponses.listviews[selected_option_id].result;//raw.listviewqueryresult;
+                        renderListViewResultList(25);
+                        View.stopLoading('jqm-list');
+                    });
                 } else if(sobject.recentlyviewed_ids != ""){
                     window.retrieveByRecentlyViewed(function(){
                         sobject.recentlyviewed = raw.recentlyviewedwithfields;
@@ -1278,7 +1273,7 @@ var route = function(){
                 
                 AjaxPools.retrieveSelectedListView(sobject.name, selected_option_id, function(){
                     
-                    var response = AjaxResponses.listviews[selected_option_id].describe;// raw.listviewdescribe[listview_id];
+                    var response = AjaxResponses.listviews[selected_option_id].describe;
                     for (var i = response.columns.length - 1; i >= 0; i--) {
                         listview.recordType[response.columns[i].fieldNameOrPath] = response.columns[i].type;
                         listview.recordLabel[response.columns[i].fieldNameOrPath] = response.columns[i].label;
