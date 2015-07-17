@@ -905,7 +905,7 @@ var route = function(){
                     record.references[ref_fields[i]] = refvalue;
                 }
             }
-            doFinish();
+            //doFinish();
             retrieveWelinkLayoutId(sobjectName, recordId, doFinish);
             //View.stopLoading('jqm-record');
         };
