@@ -218,22 +218,15 @@ var route = function(){
 
             has_retrieved_recentlyviewed:false,
             recentlyviewedwithfields:null
+
+            has_retrieved_references:false,
+            references:null
         };
 
         window.raw = {
             has_retrieved_sobject_related:false,
             has_ajax_timeout:false,
 
-            sobjectdescribe:null,
-            sobjectdescribe_retrieved:false,
-            listviews:null,
-            listviews_retrieved:false,
-            sobjectmetadata:null,
-            sobjectmetadata_retrieved:false,
-            searchlayout:null,
-            searchlayout_retrieved:false,
-            recentlyviewed:null,
-            recentlyviewed_retrieved:false,
             recentlyviewedwithfields:null,
             recentlyviewedwithfields_retrieved:false,
             listviewresult:{},
@@ -250,8 +243,6 @@ var route = function(){
             welinklayoutid_retrieved:false,
             welinklayoutdetail:null,
             welinklayoutdetail_retrieved:false,
-            sobjectlayout:null,
-            sobjectlayout_retrieved:false,
             references:null
         };
 
@@ -828,13 +819,12 @@ var route = function(){
     var AjaxPools = (function(){
 
         function retrieveRecord(sobjectName, recordId, callbackFunction){
-            record.references = {};
-
             Ajax.get(
                 '/sobjects/' + sobjectName + '/' + record.id, 
                 function(response){
                     AjaxResponses.record = response;
-                    retrieveWelinkLayoutId(sobjectName, recordId, callbackFunction);
+                    retrieveReferences(sobjectName, recordId, callbackFunction);
+                    //retrieveWelinkLayoutId(sobjectName, recordId, callbackFunction);
                     /* if without welink layout, use this
                     if(response.RecordTypeId != null){
                         retrieveLayoutByRecordType(sobjectName, response.RecordTypeId, callbackFunction);
@@ -845,6 +835,80 @@ var route = function(){
                 }
             );
         }
+
+        var retrieveReferences = function(sobjectName, recordId, doFinish){
+            var soql = getReferenceFields(sobjectname, recordId);
+            if(soql != 'Id'){
+                Ajax.get(
+                    '/query/?q=' + window.encodeURIComponent(soql),
+                    function(response){
+                        AjaxResponses.references = response;
+                        handleReferenceFields(doFinish);
+                    }
+                );
+            } else {
+                handleReferenceFields(doFinish);
+            }
+        };
+
+        var getReferenceFields = function(sobjectName, recordId){
+            var soql_fields = 'Id';
+
+            for (var i = 0; i < sobject.describe.fields.length; i++) {
+                if(sobject.describe.fields[i].type == 'reference'){
+                    var field_name = sobject.describe.fields[i].name;
+                    console.log(field_name);
+                    if(field_name == 'DelegatedApproverId' || field_name == 'CallCenterId' || field_name == 'ConnectionSentId' || field_name == 'ConnectionReceivedId'){
+                        console.log('===== in ');
+                        continue;
+                    }
+
+                    record.ref_fields.push(field_name);
+                    soql_fields += ',';
+                    soql_fields += field_name;
+                    if(field_name.indexOf('__c') > -1){
+                        soql_fields += ',';
+                        soql_fields += field_name.replace('__c','__r.Name');
+                    } else {
+                        soql_fields += ',';
+                        soql_fields += field_name.substring(0,field_name.length - 2) + '.Name';
+                    }
+                }
+            };
+
+            if(soql_fields != 'Id'){
+                return 'Select ' + soql_fields + ' From ' + sobjectName + ' Where Id = \'' + recordId + '\'';
+            } else {
+                return soql_fields;
+            }
+        };
+
+        var handleReferenceFields = function(sobjectName, recordId, doFinish){
+            var response = AjaxResponses.references;
+            var ref_fields = record.ref_fields;
+
+            record.references = {};
+
+            for(var i = 0; i < ref_fields.length; i++){
+                if(response.records[0][ref_fields[i]] != null){
+                    var relation_name = '';
+                    if(ref_fields[i].indexOf('__c') > -1){
+                        relation_name = ref_fields[i].replace('__c','__r');
+                    } else {
+                        relation_name = ref_fields[i].substring(0,ref_fields[i].length - 2);
+                    }
+                    var refvalue = {
+                        Name:response.records[0][relation_name]['Name'],
+                        Id:response.records[0][ref_fields[i]]
+                    };
+
+                    record.references[ref_fields[i]] = refvalue;
+                }
+            }
+            doFinish();
+            retrieveWelinkLayoutId(sobjectName, recordId, doFinish);
+            //View.stopLoading('jqm-record');
+        };
 
         function retrieveWelinkLayoutId(sobjectName, recordId, callbackFunction){
             Ajax.remoting(
@@ -921,7 +985,6 @@ var route = function(){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe', 
                 function(response){
-                    raw.sobjectdescribe = response;
                     AjaxResponses.sobjectdescribe = response;
                     retrieveListViews(sobject.name, doFinish);
                 }
@@ -932,7 +995,6 @@ var route = function(){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/listviews', 
                 function(response){
-                    raw.listviews = response;
                     AjaxResponses.listviews = response;
                     retrieveLayouts(sobjectName, doFinish);
                 }
@@ -943,7 +1005,6 @@ var route = function(){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe/layouts/', 
                 function(response){
-                    raw.sobjectlayouts = response;
                     AjaxResponses.layouts = response;
                     retrieveMetadata(sobjectName, doFinish);
                 }
@@ -955,7 +1016,6 @@ var route = function(){
                 'retrieveSobjectMetadata',
                 [sobjectName],
                 function(result){
-                    raw.sobjectmetadata = result;
                     AjaxResponses.metadata = result;
                     retrieveSearchLayout(sobjectName, doFinish);
                 },
@@ -970,7 +1030,6 @@ var route = function(){
             Ajax.get(
                 '/search/layout/?q=' + sobjectName, 
                 function(response){
-                    raw.searchlayout = response;
                     AjaxResponses.searchlayout = response;
                     retrieveRecentlyViewed(sobjectName, doFinish);
                 }
@@ -981,7 +1040,6 @@ var route = function(){
             Ajax.get(
                 '/query?q=' + window.encodeURIComponent("Select Id From RecentlyViewed Where Type='" + sobjectName + "'"),
                 function(response){
-                    raw.recentlyviewed = response;
                     AjaxResponses.recentlyviewed = response;
                     retrieveRecordTypes(sobjectName, doFinish);
                 }
@@ -993,7 +1051,6 @@ var route = function(){
                 'retrieveMetadataRecordType',
                 [sobjectName],
                 function(result){
-                    raw.recordtype = result;
                     AjaxResponses.recordtype = result;
                     retrieveBusinessProcess(sobjectName, doFinish);
                 },
@@ -1017,7 +1074,6 @@ var route = function(){
                 'retrieveMetadataBusinessProcess',
                 [sobjectName],
                 function(result){
-                    raw.businessprocess = result;
                     AjaxResponses.businessprocess = result;
                     AjaxResponses.has_retrieved_sobject_related = true;
                     raw.has_retrieved_sobject_related = true;
@@ -1109,7 +1165,7 @@ var route = function(){
     var initListView = function(){
 
         function handleDescribe(){
-            sobject.describe = raw.sobjectdescribe;
+            sobject.describe = AjaxResponses.sobjectdescribe;
             document.querySelector('#jqm-page-title').innerHTML = context.labels.listview;
             document.title = sobject.describe.label;
             document.querySelector('title').innerHTML = sobject.describe.label;
@@ -1133,18 +1189,18 @@ var route = function(){
         }
 
         function handleListViews(){
-            sobject.listviews = raw.listviews;
+            sobject.listviews = AjaxResponses.listviews;
             for (var i = 0; i < sobject.listviews.listviews.length; i++) {
                 sobject.listviewsmap[sobject.listviews.listviews[i].id] = sobject.listviews.listviews[i];
             };
         }
 
         function handleSearchLayout(){
-            sobject.search_layout_fields = raw.searchlayout[0].searchColumns;
+            sobject.search_layout_fields = AjaxResponses.searchlayout[0].searchColumns;
         }
 
         function handleMetadata(){
-            var result = raw.sobjectmetadata;
+            var result = AjaxResponses.metadata;
 
             sobject.ordered_listviews = [];
 
@@ -1192,7 +1248,7 @@ var route = function(){
         }
 
         function handleRecentlyViewed(){
-            var response = raw.recentlyviewed;
+            var response = AjaxResponses.recentlyviewed;
             for (var i = response.records.length - 1; i >= 0; i--) {
                 sobject.recentlyviewed_ids += "'" + response.records[i].Id + "',";
             };
@@ -1654,7 +1710,7 @@ var route = function(){
         }
 
         function handleDescribe(){
-            sobject.describe = raw.sobjectdescribe;
+            sobject.describe = AjaxResponses.sobjectdescribe;
 
             for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
                 sobject.fields[sobject.describe.fields[i].name] = sobject.fields[sobject.describe.fields[i].name] || {};
@@ -1663,7 +1719,7 @@ var route = function(){
         }
 
         function handleSobjectLayouts(){
-            var response = raw.sobjectlayouts;
+            var response = AjaxResponses.layouts;
             var recordtype_mappings = response.recordTypeMappings;
             sobject.recordtype_mappings = response.recordTypeMappings;
             switch(true){
@@ -1819,9 +1875,8 @@ var route = function(){
         }
 
         function handleRecordTypeDetail(){
-            var result = raw.recordtype;
             console.log('record type detail');
-            record.recordtype_detail = result;//JSON.parse(window.atob(result));
+            record.recordtype_detail = AjaxResponses.recordtype;//JSON.parse(window.atob(result));
             var bp_values = [];
             var processed_rt_values = [];
 
@@ -1859,7 +1914,7 @@ var route = function(){
                 return;
             }
 
-            var result = raw.businessprocess;
+            var result = AjaxResponses.businessprocess;
             console.log('remoting business process');
             record.businessprocess_detail = result;//JSON.parse(window.atob(result));
 
@@ -2469,7 +2524,7 @@ var route = function(){
 
         function retrieveSobjectData(){
             AjaxPools.retrieveSobjectRelated(sobject.name, function(){
-                sobject.describe = raw.sobjectdescribe;
+                sobject.describe = AjaxResponses.sobjectdescribe;
 
                 for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
                     sobject.fields[sobject.describe.fields[i].name] = sobject.fields[sobject.describe.fields[i].name] || {};
@@ -2501,15 +2556,18 @@ var route = function(){
                 record.processed = processRecordLayout();
             }
 
+            displayLayout();
+            View.stopLoading('jqm-record');
+            /*
             Model.retrieveReferences(function(){
                 displayLayout();
             });
+    */
         }
 
         function handleRecordTypeDetail(){
-            var result = raw.recordtype;
             console.log('record type detail');
-            record.recordtype_detail = result;//JSON.parse(window.atob(result));
+            record.recordtype_detail = AjaxResponses.recordtype;//JSON.parse(window.atob(result));
             var bp_values = [];
             var processed_rt_values = [];
 
@@ -2548,7 +2606,7 @@ var route = function(){
                 return;
             }
 
-            var result = raw.businessprocess;
+            var result = AjaxResponses.businessprocess;
             console.log('remoting business process');
             record.businessprocess_detail = result;//JSON.parse(window.atob(result));
 
@@ -3205,7 +3263,7 @@ var route = function(){
 
     var initRecordView = function(){
         function handleDescribe(){
-            sobject.describe = raw.sobjectdescribe;
+            sobject.describe = AjaxResponses.sobjectdescribe;
 
             for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
                 sobject.fields[sobject.describe.fields[i].name] = sobject.fields[sobject.describe.fields[i].name] || {};
@@ -3225,16 +3283,25 @@ var route = function(){
                         sobject.welink_layout = AjaxResponses.welinklayout;
                         record.welink_processed = processWelinkRecordLayout();
 
+                        displayLayout();
+                        View.stopLoading('jqm-record');
+
+                        /*
                         Model.retrieveReferences(function(){
                             displayWelinkLayout();
                         });
+                        */
                     } else {
                         record.layout = AjaxResponses.layout;
                         record.processed = processRecordLayout();
-
+                        
+                        displayLayout();
+                        View.stopLoading('jqm-record');
+                        /*
                         Model.retrieveReferences(function(){
                             displayLayout();
                         });
+    */
                     }
                 });
             });
