@@ -218,7 +218,7 @@ var route = function(){
             references:null,
 
             has_retrieved_recentlyviewed:false,
-            recentlyviewedwithfields:null
+            recentlyviewedwithfields:null,
 
             listviews:{
                 //id:{
