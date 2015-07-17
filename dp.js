@@ -843,7 +843,7 @@ var route = function(){
                     '/query/?q=' + window.encodeURIComponent(soql),
                     function(response){
                         AjaxResponses.references = response;
-                        handleReferenceFields(doFinish);
+                        handleReferenceFields(sobjectName, recordId, doFinish);
                     }
                 );
             } else {
