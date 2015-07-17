@@ -847,7 +847,7 @@ var route = function(){
                     }
                 );
             } else {
-                handleReferenceFields(doFinish);
+                handleReferenceFields(sobjectName, recordId, doFinish);
             }
         };
 
