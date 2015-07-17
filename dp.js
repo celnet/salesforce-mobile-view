@@ -1036,8 +1036,8 @@ var route = function(){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/listviews/' + listviewId + '/describe', 
                 function(response){
-                    AjaxResponses.listview[listviewId] = {};
-                    AjaxResponses.listview[listviewId].describe = response;
+                    AjaxResponses.listviews[listviewId] = {};
+                    AjaxResponses.listviews[listviewId].describe = response;
                     raw.listviewdescribe[listview_id] = response;
 
                     retrieveListViewResultByQuery(sobjectName, listviewId, response.query, callbackFunction);
@@ -1049,7 +1049,7 @@ var route = function(){
             Ajax.get(
                 '/query/?q=' + window.encodeURIComponent(queryString), 
                 function(response){
-                    AjaxResponses.listview[listviewId].result = response;
+                    AjaxResponses.listviews[listviewId].result = response;
                     raw.listviewqueryresult = response;
 
                     callbackFunction();
@@ -1278,13 +1278,13 @@ var route = function(){
                 
                 AjaxPools.retrieveSelectedListView(sobject.name, selected_option_id, function(){
                     
-                    var response = AjaxResponses.listview[selected_option_id].describe;// raw.listviewdescribe[listview_id];
+                    var response = AjaxResponses.listviews[selected_option_id].describe;// raw.listviewdescribe[listview_id];
                     for (var i = response.columns.length - 1; i >= 0; i--) {
                         listview.recordType[response.columns[i].fieldNameOrPath] = response.columns[i].type;
                         listview.recordLabel[response.columns[i].fieldNameOrPath] = response.columns[i].label;
                     };
 
-                    listview.queryresult = AjaxResponses.listview[selected_option_id].result;//raw.listviewqueryresult;
+                    listview.queryresult = AjaxResponses.listviews[selected_option_id].result;//raw.listviewqueryresult;
                     renderListViewResultList(25);
                     View.stopLoading('jqm-list');
                 });
