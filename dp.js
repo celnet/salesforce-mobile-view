@@ -1288,64 +1288,6 @@ var route = function(){
             }
         }
 
-        function retrieveSelectListView(listview_id){
-            retrieveListViewDescribe(listview_id);
-        }
-
-        function processSelectListView(listview_id){
-            if(raw.listviewdescribe_retrieved[listview_id]){
-                handleListViewDescribe(listview_id);
-                retrieveSelectListViewResultBySoql(listview_id);
-            }
-        }
-
-        function retrieveSelectListViewResultBySoql(listview_id){
-            retrieveListViewResultBySoql(raw.listviewdescribe[listview_id].query);
-        }
-
-        function processSelectListViewResultBySoql(){
-            handleListViewResultBySoql();
-            renderListViewResultList(25);
-        }
-
-        // listview results max 25
-        // listview describe info
-        function retrieveListViewDescribe(listview_id){
-            Ajax.get(
-                '/sobjects/' + sobject.name + '/listviews/' + listview_id + '/describe', 
-                function(response){
-                    raw.listviewdescribe[listview_id] = response;
-                    raw.listviewdescribe_retrieved[listview_id] = true;
-                    processSelectListView(listview_id);
-                }
-            );
-        }
-
-        function handleListViewDescribe(listview_id){
-            var response = raw.listviewdescribe[listview_id];
-            for (var i = response.columns.length - 1; i >= 0; i--) {
-                listview.recordType[response.columns[i].fieldNameOrPath] = response.columns[i].type;
-                listview.recordLabel[response.columns[i].fieldNameOrPath] = response.columns[i].label;
-            };
-        }
-
-        // listview describe soql query result
-        function retrieveListViewResultBySoql(soql){
-            Ajax.get(
-                '/query/?q=' + window.encodeURIComponent(soql), 
-                function(response){
-                    raw.listviewqueryresult = response;
-                    raw.listviewqueryresult_retrieved = true;
-                    processSelectListViewResultBySoql();
-                }
-            );
-        }
-
-        function handleListViewResultBySoql(){
-            listview.queryresult = raw.listviewqueryresult;
-            View.stopLoading('jqm-list');
-        }
-
         function renderListViewSelects(){
             var options = '';
             var option_template = templates.listview_option;
@@ -1704,17 +1646,69 @@ var route = function(){
 
         function checkRecordType(){
             switch(record.recordtypeid){
-                case 'pending select':
+                case 'pending select': // has record types pending selection
                     renderRecordTypeSelect();
                     break;
-                case '':
-                    retrieveWelinkLayoutId2();
+                case '': // has no record type, direct to next step
+                    retrieveWelinkLayoutId();
                     break;
-                default:
-                    retrieveRecordTypeData();
+                default: // has given record type, direct to next step
+                    retrieveLayoutByRecordTypeId();
             }
         }
 
+        function retrieveLayoutByRecordTypeId(){
+            Ajax.get(
+                '/sobjects/' + sobject.name + '/describe/layouts/' + record.recordtypeid, 
+                function(response){
+                    raw.sobjectlayout = response;
+                    raw.sobjectlayout_retrieved = true;
+                    handleSobjectLayoutByRecordTypeId();
+                    handleRecordTypeDetail();
+                    handleBusinessProcessDetail();
+
+                    retrieveWelinkLayoutId();
+                }
+            );
+        }
+
+        function retrieveWelinkLayoutId(){
+            Ajax.remoting(
+                'retrieveSobjectWelinkLayoutIdByRecordTypeId',
+                [sobject.name || '',record.recordtypeid || ''],
+                function(result){
+                    raw.welinklayoutid = result;
+                    raw.welinklayoutid_retrieved = true;
+                    
+                    if(raw.welinklayoutid == '' || raw.welinklayoutid.indexOf('exception') >= 0){
+                        renderLayout();
+                    } else {
+                        retrieveWelinkLayout('/tooling/sobjects/Layout/' + raw.welinklayoutid);
+                    }
+                },
+                function(result, event){
+                    console.log(event);
+                }
+            );
+        }
+
+        function retrieveWelinkLayout(layout_endpoint){
+            Ajax.get(
+                layout_endpoint, 
+                function(response){
+                    raw.welinklayoutdetail = response;
+                    raw.welinklayoutdetail_retrieved = true;
+                    
+                    var response = raw.welinklayoutdetail;
+                    sobject.has_welink_layout = true;
+                    sobject.welink_layout = response.Metadata;
+                    processWelinkRecordLayout();
+
+                    renderLayout();
+                }
+            );
+        }
+/*
         function retrieveRecordTypeData(){
             retrieveSobjectLayoutByRecordTypeId();
             //retrieveRecordTypeDetail();
@@ -1725,7 +1719,7 @@ var route = function(){
                 raw.businessprocess_retrieved = true;
             }
             */
-        }
+ /*       }
 
         function processRecordTypeData(){
             if(raw.sobjectlayout_retrieved ){
@@ -1758,10 +1752,14 @@ var route = function(){
         }
 
         function processWelinkLayoutData(){
-            handleWelinkLayoutDetail();
+            var response = raw.welinklayoutdetail;
+            sobject.has_welink_layout = true;
+            sobject.welink_layout = response.Metadata;
+            processWelinkRecordLayout();
+
             renderLayout();
         }
-
+*/
         function renderRecordTypeSelect(){
             //record.recordtypeid = '';
             var recordtype_mappings = sobject.recordtype_mappings;
@@ -1812,7 +1810,7 @@ var route = function(){
                 }
             }
         }
-
+/*
         function retrieveSobjectLayoutByRecordTypeId(){
             Ajax.get(
                 '/sobjects/' + sobject.name + '/describe/layouts/' + record.recordtypeid, 
@@ -1830,7 +1828,7 @@ var route = function(){
             sobject.layout = response;
             record.processed = processLayoutSection();
         }
-
+*/
         function handleRecordTypeDetail(){
             console.log('record type detail');
             record.recordtype_detail = AjaxResponses.recordtype;//JSON.parse(window.atob(result));
@@ -1901,7 +1899,7 @@ var route = function(){
                 sobject.fields['StageName']['describe'].picklistValues = bp_processed_values;
             }
         }
-
+/*
         function retrieveWelinkLayoutId(){
             Ajax.remoting(
                 'retrieveSobjectWelinkLayoutIdByRecordTypeId',
@@ -1935,7 +1933,7 @@ var route = function(){
             processWelinkRecordLayout();
         }
 
-
+*/
         // DATA RETRIEVAL END
 
         function processWelinkRecordLayout(){
