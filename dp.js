@@ -837,7 +837,7 @@ var route = function(){
         }
 
         var retrieveReferences = function(sobjectName, recordId, doFinish){
-            var soql = getReferenceFields(sobjectname, recordId);
+            var soql = getReferenceFields(sobjectName, recordId);
             if(soql != 'Id'){
                 Ajax.get(
                     '/query/?q=' + window.encodeURIComponent(soql),
