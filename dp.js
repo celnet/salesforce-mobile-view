@@ -215,16 +215,20 @@ var route = function(){
             welinklayoutid:null,
             welinklayout:null,
             layout:null,
+            references:null,
 
             has_retrieved_recentlyviewed:false,
-            recentlyviewedwithfields:null,
+            recentlyviewedwithfields:null
 
-            has_retrieved_references:false,
-            references:null
+            listviews:{
+                //id:{
+                //  describe:null,
+                //  results:null
+                //}
+            }
         };
 
         window.raw = {
-            has_retrieved_sobject_related:false,
             has_ajax_timeout:false,
 
             recentlyviewedwithfields:null,
@@ -396,21 +400,16 @@ var route = function(){
             };
 
             xmlhttp.ontimeout = function(){
-                if(raw.has_ajax_timeout){
-
-                } else {
-                    raw.has_ajax_timeout = true;
-                    if(method == 'GET') {
-                        if(params.retry == 'true'){
-                            alert(context.labels.close);
-                        } else {
-                            alert(context.labels.retry);
-                            window.location.replace(window.location.href + '&retry=true');
-                        }
+                if(method == 'GET') {
+                    if(params.retry == 'true'){
+                        alert(context.labels.close);
                     } else {
                         alert(context.labels.retry);
-                        View.stopLoading('jqm-record');
+                        window.location.replace(window.location.href + '&retry=true');
                     }
+                } else {
+                    alert(context.labels.retry);
+                    View.stopLoading('jqm-record');
                 }
             };
             xmlhttp.open(method, endpoint, true);
@@ -725,100 +724,9 @@ var route = function(){
         }
     };
 
-    var Model = {
-        retrieveReferences:function(doFinish){
-            if(raw.references){
-                Model.handleReferenceFields(doFinish);
-            }
-
-            var soql = Model.getReferenceFields();
-            if(soql != 'Id')
-            Ajax.get(
-                '/query/?q=' + window.encodeURIComponent(soql),
-                function(response){
-                    raw.references = response;
-                    Model.handleReferenceFields(doFinish);
-                }
-            );
-        },
-
-        getReferenceFields:function(){
-            var soql_fields = 'Id';
-
-            for (var i = 0; i < sobject.describe.fields.length; i++) {
-                if(sobject.describe.fields[i].type == 'reference'){
-                    var field_name = sobject.describe.fields[i].name;
-                    console.log(field_name);
-                    if(field_name == 'DelegatedApproverId' || field_name == 'CallCenterId' || field_name == 'ConnectionSentId' || field_name == 'ConnectionReceivedId'){
-                        console.log('===== in ');
-                        continue;
-                    }
-
-                    record.ref_fields.push(field_name);
-                    soql_fields += ',';
-                    soql_fields += field_name;
-                    if(field_name.indexOf('__c') > -1){
-                        soql_fields += ',';
-                        soql_fields += field_name.replace('__c','__r.Name');
-                    } else {
-                        soql_fields += ',';
-                        soql_fields += field_name.substring(0,field_name.length - 2) + '.Name';
-                    }
-                }
-            };
-
-            if(soql_fields != 'Id'){
-                return 'Select ' + soql_fields + ' From ' + sobject.name + ' Where Id = \'' + record.id + '\'';
-            } else {
-                return soql_fields;
-            }
-        },
-
-        handleReferenceFields:function(doFinish){
-            var response = raw.references;
-            var ref_fields = record.ref_fields;
-            for(var i = 0; i < ref_fields.length; i++){
-                if(response.records[0][ref_fields[i]] != null){
-                    var relation_name = '';
-                    if(ref_fields[i].indexOf('__c') > -1){
-                        relation_name = ref_fields[i].replace('__c','__r');
-                    } else {
-                        relation_name = ref_fields[i].substring(0,ref_fields[i].length - 2);
-                    }
-                    var refvalue = {
-                        Name:response.records[0][relation_name]['Name'],
-                        Id:response.records[0][ref_fields[i]]
-                    };
-
-                    record.references[ref_fields[i]] = refvalue;
-                }
-            }
-            doFinish();
-            View.stopLoading('jqm-record');
-        },
-
-        retrieveLayoutWithoutRecordType:function(){
-            Ajax.get(
-                '/sobjects/' + sobject.name + '/describe/layouts/', 
-                function(response){
-                    record.layout = response.layouts[0];
-                }
-            );
-        },
-
-        retrieveLayoutByRecordType:function(recordTypeId){
-            Ajax.get(
-                '/sobjects/' + sobject.name + '/describe/layouts/' + recordTypeId, 
-                function(response){
-                    record.layout = response;
-                }
-            );
-        }
-    };
-
     var AjaxPools = (function(){
 
-        function retrieveRecord(sobjectName, recordId, callbackFunction){
+        var retrieveRecord = function(sobjectName, recordId, callbackFunction){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/' + record.id, 
                 function(response){
@@ -910,7 +818,7 @@ var route = function(){
             //View.stopLoading('jqm-record');
         };
 
-        function retrieveWelinkLayoutId(sobjectName, recordId, callbackFunction){
+        var retrieveWelinkLayoutId = function(sobjectName, recordId, callbackFunction){
             Ajax.remoting(
                 'retrieveSobjectWelinkLayoutId',
                 [sobjectName || '',recordId || ''],
@@ -935,7 +843,7 @@ var route = function(){
             );
         }
 
-        function retrieveWelinkLayoutIdByRecordTypeId(sobjectName, recordTypeId, callbackFunction){
+        var retrieveWelinkLayoutIdByRecordTypeId = function(sobjectName, recordTypeId, callbackFunction){
             Ajax.remoting(
                 'retrieveSobjectWelinkLayoutIdByRecordTypeId',
                 [sobjectName || '',recordTypeId || ''],
@@ -948,7 +856,7 @@ var route = function(){
             );
         }
 
-        function retrieveWelinkLayout(welinkLayoutId, callbackFunction){
+        var retrieveWelinkLayout = function(welinkLayoutId, callbackFunction){
             Ajax.get(
                 '/tooling/sobjects/Layout/' + welinkLayoutId, 
                 function(response){
@@ -959,7 +867,7 @@ var route = function(){
             );
         }
 
-        function retrieveLayoutWithoutRecordType(sobjectName, callbackFunction){
+        var retrieveLayoutWithoutRecordType = function(sobjectName, callbackFunction){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe/layouts/', 
                 function(response){
@@ -970,7 +878,7 @@ var route = function(){
             );
         }
 
-        function retrieveLayoutByRecordType(sobjectName, recordTypeId, callbackFunction){
+        var retrieveLayoutByRecordType = function(sobjectName, recordTypeId, callbackFunction){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe/layouts/' + recordTypeId, 
                 function(response){
@@ -1064,7 +972,6 @@ var route = function(){
 
         var retrieveBusinessProcess = function(sobjectName, doFinish){
             if(sobjectName != 'Opportunity'){
-                raw.has_retrieved_sobject_related = true;
                 AjaxResponses.has_retrieved_sobject_related = true;
                 doFinish();
                 return;
@@ -1076,14 +983,12 @@ var route = function(){
                 function(result){
                     AjaxResponses.businessprocess = result;
                     AjaxResponses.has_retrieved_sobject_related = true;
-                    raw.has_retrieved_sobject_related = true;
                     doFinish();
                 },
                 function(result,event){
                     console.log(result);
                     console.log(event);
                     AjaxResponses.has_retrieved_sobject_related = true;
-                    raw.has_retrieved_sobject_related = true;
                     doFinish();
                 }
             );
@@ -1127,6 +1032,45 @@ var route = function(){
             );
         };
 
+        var retrieveListViewDescribe = function(sobjectName, listviewId, callbackFunction){
+            Ajax.get(
+                '/sobjects/' + sobjectName + '/listviews/' + listviewId + '/describe', 
+                function(response){
+                    AjaxResponses.listview[listviewId] = {};
+                    AjaxResponses.listview[listviewId].describe = response;
+                    raw.listviewdescribe[listview_id] = response;
+
+                    retrieveListViewResultByQuery(sobjectName, listviewId, response.query, callbackFunction);
+                }
+            );
+        };
+
+        var retrieveListViewResultByQuery = function(sobjectName, listviewId, queryString, callbackFunction){
+            Ajax.get(
+                '/query/?q=' + window.encodeURIComponent(queryString), 
+                function(response){
+                    AjaxResponses.listview[listviewId].result = response;
+                    raw.listviewqueryresult = response;
+
+                    callbackFunction();
+                }
+            );
+        };
+
+        function handleListViewDescribe(listview_id){
+            var response = raw.listviewdescribe[listview_id];
+            for (var i = response.columns.length - 1; i >= 0; i--) {
+                listview.recordType[response.columns[i].fieldNameOrPath] = response.columns[i].type;
+                listview.recordLabel[response.columns[i].fieldNameOrPath] = response.columns[i].label;
+            };
+        }
+
+        function handleListViewResultBySoql(){
+            listview.queryresult = raw.listviewqueryresult;
+            renderListViewResultList(25);
+            View.stopLoading('jqm-list');
+        }
+
         return {
             retrieveRecordRelated:function(sobjectName, recordId, callbackFunction){
                 retrieveRecord(sobjectName, recordId, callbackFunction);
@@ -1138,6 +1082,10 @@ var route = function(){
                 } else {
                     retrieveDescribe(sobjectName, callbackFunction);
                 }
+            },
+
+            retrieveSelectedListView:function(sobjectName, listviewId, callbackFunction){
+                retrieveListViewDescribe(sobjectName, listviewId, callbackFunction);
             }
         };
     })();
@@ -1327,7 +1275,21 @@ var route = function(){
                 window.history.replaceState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=' + selected_option_id);
                 
                 View.animateLoading(context.labels.loading,'jqm-list');
-                retrieveSelectListView(selected_option_id);
+                
+                AjaxPools.retrieveSelectedListView(sobject.name, selected_option_id, function(){
+                    
+                    var response = AjaxResponses.listview[selected_option_id].describe;// raw.listviewdescribe[listview_id];
+                    for (var i = response.columns.length - 1; i >= 0; i--) {
+                        listview.recordType[response.columns[i].fieldNameOrPath] = response.columns[i].type;
+                        listview.recordLabel[response.columns[i].fieldNameOrPath] = response.columns[i].label;
+                    };
+
+                    listview.queryresult = AjaxResponses.listview[selected_option_id].result;//raw.listviewqueryresult;
+                    renderListViewResultList(25);
+                    View.stopLoading('jqm-list');
+                });
+                
+                //retrieveSelectListView(selected_option_id);
             }
         }
 
@@ -2558,11 +2520,6 @@ var route = function(){
 
             displayLayout();
             View.stopLoading('jqm-record');
-            /*
-            Model.retrieveReferences(function(){
-                displayLayout();
-            });
-    */
         }
 
         function handleRecordTypeDetail(){
@@ -3284,25 +3241,13 @@ var route = function(){
                         record.welink_processed = processWelinkRecordLayout();
 
                         displayWelinkLayout();
-                        View.stopLoading('jqm-record');
-
-                        /*
-                        Model.retrieveReferences(function(){
-                            displayWelinkLayout();
-                        });
-                        */
                     } else {
                         record.layout = AjaxResponses.layout;
                         record.processed = processRecordLayout();
                         
                         displayLayout();
-                        View.stopLoading('jqm-record');
-                        /*
-                        Model.retrieveReferences(function(){
-                            displayLayout();
-                        });
-    */
                     }
+                     View.stopLoading('jqm-record');
                 });
             });
         }
