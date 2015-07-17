@@ -2,148 +2,148 @@ if(window.location.search.indexOf('sobject') > -1 && window.location.search.inde
     window.history.replaceState('DPListView','DPListView','DP' + window.location.search + '&mode=list');
 }
 
+window.onpopstate = function(event){
+    route();
+    console.log('test');
+    event.preventDefault();
+};
+
 var route = function(){
-        getParams();
+    getParams();
 
-        switch(params.mode.toLowerCase()){
-            case 'list':
-                renderListView();
-                break;
-            case 'view':
-                renderRecordView();
-                break;
-            case 'edit':
-                renderRecordEdit();
-                break;
-            case 'new':
-                renderRecordNew();
-                break;
-            default:
-                console.log('test');
-        }
-    };
+    switch(params.mode.toLowerCase()){
+        case 'list':
+            renderListView();
+            break;
+        case 'view':
+            renderRecordView();
+            break;
+        case 'edit':
+            renderRecordEdit();
+            break;
+        case 'new':
+            renderRecordNew();
+            break;
+        default:
+            console.log('test');
+    }
+};
 
-    var getParams = function(){
-        var query_strings = window.location.search.substr(1).split('&');
+var getParams = function(){
+    var query_strings = window.location.search.substr(1).split('&');
+    
+    for(var i = 0; i < query_strings.length; i++){
+        var keyvalue = query_strings[i].split('=');
+        params[keyvalue[0].toLowerCase()] = keyvalue[1];
+    }
+
+    sobject.name = params.sobject;
+    record.id = params.id;
+    if(params.listviewid==''){
+        params.listviewid='recentlyviewed';
+    }
+
+    if(/Android/i.test(navigator.userAgent)){
+        context.device_type = 'Android';
+    } else if(/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        context.device_type = 'iPhone';
+    }
+};
+
+var getTemplates = function(){
+    //alert(window.location.search);
+    templates = {
+        // ListView
+        listview_page_structure:document.querySelector('#template-listview-page-structure').text,
+        listview_select:document.querySelector('#template-listview-select').text,
+        listview_option:document.querySelector('#template-listview-option').text,
+        listview_resultlist:document.querySelector('#template-listview-resultlist').text,
+        listview_resultitem:document.querySelector('#template-listview-resultitem').text,
+        listview_result_noitem:document.querySelector('#template-listview-result-noitem').text,
+
+        // RecordNew, RecordEdit
+        record_page_structure:document.querySelector('#template-record-jqm-page').text,
+        lookup_field:document.querySelector('#template-lookup-record').text,
+        section:document.querySelector('#template-recordedit-section').text,
+        section_without_heading:document.querySelector('#template-recordedit-section-without-heading').text,
+        recordtype_select:document.querySelector('#template-recordtype-select').text,
+        recordtype_option:document.querySelector('#template-recordtype-option').text,
+        field_readonly:document.querySelector('#template-field-edit-readonly').text,
+        field_lookup:document.querySelector('#template-field-edit-lookup').text,
+        field_checkbox:document.querySelector('#template-field-edit-checkbox').text,
+        field_currency:document.querySelector('#template-field-edit-currency').text,
+        field_date:document.querySelector('#template-field-edit-date').text,
+        field_datetime:document.querySelector('#template-field-edit-datetime').text,
+        field_email:document.querySelector('#template-field-edit-email').text,
+        field_geolocation:document.querySelector('#template-field-edit-geolocation').text,
+        field_number:document.querySelector('#template-field-edit-number').text,
+        field_percent:document.querySelector('#template-field-edit-percent').text,
+        field_phone:document.querySelector('#template-field-edit-phone').text,
+        field_picklist_select:document.querySelector('#template-field-edit-picklist-select').text,
+        field_picklist_option:document.querySelector('#template-field-edit-picklist-option').text,
+        field_multipicklist_select:document.querySelector('#template-field-edit-multipicklist-select').text,
+        field_multipicklist_option:document.querySelector('#template-field-edit-multipicklist-option').text,
+        field_text:document.querySelector('#template-field-edit-text').text,
+        field_textarea:document.querySelector('#template-field-edit-textarea').text,
+        field_text_encrypted:document.querySelector('#template-field-edit-text-encrypted').text,
+        field_url:document.querySelector('#template-field-edit-url').text,
+        field_address:document.querySelector('#template-field-edit-address').text,
+        field_contactname:document.querySelector('#template-field-edit-contact-name').text,
+        field_username:document.querySelector('#template-field-edit-user-name').text,
+        page_lookup:document.querySelector('#template-lookup-jqm-page').text,
         
-        for(var i = 0; i < query_strings.length; i++){
-            var keyvalue = query_strings[i].split('=');
-            params[keyvalue[0].toLowerCase()] = keyvalue[1];
-        }
+        field_contact_name:document.querySelector('#template-field-edit-contact-name').text,
+        field_user_name:document.querySelector('#template-field-edit-user-name').text,
 
-        sobject.name = params.sobject;
-        record.id = params.id;
-        if(params.listviewid==''){
-            params.listviewid='recentlyviewed';
-        }
-
-        if(/Android/i.test(navigator.userAgent)){
-            context.device_type = 'Android';
-        } else if(/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            context.device_type = 'iPhone';
-        }
+        // RecordView
+        view_section:document.querySelector('#template-recordview-section').text,
+        view_section_without_heading:document.querySelector('#template-recordview-section-without-heading').text,
+        field_view_readonly:document.querySelector('#template-field-view-readonly').text
     };
+};
 
-    var getTemplates = function(){
-        //alert(window.location.search);
-        templates = {
-            // ListView
-            listview_page_structure:document.querySelector('#template-listview-page-structure').text,
-            listview_select:document.querySelector('#template-listview-select').text,
-            listview_option:document.querySelector('#template-listview-option').text,
-            listview_resultlist:document.querySelector('#template-listview-resultlist').text,
-            listview_resultitem:document.querySelector('#template-listview-resultitem').text,
-            listview_result_noitem:document.querySelector('#template-listview-result-noitem').text,
+var UserAction = {
+    selectListView:function(){
 
-            // RecordNew, RecordEdit
-            record_page_structure:document.querySelector('#template-record-jqm-page').text,
-            lookup_field:document.querySelector('#template-lookup-record').text,
-            section:document.querySelector('#template-recordedit-section').text,
-            section_without_heading:document.querySelector('#template-recordedit-section-without-heading').text,
-            recordtype_select:document.querySelector('#template-recordtype-select').text,
-            recordtype_option:document.querySelector('#template-recordtype-option').text,
-            field_readonly:document.querySelector('#template-field-edit-readonly').text,
-            field_lookup:document.querySelector('#template-field-edit-lookup').text,
-            field_checkbox:document.querySelector('#template-field-edit-checkbox').text,
-            field_currency:document.querySelector('#template-field-edit-currency').text,
-            field_date:document.querySelector('#template-field-edit-date').text,
-            field_datetime:document.querySelector('#template-field-edit-datetime').text,
-            field_email:document.querySelector('#template-field-edit-email').text,
-            field_geolocation:document.querySelector('#template-field-edit-geolocation').text,
-            field_number:document.querySelector('#template-field-edit-number').text,
-            field_percent:document.querySelector('#template-field-edit-percent').text,
-            field_phone:document.querySelector('#template-field-edit-phone').text,
-            field_picklist_select:document.querySelector('#template-field-edit-picklist-select').text,
-            field_picklist_option:document.querySelector('#template-field-edit-picklist-option').text,
-            field_multipicklist_select:document.querySelector('#template-field-edit-multipicklist-select').text,
-            field_multipicklist_option:document.querySelector('#template-field-edit-multipicklist-option').text,
-            field_text:document.querySelector('#template-field-edit-text').text,
-            field_textarea:document.querySelector('#template-field-edit-textarea').text,
-            field_text_encrypted:document.querySelector('#template-field-edit-text-encrypted').text,
-            field_url:document.querySelector('#template-field-edit-url').text,
-            field_address:document.querySelector('#template-field-edit-address').text,
-            field_contactname:document.querySelector('#template-field-edit-contact-name').text,
-            field_username:document.querySelector('#template-field-edit-user-name').text,
-            page_lookup:document.querySelector('#template-lookup-jqm-page').text,
-            
-            field_contact_name:document.querySelector('#template-field-edit-contact-name').text,
-            field_user_name:document.querySelector('#template-field-edit-user-name').text,
+    }, // loading
 
-            // RecordView
-            view_section:document.querySelector('#template-recordview-section').text,
-            view_section_without_heading:document.querySelector('#template-recordview-section-without-heading').text,
-            field_view_readonly:document.querySelector('#template-field-view-readonly').text
-        };
-    };
-
-    var UserAction = {
-        selectListView:function(){
-
-        }, // loading
-
-        newRecord:function(current_jqm_page_id){
-            View.animateLoading(context.labels.loading,current_jqm_page_id);
-            window.history.pushState('DPRecordNew','DPRecordNew','DP?mode=new&sobject=' + sobject.name);
-            route();
-        }, // no loading
-
-        selectRecordType:function(){
-
-        }, // loading
-
-        viewRecord:function(current_jqm_page_id){
-            View.animateLoading(context.labels.loading, current_jqm_page_id);
-            window.history.pushState('DPRecordView','DPRecordView','DP?mode=view&sobject=' + sobject.name + '&id=' + record.id + '&listviewid=' + params.listviewid);
-            route();
-        }, // loading
-
-        viewList:function(current_jqm_page_id){
-            View.animateLoading(context.labels.loading, current_jqm_page_id);
-            window.history.pushState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=' + params.listviewid);
-            route();
-        }, // loading
-
-        editRecord:function(current_jqm_page_id){
-            View.animateLoading(context.labels.loading, current_jqm_page_id);
-            window.history.pushState('DPRecordEdit','DPRecordEdit','DP?mode=edit&sobject=' + sobject.name + '&id=' + record.id + '&listviewid=' + params.listviewid);
-            route();
-        }, // no loading
-
-        saveRecord:function(){
-            var form_dataset = RecordForm.construct();
-            RecordForm.save(form_dataset);
-        }, // loading
-
-        cancel:function(){
-            window.history.back();
-        } // no loading
-    };
-
-    window.onpopstate = function(event){
+    newRecord:function(current_jqm_page_id){
+        View.animateLoading(context.labels.loading,current_jqm_page_id);
+        window.history.pushState('DPRecordNew','DPRecordNew','DP?mode=new&sobject=' + sobject.name);
         route();
-        console.log('test');
-        event.preventDefault();
-    };
+    }, // no loading
+
+    selectRecordType:function(){
+
+    }, // loading
+
+    viewRecord:function(current_jqm_page_id){
+        View.animateLoading(context.labels.loading, current_jqm_page_id);
+        window.history.pushState('DPRecordView','DPRecordView','DP?mode=view&sobject=' + sobject.name + '&id=' + record.id + '&listviewid=' + params.listviewid);
+        route();
+    }, // loading
+
+    viewList:function(current_jqm_page_id){
+        View.animateLoading(context.labels.loading, current_jqm_page_id);
+        window.history.pushState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=' + params.listviewid);
+        route();
+    }, // loading
+
+    editRecord:function(current_jqm_page_id){
+        View.animateLoading(context.labels.loading, current_jqm_page_id);
+        window.history.pushState('DPRecordEdit','DPRecordEdit','DP?mode=edit&sobject=' + sobject.name + '&id=' + record.id + '&listviewid=' + params.listviewid);
+        route();
+    }, // no loading
+
+    saveRecord:function(){
+        var form_dataset = RecordForm.construct();
+        RecordForm.save(form_dataset);
+    }, // loading
+
+    cancel:function(){
+        window.history.back();
+    } // no loading
+};
 
     window.params = {
         mode:'',
@@ -227,31 +227,7 @@ var route = function(){
                 //}
             }
         };
-
-        window.raw = {
-            has_ajax_timeout:false,
-
-            recentlyviewedwithfields:null,
-            recentlyviewedwithfields_retrieved:false,
-            listviewresult:{},
-            listviewresult_retrieved:{},
-            listviewdescribe:{},
-            listviewdescribe_retrieved:{},
-            listviewqueryresult:null,
-            listviewqueryresult_retrieved:false,
-            recorddetail:null,
-            recorddetail_retrieved:false,
-            sobjectlayouts:null,
-            sobjectlayouts_retrieved:false,
-            welinklayoutid:null,
-            welinklayoutid_retrieved:false,
-            welinklayoutdetail:null,
-            welinklayoutdetail_retrieved:false,
-            references:null
-        };
-
-
-
+        
         window.setup_objects = [
             'AccountTerritoryAssignmentRule','AccountTerritoryAssignmentRuleItem','ApexComponent','ApexPage','BusinessHours','BusinessProcess','CategoryNode','CurrencyType','DatedConversionRate','NetworkMember','ProcessInstance','Profile','RecordType','SelfServiceUser','StaticResource','Territory2','UserAccountTeamMember','UserTerritory','WebLink','FieldPermissions','Group','GroupMember','ObjectPermissions','PermissionSet','PermissionSetAssignment','QueueSObject','ObjectTerritory2AssignmentRule','ObjectTerritory2AssignmentRuleItem','RuleTerritory2Association','SetupEntityAccess','Territory2','Territory2Model','UserTerritory2Association','User','UserRole','UserTerritory','Territory'
             ];
@@ -296,60 +272,6 @@ var route = function(){
                 document.querySelector('#' + jqm_page_id).classList.remove('ui-state-disabled');
             }
         };
-
-    var retrieveByRecentlyViewed = function(doFinish){ // sobject name, search layouts, recentlyviewed ids
-        if(raw.recentlyviewedwithfields_retrieved){
-            doFinish();
-            return;
-        }
-        retrieveRecentlyViewedwithFields(doFinish);
-    };
-
-    var retrieveByListViewId = function(doFinish){ // USER SELECT sobject name, listview id
-
-    };
-
-    var retrieveByWelinkLayoutId = function(doFinish){ // welink layout id
-
-    };
-
-    var constructSoqlStatement = function(){
-        var fields = '';
-
-        for (var i = 0; i < sobject.search_layout_fields.length; i++) {
-            if(sobject.search_layout_fields[i].name != 'Name'){
-                fields += ',';
-                fields += sobject.search_layout_fields[i].name;
-            }
-        };
-
-        if(sobject.name != 'Case' && sobject.name != 'Solution' && sobject.name != 'Contract' && sobject.name != 'Idea'){
-            fields += ',Name';
-        }
-
-        var soql = 'Select Id' + fields + ' From ' + sobject.name + " Where ";
-        if(sobject.recentlyviewed_ids != ''){
-            soql += "Id IN (";
-            soql += sobject.recentlyviewed_ids;
-            soql += ") And (LastViewedDate != null Or LastReferencedDate != null)";
-        } else {
-            soql += "LastViewedDate != null Or LastReferencedDate != null";
-        }
-        soql += " Order By LastViewedDate asc,LastReferencedDate asc";
-
-        return soql;
-    }
-
-    var retrieveRecentlyViewedwithFields = function(doFinish){
-        Ajax.get(
-            '/query?q=' + window.encodeURIComponent(constructSoqlStatement()), 
-            function(response){
-                raw.recentlyviewedwithfields = response;
-                raw.recentlyviewedwithfields_retrieved = true;
-                doFinish();
-            }
-        );
-    };
 
     var Ajax = {
         remoting:function(action,params,success,failure){
@@ -1025,8 +947,7 @@ var route = function(){
             Ajax.get(
                 '/query?q=' + window.encodeURIComponent(constructSoqlStatement()), 
                 function(response){
-                    raw.recentlyviewedwithfields = response;
-                    raw.recentlyviewedwithfields_retrieved = true;
+                    AjaxResponses.recentlyviewedwithfields = response;
                     doFinish();
                 }
             );
@@ -1060,7 +981,6 @@ var route = function(){
                 '/sobjects/' + sobjectName + '/describe/layouts/' + recordTypeId, 
                 function(response){
                     AjaxResponses.layout = response;
-                    raw.sobjectlayout = response;
 
                     retrieveWelinkLayoutIdNew(sobjectName, recordTypeId, callbackFunction);
                 }
@@ -1073,12 +993,11 @@ var route = function(){
                 [sobjectName || '',recordTypeId || ''],
                 function(result){
                     AjaxResponses.welinklayoutid = result;
-                    raw.welinklayoutid = result;
                     
-                    if(raw.welinklayoutid == '' || raw.welinklayoutid.indexOf('exception') >= 0){
+                    if(result == '' || result.indexOf('exception') >= 0){
                         callbackFunction();
                     } else {
-                        retrieveWelinkLayoutNew('/tooling/sobjects/Layout/' + raw.welinklayoutid, callbackFunction);
+                        retrieveWelinkLayoutNew('/tooling/sobjects/Layout/' + result, callbackFunction);
                     }
                 },
                 function(result, event){
@@ -1092,7 +1011,6 @@ var route = function(){
                 layoutEndpoint, 
                 function(response){
                     AjaxResponses.welinklayout = response;
-                    raw.welinklayoutdetail = response;
 
                     callbackFunction();
                 }
@@ -1110,6 +1028,10 @@ var route = function(){
                 } else {
                     retrieveDescribe(sobjectName, callbackFunction);
                 }
+            },
+
+            retrieveRecentlyViewed:function(callbackFunction){
+                retrieveRecentlyViewedwithFields(callbackFunction);
             },
 
             retrieveSelectedListView:function(sobjectName, listviewId, callbackFunction){
@@ -1169,13 +1091,13 @@ var route = function(){
                         listview.recordLabel[response.columns[i].fieldNameOrPath] = response.columns[i].label;
                     };
 
-                    listview.queryresult = AjaxResponses.listviews[params.listviewid].result;//raw.listviewqueryresult;
+                    listview.queryresult = AjaxResponses.listviews[params.listviewid].result;
                     renderListViewResultList(25);
                     View.stopLoading('jqm-list');
                 });
             } else if(sobject.recentlyviewed_ids != ""){
-                window.retrieveByRecentlyViewed(function(){
-                    sobject.recentlyviewed = raw.recentlyviewedwithfields;
+                AjaxPools.retrieveRecentlyViewed(function(){
+                    sobject.recentlyviewed = AjaxResponses.recentlyviewedwithfields;
 
                     renderListViewSelects();
                     renderRecentlyViewedList();
@@ -1304,11 +1226,11 @@ var route = function(){
                 params.listviewid = 'recentlyviewed';
                 window.history.replaceState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=recentlyviewed');
 
-                if(raw.recentlyviewedwithfields != null){
+                if(AjaxResponses.recentlyviewedwithfields != null){
                     renderRecentlyViewedList();
                 } else {
-                    window.retrieveByRecentlyViewed(function(){
-                        sobject.recentlyviewed = raw.recentlyviewedwithfields;
+                    AjaxPools.retrieveRecentlyViewed(function(){
+                        sobject.recentlyviewed = AjaxResponses.recentlyviewedwithfields;
 
                         //renderListViewSelects();
                         renderRecentlyViewedList();
@@ -1331,7 +1253,7 @@ var route = function(){
                         listview.recordLabel[response.columns[i].fieldNameOrPath] = response.columns[i].label;
                     };
 
-                    listview.queryresult = AjaxResponses.listviews[selected_option_id].result;//raw.listviewqueryresult;
+                    listview.queryresult = AjaxResponses.listviews[selected_option_id].result;
                     renderListViewResultList(25);
                     View.stopLoading('jqm-list');
                 });
@@ -1716,9 +1638,6 @@ var route = function(){
                 default: // has given record type, direct to next step
                     //retrieveLayoutByRecordTypeId();
                     AjaxPools.retrieveLayoutBySelectedRecordType(sobject.name, record.recordtypeid, function(){
-                        //raw.sobjectlayout = response;
-                        //raw.sobjectlayout_retrieved = true;
-
                         sobject.layout = AjaxResponses.layout;
                         record.processed = processLayoutSection();
 
@@ -1735,68 +1654,7 @@ var route = function(){
                     });
             }
         }
-/*
-        function retrieveLayoutByRecordTypeId(){
-            Ajax.get(
-                '/sobjects/' + sobject.name + '/describe/layouts/' + record.recordtypeid, 
-                function(response){
-                    raw.sobjectlayout = response;
-                    raw.sobjectlayout_retrieved = true;
 
-                    sobject.layout = response;
-                    record.processed = processLayoutSection();
-
-                    //handleSobjectLayoutByRecordTypeId();
-                    handleRecordTypeDetail();
-                    handleBusinessProcessDetail();
-
-                    if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
-                        sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                        processWelinkRecordLayout();
-                    }
-
-                    renderLayout();
-                }
-            );
-        }
-
-        function retrieveWelinkLayoutId(){
-            Ajax.remoting(
-                'retrieveSobjectWelinkLayoutIdByRecordTypeId',
-                [sobject.name || '',record.recordtypeid || ''],
-                function(result){
-                    raw.welinklayoutid = result;
-                    raw.welinklayoutid_retrieved = true;
-                    
-                    if(raw.welinklayoutid == '' || raw.welinklayoutid.indexOf('exception') >= 0){
-                        renderLayout();
-                    } else {
-                        retrieveWelinkLayout('/tooling/sobjects/Layout/' + raw.welinklayoutid);
-                    }
-                },
-                function(result, event){
-                    console.log(event);
-                }
-            );
-        }
-
-        function retrieveWelinkLayout(layout_endpoint){
-            Ajax.get(
-                layout_endpoint, 
-                function(response){
-                    raw.welinklayoutdetail = response;
-                    raw.welinklayoutdetail_retrieved = true;
-                    
-                    var response = raw.welinklayoutdetail;
-                    sobject.has_welink_layout = true;
-                    sobject.welink_layout = response.Metadata;
-                    processWelinkRecordLayout();
-
-                    renderLayout();
-                }
-            );
-        }
-*/
         function renderRecordTypeSelect(){
             //record.recordtypeid = '';
             var recordtype_mappings = sobject.recordtype_mappings;
