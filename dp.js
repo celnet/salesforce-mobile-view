@@ -3283,7 +3283,7 @@ var route = function(){
                         sobject.welink_layout = AjaxResponses.welinklayout;
                         record.welink_processed = processWelinkRecordLayout();
 
-                        displayLayout();
+                        displayWelinkLayout();
                         View.stopLoading('jqm-record');
 
                         /*
