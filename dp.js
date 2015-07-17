@@ -1204,13 +1204,13 @@ var route = function(){
                     renderListViewSelects();
                     //retrieveSelectListView(params.listviewid);
                     AjaxPools.retrieveSelectedListView(sobject.name, params.listviewid, function(){
-                        var response = AjaxResponses.listviews[selected_option_id].describe;
+                        var response = AjaxResponses.listviews[params.listviewid].describe;
                         for (var i = response.columns.length - 1; i >= 0; i--) {
                             listview.recordType[response.columns[i].fieldNameOrPath] = response.columns[i].type;
                             listview.recordLabel[response.columns[i].fieldNameOrPath] = response.columns[i].label;
                         };
 
-                        listview.queryresult = AjaxResponses.listviews[selected_option_id].result;//raw.listviewqueryresult;
+                        listview.queryresult = AjaxResponses.listviews[params.listviewid].result;//raw.listviewqueryresult;
                         renderListViewResultList(25);
                         View.stopLoading('jqm-list');
                     });
