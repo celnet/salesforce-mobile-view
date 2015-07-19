@@ -1034,8 +1034,58 @@ var UserAction = {
             };
         };
         
+        var handleWelinkLayout = function(){
+            var _welink_processed = [];
+            if(sobject.welink_layout.layoutSections == undefined)
+                return;
+            for (var i = 0; i < sobject.welink_layout.layoutSections.length; i++) {
+                if(sobject.welink_layout.layoutSections[i].style != 'CustomLinks'){
+                    var _layout_sections = {};
+                    var _layout_columns = sobject.welink_layout.layoutSections[i].layoutColumns;
+                    _layout_sections.editHeading = sobject.welink_layout.layoutSections[i].editHeading;
+                    _layout_sections.detailHeading = sobject.welink_layout.layoutSections[i].detailHeading;
+                    _layout_sections.label = sobject.welink_layout.layoutSections[i].label;
+
+                    var _layout_items = [];
+                    for (var j = 0; j < _layout_columns.length; j++) {
+                        _layout_items = _layout_items.concat(_layout_columns[j].layoutItems);
+                    };
+
+                    var _filtered_layout_items = [];
+                    for (var k = 0; k < _layout_items.length; k++) {
+                        if(_layout_items[k].field != null){
+                            _filtered_layout_items.push(_layout_items[k]);
+
+                            record.welink_required[_layout_items[k].field] = false;
+                            record.welink_edit[_layout_items[k].field] = false;
+                            record.welink_readonly[_layout_items[k].field] = false;
+
+                            switch(_layout_items[k].behavior){
+                                case 'Edit':
+                                    record.welink_edit[_layout_items[k].field] = true;
+                                    break;
+                                case 'Required':
+                                    record.welink_required[_layout_items[k].field] = true;
+                                    break;
+                                case 'Readonly':
+                                    record.welink_readonly[_layout_items[k].field] = true;
+                                    break;
+                                default:
+                                    console.log(_layout_items[k]);
+                            }
+                        }
+                    };
+                    _layout_sections.fields = _filtered_layout_items;
+                    _welink_processed.push(_layout_sections);
+
+                }
+            };
+            return _welink_processed;
+        };
+        
         return {
-            describe:handleDescribe
+            describe:handleDescribe,
+            welinklayout:handleWelinkLayout
         };
     })();
 
@@ -1058,6 +1108,7 @@ var UserAction = {
         View.animateLoading(context.labels.loading,'jqm-list');
         // ListView.retrieveSobjectData();
         AjaxPools.retrieveSobjectRelated(sobject.name, function(){
+            AjaxHandlers.describe();
             ListView.retrieveSobjectData();
         });
     }
@@ -1102,8 +1153,6 @@ var UserAction = {
         }
 
         function handleDescribe(){
-            AjaxHandlers.describe();
-            
             document.querySelector('#jqm-page-title').innerHTML = context.labels.listview;
             document.title = sobject.describe.label;
             document.querySelector('title').innerHTML = sobject.describe.label;
@@ -1554,27 +1603,17 @@ var UserAction = {
         View.animateLoading(context.labels.loading,'jqm-record');
         //RecordNew.retrieveSobjectData();
         AjaxPools.retrieveSobjectRelated(sobject.name, function(){
+            AjaxHandlers.describe();
             RecordNew.retrieveSobjectData();
         });
     }
 
     var initRecordNew = function(){
         function retrieveSobjectData(){
-            AjaxHandlers.describe();
-            //handleDescribe();
             handleSobjectLayouts();
             checkRecordType();
         }
-/*
-        function handleDescribe(){
-            sobject.describe = AjaxResponses.sobjectdescribe;
-
-            for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
-                sobject.fields[sobject.describe.fields[i].name] = sobject.fields[sobject.describe.fields[i].name] || {};
-                sobject.fields[sobject.describe.fields[i].name].describe = sobject.describe.fields[i];
-            };
-        }
-*/
+        
         function handleSobjectLayouts(){
             var response = AjaxResponses.layouts;
             var recordtype_mappings = response.recordTypeMappings;
@@ -1583,7 +1622,6 @@ var UserAction = {
                 case (response.layouts != null && response.layouts.length > 0):
                     console.log('no recordtype, no recordtype select needed');
                     sobject.layout = response.layouts[0];
-                    //record.processed = 
                     record.processed = processLayoutSection();
                     break;
                 case (response.recordTypeSelectorRequired.length > 0 && !response.recordTypeSelectorRequired[0]):
@@ -1612,7 +1650,7 @@ var UserAction = {
                     AjaxPools.retrieveLayoutWithoutRecordType(sobject.name, '', function(){
                         if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                            processWelinkRecordLayout();
+                            record.welink_processed = AjaxHandlers.welinklayout();//processWelinkRecordLayout();
                         }
 
                         renderLayout();
@@ -1630,7 +1668,7 @@ var UserAction = {
 
                         if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                            processWelinkRecordLayout();
+                            record.welink_processed = AjaxHandlers.welinklayout();//processWelinkRecordLayout();
                         }
 
                         renderLayout();
@@ -1684,19 +1722,17 @@ var UserAction = {
                     document.querySelector('#jqm-header-right-button').href = 'javascript:UserAction.saveRecord()';
                     record.recordtypeid = recordtype_options[i].value;
                     record.recordtypename = recordtype_options[i].label;
-                    //retrieveLayoutByRecordTypeId();
 
                     AjaxPools.retrieveLayoutBySelectedRecordType(sobject.name, record.recordtypeid, function(){
                         sobject.layout = AjaxResponses.layout;
                         record.processed = processLayoutSection();
-
-                        //handleSobjectLayoutByRecordTypeId();
+                        
                         handleRecordTypeDetail();
                         handleBusinessProcessDetail();
 
                         if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                            processWelinkRecordLayout();
+                            record.welink_processed = AjaxHandlers.welinklayout();//processWelinkRecordLayout();
                         }
 
                         renderLayout();
@@ -1775,7 +1811,7 @@ var UserAction = {
                 sobject.fields['StageName']['describe'].picklistValues = bp_processed_values;
             }
         }
-
+/*
         function processWelinkRecordLayout(){
             var _welink_processed = [];
             if(sobject.welink_layout.layoutSections == undefined)
@@ -1824,7 +1860,7 @@ var UserAction = {
             };
             record.welink_processed = _welink_processed;
         }
-
+*/
         function processLayoutSection(){
             var edit_layout_sections = sobject.layout.editLayoutSections;
             var converted_layout = [];
@@ -2312,8 +2348,8 @@ var UserAction = {
         Styles.tunePageStyle();
 
         View.animateLoading(context.labels.loading,'jqm-record');
-        //RecordEdit.retrieveSobjectData();
         AjaxPools.retrieveSobjectRelated(sobject.name, function(){
+            AjaxHandlers.describe();
             RecordEdit.retrieveSobjectData();
         });
     }
@@ -2321,15 +2357,6 @@ var UserAction = {
     var initRecordEdit = function(){
 
         function retrieveSobjectData(){
-            /*
-            sobject.describe = AjaxResponses.sobjectdescribe;
-
-            for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
-                sobject.fields[sobject.describe.fields[i].name] = sobject.fields[sobject.describe.fields[i].name] || {};
-                sobject.fields[sobject.describe.fields[i].name].describe = sobject.describe.fields[i];
-            };
-            */
-            AjaxHandlers.describe();
             if(AjaxResponses.has_retrieved_record_related){
                 processRecordRelated();
             } else {
@@ -2349,7 +2376,7 @@ var UserAction = {
             record.layout = AjaxResponses.layout;
 
             if(sobject.welink_layout != null){
-                record.welink_processed = processWelinkRecordLayout();
+                record.welink_processed = AjaxHandlers.welinklayout();// processWelinkRecordLayout();
             } else {
                 record.processed = processRecordLayout();
             }
@@ -2429,7 +2456,7 @@ var UserAction = {
                 sobject.fields['StageName']['describe'].picklistValues = bp_processed_values;
             }
         }
-
+/*
         function processWelinkRecordLayout(){
             var _welink_processed = [];
             if(sobject.welink_layout.layoutSections == undefined)
@@ -2478,7 +2505,7 @@ var UserAction = {
             };
             return _welink_processed;
         }
-
+*/
         function processRecordLayout(){
             var _processed = [];
 
@@ -3051,26 +3078,14 @@ var UserAction = {
 
         View.animateLoading(context.labels.loading,'jqm-record');
 
-        //RecordView.retrieveSobjectData();
         AjaxPools.retrieveSobjectRelated(sobject.name, function(){
+            AjaxHandlers.describe();
             RecordView.retrieveSobjectData();
         });
     }
 
     var initRecordView = function(){
-        /*
-        function handleDescribe(){ // retrieve sobject.describe and sobject.fields
-            sobject.describe = AjaxResponses.sobjectdescribe;
-
-            for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
-                sobject.fields[sobject.describe.fields[i].name] = sobject.fields[sobject.describe.fields[i].name] || {};
-                sobject.fields[sobject.describe.fields[i].name].describe = sobject.describe.fields[i];
-            };
-        }
-*/
         function retrieveSobjectData(){
-            //handleDescribe();
-            AjaxHandlers.describe();
             AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
                 record.detail = AjaxResponses.record;
                 document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
@@ -3078,7 +3093,7 @@ var UserAction = {
 
                 if(AjaxResponses.welinklayout != null){
                     sobject.welink_layout = AjaxResponses.welinklayout;
-                    record.welink_processed = processWelinkRecordLayout();
+                    record.welink_processed = AjaxHandlers.welinklayout();// processWelinkRecordLayout();
 
                     displayWelinkLayout();
                 } else {
@@ -3090,7 +3105,7 @@ var UserAction = {
                  View.stopLoading('jqm-record');
             });
         }
-
+/*
         function processWelinkRecordLayout(){
             var _welink_processed = [];
             if(sobject.welink_layout.layoutSections == undefined)
@@ -3140,7 +3155,7 @@ var UserAction = {
             };
             return _welink_processed;
         }
-
+*/
         function processRecordLayout(){
             var _processed = [];
 
