@@ -145,7 +145,7 @@ var UserAction = {
     } // no loading
 };
 
-    window.params = {
+    var params = {
         mode:'',
         sobject:'',
         referer:'',
@@ -156,7 +156,7 @@ var UserAction = {
         crossref:''
     };
 
-        window.sobject ={
+        var sobject ={
             name: '', // sobject api name
             describe: {},// sobject describe
             fields: {},// field api name : describe infomation
@@ -173,7 +173,7 @@ var UserAction = {
             recordtype_mappings:{}
         };
 
-        window.record = {
+        var record = {
             id:'',
             layout:{},
             detail:{},
@@ -191,18 +191,17 @@ var UserAction = {
             businessprocess_detail:{}
         };
 
-        window.listview = {
+        var listview = {
             recordType:{},
             recordLabel:{},
             queryresult:{}
         };
 
-        window.templates = {};
+        var templates = {};
 
-        window.AjaxResponses = {
+        var AjaxResponses = {
             has_retrieved_sobject_related:false,
             sobjectdescribe:null,
-            listviews:null,
             layouts:null,
             metadata:null,
             searchlayout:null,
@@ -1549,7 +1548,7 @@ var UserAction = {
 
     var RecordNew;
 
-    function renderRecordNew(){
+    var renderRecordNew = function(){
         RecordNew = initRecordNew();
 
         var recordnew_page = templates.record_page_structure;
