@@ -227,11 +227,11 @@ var UserAction = {
             }
         };
         
-        window.setup_objects = [
+        var setup_objects = [
             'AccountTerritoryAssignmentRule','AccountTerritoryAssignmentRuleItem','ApexComponent','ApexPage','BusinessHours','BusinessProcess','CategoryNode','CurrencyType','DatedConversionRate','NetworkMember','ProcessInstance','Profile','RecordType','SelfServiceUser','StaticResource','Territory2','UserAccountTeamMember','UserTerritory','WebLink','FieldPermissions','Group','GroupMember','ObjectPermissions','PermissionSet','PermissionSetAssignment','QueueSObject','ObjectTerritory2AssignmentRule','ObjectTerritory2AssignmentRuleItem','RuleTerritory2Association','SetupEntityAccess','Territory2','Territory2Model','UserTerritory2Association','User','UserRole','UserTerritory','Territory'
             ];
 
-        window.processing = {
+        var processing = {
                 page_scroll_y:0
             };
 
@@ -1024,6 +1024,20 @@ var UserAction = {
             }
         };
     })();
+    
+    var AjaxHandlers = (function(){
+        var handleDescribe = function(){
+            sobject.describe = AjaxResponses.sobjectdescribe;
+            for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
+                sobject.fields[sobject.describe.fields[i].name] = sobject.fields[sobject.describe.fields[i].name] || {};
+                sobject.fields[sobject.describe.fields[i].name].describe = sobject.describe.fields[i];
+            };
+        };
+        
+        return {
+            describe:handleDescribe
+        };
+    })();
 
     var ListView;
 
@@ -1088,7 +1102,8 @@ var UserAction = {
         }
 
         function handleDescribe(){
-            sobject.describe = AjaxResponses.sobjectdescribe;
+            AjaxHandlers.describe();
+            
             document.querySelector('#jqm-page-title').innerHTML = context.labels.listview;
             document.title = sobject.describe.label;
             document.querySelector('title').innerHTML = sobject.describe.label;
@@ -1101,14 +1116,6 @@ var UserAction = {
                     $iframe.off('load').remove();
                 }, 0)
             }).appendTo($body);
-
-            var sobject_fields = sobject.describe.fields;
-
-            for (var i = sobject_fields.length - 1; i >= 0; i--) {
-
-                sobject.fields[sobject_fields[i].name] = sobject.fields[sobject_fields[i].name] || {};
-                sobject.fields[sobject_fields[i].name].describe = sobject_fields[i];
-            };
         }
 
         function handleListViews(){
@@ -1553,11 +1560,12 @@ var UserAction = {
 
     var initRecordNew = function(){
         function retrieveSobjectData(){
-            handleDescribe();
+            AjaxHandlers.describe();
+            //handleDescribe();
             handleSobjectLayouts();
             checkRecordType();
         }
-
+/*
         function handleDescribe(){
             sobject.describe = AjaxResponses.sobjectdescribe;
 
@@ -1566,7 +1574,7 @@ var UserAction = {
                 sobject.fields[sobject.describe.fields[i].name].describe = sobject.describe.fields[i];
             };
         }
-
+*/
         function handleSobjectLayouts(){
             var response = AjaxResponses.layouts;
             var recordtype_mappings = response.recordTypeMappings;
@@ -2313,13 +2321,15 @@ var UserAction = {
     var initRecordEdit = function(){
 
         function retrieveSobjectData(){
+            /*
             sobject.describe = AjaxResponses.sobjectdescribe;
 
             for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
                 sobject.fields[sobject.describe.fields[i].name] = sobject.fields[sobject.describe.fields[i].name] || {};
                 sobject.fields[sobject.describe.fields[i].name].describe = sobject.describe.fields[i];
             };
-
+            */
+            AjaxHandlers.describe();
             if(AjaxResponses.has_retrieved_record_related){
                 processRecordRelated();
             } else {
@@ -3048,7 +3058,8 @@ var UserAction = {
     }
 
     var initRecordView = function(){
-        function handleDescribe(){
+        /*
+        function handleDescribe(){ // retrieve sobject.describe and sobject.fields
             sobject.describe = AjaxResponses.sobjectdescribe;
 
             for (var i = sobject.describe.fields.length - 1; i >= 0; i--) {
@@ -3056,9 +3067,10 @@ var UserAction = {
                 sobject.fields[sobject.describe.fields[i].name].describe = sobject.describe.fields[i];
             };
         }
-
+*/
         function retrieveSobjectData(){
-            handleDescribe();
+            //handleDescribe();
+            AjaxHandlers.describe();
             AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
                 record.detail = AjaxResponses.record;
                 document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
