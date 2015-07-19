@@ -1149,11 +1149,81 @@ var UserAction = {
             return processedLayout;
         };
         
+        var handleRecordTypes = function(){
+            record.recordtype_detail = AjaxResponses.recordtype;//JSON.parse(window.atob(result));
+            var bp_values = [];
+
+            if(record.recordtype_detail != null){
+                for (var i = 0; i < record.recordtype_detail.length; i++) {
+                    if(record.recordtype_detail[i].fullName != null && record.recordtype_detail[i].label == record.recordtypename){
+                        bp_values = record.recordtype_detail[i].picklistValues;
+                        record.selected_recordtype_detail = record.recordtype_detail[i];
+                        break;
+                    }
+                };
+            }
+
+            for (var i = 0; i < bp_values.length; i++) {
+                var rt_values = [];
+                for (var j = bp_values[i].values.length - 1; j >= 0; j--) {
+                    var bp_value = {
+                        active: true,
+                        defaultValue: bp_values[i].values[j].default_x,
+                        label: window.decodeURIComponent(bp_values[i].values[j].fullName),
+                        validFor:null,
+                        value: window.decodeURIComponent(bp_values[i].values[j].fullName)
+                    };
+                    rt_values.push(bp_value);
+                };
+                
+                if(sobject.fields[bp_values[i].picklist] != null)
+                sobject.fields[bp_values[i].picklist].describe.picklistValues = rt_values;
+            };
+        };
+        
+        var handleBusinessProcesses = function(){
+            if(sobject.name != 'Opportunity'){
+                return;
+            }
+
+            var result = AjaxResponses.businessprocess;
+            console.log('remoting business process');
+            record.businessprocess_detail = result;//JSON.parse(window.atob(result));
+
+            var bp_values = [];
+            var bp_processed_values = [];
+
+            if(record.businessprocess_detail != null)
+            for (var i = 0; i < record.businessprocess_detail.length; i++) {
+                if(record.businessprocess_detail[i].fullName != null && record.businessprocess_detail[i].fullName == record.selected_recordtype_detail.businessProcess){
+                    bp_values = record.businessprocess_detail[i].values;
+                    break;
+                }
+            };
+
+            for (var i = bp_values.length - 1; i >= 0; i--) {
+                var bp_value = {
+                    active: true,
+                    defaultValue: false,
+                    label: window.decodeURIComponent(bp_values[i].fullName),
+                    validFor: null,
+                    value: window.decodeURIComponent(bp_values[i].fullName)
+                };
+                bp_processed_values.push(bp_value);
+            };
+
+            if(sobject.name == 'Opportunity'){
+                sobject.fields['StageName']['describe'].picklistValues = bp_processed_values;
+            }
+        };
+        
         return {
             describe:handleDescribe,
             welinklayout:handleWelinkLayout,
             layout:handleLayout,
-            viewlayout:handleViewLayout
+            viewlayout:handleViewLayout,
+            recordTypes:handleRecordTypes,
+            businessProcesses:handleBusinessProcesses
         };
     })();
 
@@ -1731,8 +1801,11 @@ var UserAction = {
                         record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);//processLayoutSection();
 
                         //handleSobjectLayoutByRecordTypeId();
-                        handleRecordTypeDetail();
-                        handleBusinessProcessDetail();
+                        //handleRecordTypeDetail();
+                        //handleBusinessProcessDetail();
+                        
+                        AjaxHandlers.recordTypes();
+                        AjaxHandlers.businessProcesses();
 
                         if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
@@ -1795,8 +1868,11 @@ var UserAction = {
                         sobject.layout = AjaxResponses.layout;
                         record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);//processLayoutSection();
                         
-                        handleRecordTypeDetail();
-                        handleBusinessProcessDetail();
+                        //handleRecordTypeDetail();
+                        //handleBusinessProcessDetail();
+                        
+                        AjaxHandlers.recordTypes();
+                        AjaxHandlers.businessProcesses();
 
                         if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
@@ -1878,41 +1954,7 @@ var UserAction = {
                 sobject.fields['StageName']['describe'].picklistValues = bp_processed_values;
             }
         }
-        /*
-        function processLayoutSection(){
-            var edit_layout_sections = sobject.layout.editLayoutSections;
-            var converted_layout = [];
-            
-            for(var i = 0; i < edit_layout_sections.length; i++){
-                var converted_section = {};
-                converted_section.heading = edit_layout_sections[i].heading;
-                converted_section.useHeading = edit_layout_sections[i].useHeading;
-                converted_section.rows = convertLayoutRows(edit_layout_sections[i].layoutRows);
-                converted_layout.push(converted_section);
-            }
-            
-            //record.processed = converted_layout;
-            return converted_layout;
-        }
         
-        function convertLayoutRows(layout_rows){
-            var converted = [];
-            for(var i = 0; i < layout_rows.length; i++){
-                converted = converted.concat(convertLayoutRowItems(layout_rows[i].layoutItems));
-            }
-            return converted;
-        }
-        
-        function convertLayoutRowItems(layout_items){
-            var converted = [];
-            for(var i = 0; i < layout_items.length; i++){
-                if(layout_items[i].layoutComponents != null && layout_items[i].layoutComponents.length > 0 && layout_items[i].layoutComponents[0].type == 'Field'){
-                    converted.push(layout_items[i]);
-                }
-            }
-            return converted;
-        }
-*/
         function processFieldsDisplay(_row, _is_welink_layout){
             var sobject_name = sobject.name;
 
@@ -2396,7 +2438,7 @@ var UserAction = {
             if(sobject.welink_layout != null){
                 record.welink_processed = AjaxHandlers.welinklayout();
             } else {
-                record.processed = AjaxHandlers.layout(record.layout.editLayoutSections);//processRecordLayout();
+                record.processed = AjaxHandlers.layout(record.layout.editLayoutSections);
             }
 
             displayLayout();
@@ -2474,43 +2516,6 @@ var UserAction = {
             }
         }
         
-        function processRecordLayout(){
-            var _processed = [];
-
-            var _record_editLayoutSections = record.layout.editLayoutSections;
-            
-            for(var i = 0; i < _record_editLayoutSections.length; i++){
-                var _section = {};
-                _section.heading = _record_editLayoutSections[i].heading;
-                _section.useHeading = _record_editLayoutSections[i].useHeading;
-                _section.rows = processRecordLayoutRows(_record_editLayoutSections[i].layoutRows);
-                _processed.push(_section);
-            }
-            
-            return _processed;
-        }
-
-        function processRecordLayoutRows(layout_rows){
-            var _rows = [];
-            
-            for(var i = 0; i < layout_rows.length; i++){
-                _rows = _rows.concat(processRecordLayoutItems(layout_rows[i].layoutItems));
-            }
-            
-            return _rows;
-        }
-
-        function processRecordLayoutItems(layout_items){
-            var _items = [];
-            for(var i = 0; i < layout_items.length; i++){
-                if(layout_items[i].layoutComponents != null && layout_items[i].layoutComponents.length > 0 && layout_items[i].layoutComponents[0].type == 'Field'){
-                    _items.push(layout_items[i]);
-                }
-            }
-            
-            return _items;
-        }
-
         function processFieldsDisplay(_row, _is_welink_layout){
             var _timezone = context.timezone;
             var _field_name = _is_welink_layout?_row:_row.layoutComponents[0].details.name;
@@ -3019,8 +3024,6 @@ var UserAction = {
 
     function renderRecordView(){
         RecordView = initRecordView();
-
-        //document.querySelector('body').innerHTML = templates.record_page_structure.replace(/{{page}}/g,'view');
         document.querySelector('body').innerHTML = templates.record_page_structure;//.replace(/{{page}}/g,'view');
 
         document.querySelector('#jqm-header-left-button')['href'] = "javascript:UserAction.viewList('jqm-record')";
@@ -3066,49 +3069,12 @@ var UserAction = {
                     displayWelinkLayout();
                 } else {
                     record.layout = AjaxResponses.layout;
-                    record.processed = AjaxHandlers.viewlayout(record.layout.detailLayoutSections);//processRecordLayout();
+                    record.processed = AjaxHandlers.viewlayout(record.layout.detailLayoutSections);
                     
                     displayLayout();
                 }
                  View.stopLoading('jqm-record');
             });
-        }
-        
-        function processRecordLayout(){
-            var _processed = [];
-
-            var _record_detailLayoutSections = record.layout.detailLayoutSections;
-            
-            for(var i = 0; i < _record_detailLayoutSections.length; i++){
-                var _section = {};
-                _section.heading = _record_detailLayoutSections[i].heading;
-                _section.useHeading = _record_detailLayoutSections[i].useHeading;
-                _section.rows = processRecordLayoutRows(_record_detailLayoutSections[i].layoutRows);
-                _processed.push(_section);
-            }
-            
-            return _processed;
-        }
-
-        function processRecordLayoutRows(layout_rows){
-            var _rows = [];
-            
-            for(var i = 0; i < layout_rows.length; i++){
-                _rows = _rows.concat(processRecordLayoutItems(layout_rows[i].layoutItems));
-            }
-            
-            return _rows;
-        }
-
-        function processRecordLayoutItems(layout_items){
-            var _items = [];
-            for(var i = 0; i < layout_items.length; i++){
-                if(layout_items[i].layoutComponents != null && layout_items[i].layoutComponents.length > 0 && layout_items[i].layoutComponents[0].type == 'Field'){
-                    _items.push(layout_items[i].layoutComponents[0].details);
-                }
-            }
-            
-            return _items;
         }
 
         function displayLayout(){
