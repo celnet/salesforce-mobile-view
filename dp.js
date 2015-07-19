@@ -1083,9 +1083,77 @@ var UserAction = {
             return _welink_processed;
         };
         
+        var handleLayout = function(layoutSections){
+            
+            var processRows = function(rows){
+                var processed = [];
+                for(var i = 0; i < rows.length; i++){
+                    processed = processed.concat(processItems(rows[i].layoutItems));
+                }
+                return processed;
+            };
+            
+            var processItems = function(items){
+                var processed = [];
+                for(var i = 0; i < items.length; i++){
+                    if(items[i].layoutComponents != null && items[i].layoutComponents.length > 0 && items[i].layoutComponents[0].type == 'Field'){
+                        processed.push(items[i]);
+                    }
+                }
+                return processed;
+            };
+            
+            var processedLayout = [];
+            
+            for(var i = 0; i < layoutSections.length; i++){
+                var section = {};
+                section.heading = layoutSections[i].heading;
+                section.useHeading = layoutSections[i].useHeading;
+                section.rows = processRows(layoutSections[i].layoutRows);
+                processedLayout.push(section);
+            }
+            
+            return processedLayout;
+        };
+        
+        var handleViewLayout = function(layoutSections){
+            
+             var processRows = function(rows){
+                var processed = [];
+                for(var i = 0; i < rows.length; i++){
+                    processed = processed.concat(processItems(rows[i].layoutItems));
+                }
+                return processed;
+            };
+            
+            var processItems = function(items){
+                var processed = [];
+                for(var i = 0; i < items.length; i++){
+                    if(items[i].layoutComponents != null && items[i].layoutComponents.length > 0 && items[i].layoutComponents[0].type == 'Field'){
+                        processed.push(items[i].layoutComponents[0].details);
+                    }
+                }
+                return processed;
+            };
+            
+            var processedLayout = [];
+            
+            for(var i = 0; i < layoutSections.length; i++){
+                var section = {};
+                section.heading = layoutSections[i].heading;
+                section.useHeading = layoutSections[i].useHeading;
+                section.rows = processRows(layoutSections[i].layoutRows);
+                processedLayout.push(section);
+            }
+            
+            return processedLayout;
+        };
+        
         return {
             describe:handleDescribe,
-            welinklayout:handleWelinkLayout
+            welinklayout:handleWelinkLayout,
+            layout:handleLayout,
+            viewlayout:handleViewLayout
         };
     })();
 
@@ -1622,7 +1690,7 @@ var UserAction = {
                 case (response.layouts != null && response.layouts.length > 0):
                     console.log('no recordtype, no recordtype select needed');
                     sobject.layout = response.layouts[0];
-                    record.processed = processLayoutSection();
+                    record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);//processLayoutSection();
                     break;
                 case (response.recordTypeSelectorRequired.length > 0 && !response.recordTypeSelectorRequired[0]):
                     console.log('use default recordtype, no recordtype select needed');
@@ -1650,7 +1718,7 @@ var UserAction = {
                     AjaxPools.retrieveLayoutWithoutRecordType(sobject.name, '', function(){
                         if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                            record.welink_processed = AjaxHandlers.welinklayout();//processWelinkRecordLayout();
+                            record.welink_processed = AjaxHandlers.welinklayout();
                         }
 
                         renderLayout();
@@ -1660,7 +1728,7 @@ var UserAction = {
                     //retrieveLayoutByRecordTypeId();
                     AjaxPools.retrieveLayoutBySelectedRecordType(sobject.name, record.recordtypeid, function(){
                         sobject.layout = AjaxResponses.layout;
-                        record.processed = processLayoutSection();
+                        record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);//processLayoutSection();
 
                         //handleSobjectLayoutByRecordTypeId();
                         handleRecordTypeDetail();
@@ -1668,7 +1736,7 @@ var UserAction = {
 
                         if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                            record.welink_processed = AjaxHandlers.welinklayout();//processWelinkRecordLayout();
+                            record.welink_processed = AjaxHandlers.welinklayout();
                         }
 
                         renderLayout();
@@ -1725,14 +1793,14 @@ var UserAction = {
 
                     AjaxPools.retrieveLayoutBySelectedRecordType(sobject.name, record.recordtypeid, function(){
                         sobject.layout = AjaxResponses.layout;
-                        record.processed = processLayoutSection();
+                        record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);//processLayoutSection();
                         
                         handleRecordTypeDetail();
                         handleBusinessProcessDetail();
 
                         if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                            record.welink_processed = AjaxHandlers.welinklayout();//processWelinkRecordLayout();
+                            record.welink_processed = AjaxHandlers.welinklayout();
                         }
 
                         renderLayout();
@@ -1745,7 +1813,6 @@ var UserAction = {
             console.log('record type detail');
             record.recordtype_detail = AjaxResponses.recordtype;//JSON.parse(window.atob(result));
             var bp_values = [];
-            var processed_rt_values = [];
 
             if(record.recordtype_detail != null){
                 for (var i = 0; i < record.recordtype_detail.length; i++) {
@@ -1811,56 +1878,7 @@ var UserAction = {
                 sobject.fields['StageName']['describe'].picklistValues = bp_processed_values;
             }
         }
-/*
-        function processWelinkRecordLayout(){
-            var _welink_processed = [];
-            if(sobject.welink_layout.layoutSections == undefined)
-                return;
-            for (var i = 0; i < sobject.welink_layout.layoutSections.length; i++) {
-                if(sobject.welink_layout.layoutSections[i].style != 'CustomLinks'){
-                    var _layout_sections = {};
-                    var _layout_columns = sobject.welink_layout.layoutSections[i].layoutColumns;
-                    _layout_sections.editHeading = sobject.welink_layout.layoutSections[i].editHeading;
-                    _layout_sections.detailHeading = sobject.welink_layout.layoutSections[i].detailHeading;
-                    _layout_sections.label = sobject.welink_layout.layoutSections[i].label;
-
-                    var _layout_items = [];
-                    for (var j = 0; j < _layout_columns.length; j++) {
-                        _layout_items = _layout_items.concat(_layout_columns[j].layoutItems);
-                    };
-
-                    var _filtered_layout_items = [];
-                    for (var k = 0; k < _layout_items.length; k++) {
-                        if(_layout_items[k].field != null){
-                            _filtered_layout_items.push(_layout_items[k]);
-
-                            record.welink_required[_layout_items[k].field] = false;
-                            record.welink_edit[_layout_items[k].field] = false;
-                            record.welink_readonly[_layout_items[k].field] = false;
-
-                            switch(_layout_items[k].behavior){
-                                case 'Edit':
-                                    record.welink_edit[_layout_items[k].field] = true;
-                                    break;
-                                case 'Required':
-                                    record.welink_required[_layout_items[k].field] = true;
-                                    break;
-                                case 'Readonly':
-                                    record.welink_readonly[_layout_items[k].field] = true;
-                                    break;
-                                default:
-                                    console.log(_layout_items[k]);
-                            }
-                        }
-                    };
-                    _layout_sections.fields = _filtered_layout_items;
-                    _welink_processed.push(_layout_sections);
-
-                }
-            };
-            record.welink_processed = _welink_processed;
-        }
-*/
+        /*
         function processLayoutSection(){
             var edit_layout_sections = sobject.layout.editLayoutSections;
             var converted_layout = [];
@@ -1894,7 +1912,7 @@ var UserAction = {
             }
             return converted;
         }
-
+*/
         function processFieldsDisplay(_row, _is_welink_layout){
             var sobject_name = sobject.name;
 
@@ -2376,9 +2394,9 @@ var UserAction = {
             record.layout = AjaxResponses.layout;
 
             if(sobject.welink_layout != null){
-                record.welink_processed = AjaxHandlers.welinklayout();// processWelinkRecordLayout();
+                record.welink_processed = AjaxHandlers.welinklayout();
             } else {
-                record.processed = processRecordLayout();
+                record.processed = AjaxHandlers.layout(record.layout.editLayoutSections);//processRecordLayout();
             }
 
             displayLayout();
@@ -2387,9 +2405,8 @@ var UserAction = {
 
         function handleRecordTypeDetail(){
             console.log('record type detail');
-            record.recordtype_detail = AjaxResponses.recordtype;//JSON.parse(window.atob(result));
+            record.recordtype_detail = AjaxResponses.recordtype;
             var bp_values = [];
-            var processed_rt_values = [];
 
             if(record.recordtype_detail != null){
                 for (var i = 0; i < record.recordtype_detail.length; i++) {
@@ -2456,56 +2473,7 @@ var UserAction = {
                 sobject.fields['StageName']['describe'].picklistValues = bp_processed_values;
             }
         }
-/*
-        function processWelinkRecordLayout(){
-            var _welink_processed = [];
-            if(sobject.welink_layout.layoutSections == undefined)
-                return;
-            for (var i = 0; i < sobject.welink_layout.layoutSections.length; i++) {
-                if(sobject.welink_layout.layoutSections[i].style != 'CustomLinks'){
-                    var _layout_sections = {};
-                    var _layout_columns = sobject.welink_layout.layoutSections[i].layoutColumns;
-                    _layout_sections.editHeading = sobject.welink_layout.layoutSections[i].editHeading;
-                    _layout_sections.detailHeading = sobject.welink_layout.layoutSections[i].detailHeading;
-                    _layout_sections.label = sobject.welink_layout.layoutSections[i].label;
-
-                    var _layout_items = [];
-                    for (var j = 0; j < _layout_columns.length; j++) {
-                        _layout_items = _layout_items.concat(_layout_columns[j].layoutItems);
-                    };
-
-                    var _filtered_layout_items = [];
-                    for (var k = 0; k < _layout_items.length; k++) {
-                        if(_layout_items[k].field != null){
-                            _filtered_layout_items.push(_layout_items[k]);
-
-                            record.welink_required[_layout_items[k].field] = false;
-                            record.welink_edit[_layout_items[k].field] = false;
-                            record.welink_readonly[_layout_items[k].field] = false;
-
-                            switch(_layout_items[k].behavior){
-                                case 'Edit':
-                                    record.welink_edit[_layout_items[k].field] = true;
-                                    break;
-                                case 'Required':
-                                    record.welink_required[_layout_items[k].field] = true;
-                                    break;
-                                case 'Readonly':
-                                    record.welink_readonly[_layout_items[k].field] = true;
-                                    break;
-                                default:
-                                    console.log(_layout_items[k]);
-                            }
-                        }
-                    };
-                    _layout_sections.fields = _filtered_layout_items;
-                    _welink_processed.push(_layout_sections);
-
-                }
-            };
-            return _welink_processed;
-        }
-*/
+        
         function processRecordLayout(){
             var _processed = [];
 
@@ -3093,69 +3061,19 @@ var UserAction = {
 
                 if(AjaxResponses.welinklayout != null){
                     sobject.welink_layout = AjaxResponses.welinklayout;
-                    record.welink_processed = AjaxHandlers.welinklayout();// processWelinkRecordLayout();
+                    record.welink_processed = AjaxHandlers.welinklayout();
 
                     displayWelinkLayout();
                 } else {
                     record.layout = AjaxResponses.layout;
-                    record.processed = processRecordLayout();
+                    record.processed = AjaxHandlers.viewlayout(record.layout.detailLayoutSections);//processRecordLayout();
                     
                     displayLayout();
                 }
                  View.stopLoading('jqm-record');
             });
         }
-/*
-        function processWelinkRecordLayout(){
-            var _welink_processed = [];
-            if(sobject.welink_layout.layoutSections == undefined)
-                return;
-            for (var i = 0; i < sobject.welink_layout.layoutSections.length; i++) {
-                if(sobject.welink_layout.layoutSections[i].style != 'CustomLinks'){
-                    var _layout_sections = {};
-                    var _layout_columns = sobject.welink_layout.layoutSections[i].layoutColumns;
-                    _layout_sections.editHeading = sobject.welink_layout.layoutSections[i].editHeading;
-                    _layout_sections.detailHeading = sobject.welink_layout.layoutSections[i].detailHeading;
-                    _layout_sections.label = sobject.welink_layout.layoutSections[i].label;
-
-                    var _layout_items = [];
-                    for (var j = 0; j < _layout_columns.length; j++) {
-                        _layout_items = _layout_items.concat(_layout_columns[j].layoutItems);
-                    };
-
-                    var _filtered_layout_items = [];
-                    for (var k = 0; k < _layout_items.length; k++) {
-                        if(_layout_items[k].field != null){
-                            _filtered_layout_items.push(_layout_items[k]);
-                            
-                            record.welink_required[_layout_items[k].field] = false;
-                            record.welink_edit[_layout_items[k].field] = false;
-                            record.welink_readonly[_layout_items[k].field] = false;
-
-                            switch(_layout_items[k].behavior){
-                                case 'Edit':
-                                    record.welink_edit[_layout_items[k].field] = true;
-                                    break;
-                                case 'Required':
-                                    record.welink_required[_layout_items[k].field] = true;
-                                    break;
-                                case 'Readonly':
-                                    record.welink_readonly[_layout_items[k].field] = true;
-                                    break;
-                                default:
-                                    console.log(_layout_items[k]);
-                            }
-                            
-                        }
-                    };
-                    _layout_sections.fields = _filtered_layout_items;
-                    _welink_processed.push(_layout_sections);
-
-                }
-            };
-            return _welink_processed;
-        }
-*/
+        
         function processRecordLayout(){
             var _processed = [];
 
