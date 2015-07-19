@@ -1784,7 +1784,6 @@ var UserAction = {
                     renderRecordTypeSelect();
                     break;
                 case '': // has no record type, direct to next step
-                    //retrieveWelinkLayoutId();
                     AjaxPools.retrieveLayoutWithoutRecordType(sobject.name, '', function(){
                         if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
@@ -1795,15 +1794,10 @@ var UserAction = {
                     });
                     break;
                 default: // has given record type, direct to next step
-                    //retrieveLayoutByRecordTypeId();
                     AjaxPools.retrieveLayoutBySelectedRecordType(sobject.name, record.recordtypeid, function(){
                         sobject.layout = AjaxResponses.layout;
-                        record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);//processLayoutSection();
+                        record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
 
-                        //handleSobjectLayoutByRecordTypeId();
-                        //handleRecordTypeDetail();
-                        //handleBusinessProcessDetail();
-                        
                         AjaxHandlers.recordTypes();
                         AjaxHandlers.businessProcesses();
 
@@ -1868,9 +1862,6 @@ var UserAction = {
                         sobject.layout = AjaxResponses.layout;
                         record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);//processLayoutSection();
                         
-                        //handleRecordTypeDetail();
-                        //handleBusinessProcessDetail();
-                        
                         AjaxHandlers.recordTypes();
                         AjaxHandlers.businessProcesses();
 
@@ -1882,76 +1873,6 @@ var UserAction = {
                         renderLayout();
                     });
                 }
-            }
-        }
-
-        function handleRecordTypeDetail(){
-            console.log('record type detail');
-            record.recordtype_detail = AjaxResponses.recordtype;//JSON.parse(window.atob(result));
-            var bp_values = [];
-
-            if(record.recordtype_detail != null){
-                for (var i = 0; i < record.recordtype_detail.length; i++) {
-                    if(record.recordtype_detail[i].fullName != null && record.recordtype_detail[i].label == record.recordtypename){
-                        bp_values = record.recordtype_detail[i].picklistValues;
-                        record.selected_recordtype_detail = record.recordtype_detail[i];
-                        break;
-                    }
-                };
-            }
-
-            for (var i = 0; i < bp_values.length; i++) {
-                var rt_values = [];
-                for (var j = bp_values[i].values.length - 1; j >= 0; j--) {
-                    var bp_value = {
-                        active: true,
-                        defaultValue: bp_values[i].values[j].default_x,
-                        label: window.decodeURIComponent(bp_values[i].values[j].fullName),
-                        validFor:null,
-                        value: window.decodeURIComponent(bp_values[i].values[j].fullName)
-                    };
-                    rt_values.push(bp_value);
-                };
-                console.log(bp_values);
-                console.log(i);
-                if(sobject.fields[bp_values[i].picklist] != null)
-                sobject.fields[bp_values[i].picklist].describe.picklistValues = rt_values;
-            };
-        }
-
-        function handleBusinessProcessDetail(){
-            if(sobject.name != 'Opportunity'){
-                return;
-            }
-
-            var result = AjaxResponses.businessprocess;
-            console.log('remoting business process');
-            record.businessprocess_detail = result;//JSON.parse(window.atob(result));
-
-            var bp_values = [];
-            var bp_processed_values = [];
-
-            if(record.businessprocess_detail != null)
-            for (var i = 0; i < record.businessprocess_detail.length; i++) {
-                if(record.businessprocess_detail[i].fullName != null && record.businessprocess_detail[i].fullName == record.selected_recordtype_detail.businessProcess){
-                    bp_values = record.businessprocess_detail[i].values;
-                    break;
-                }
-            };
-
-            for (var i = bp_values.length - 1; i >= 0; i--) {
-                var bp_value = {
-                    active: true,
-                    defaultValue: false,
-                    label: window.decodeURIComponent(bp_values[i].fullName),
-                    validFor: null,
-                    value: window.decodeURIComponent(bp_values[i].fullName)
-                };
-                bp_processed_values.push(bp_value);
-            };
-
-            if(sobject.name == 'Opportunity'){
-                sobject.fields['StageName']['describe'].picklistValues = bp_processed_values;
             }
         }
         
@@ -2443,77 +2364,6 @@ var UserAction = {
 
             displayLayout();
             View.stopLoading('jqm-record');
-        }
-
-        function handleRecordTypeDetail(){
-            console.log('record type detail');
-            record.recordtype_detail = AjaxResponses.recordtype;
-            var bp_values = [];
-
-            if(record.recordtype_detail != null){
-                for (var i = 0; i < record.recordtype_detail.length; i++) {
-                    if(record.recordtype_detail[i].fullName != null && record.recordtype_detail[i].label == record.recordtypename){
-                        bp_values = record.recordtype_detail[i].picklistValues;
-                        record.selected_recordtype_detail = record.recordtype_detail[i];
-                        break;
-                    }
-                };
-            }
-
-            for (var i = 0; i < bp_values.length; i++) {
-                var rt_values = [];
-                for (var j = bp_values[i].values.length - 1; j >= 0; j--) {
-                    var bp_value = {
-                        active: true,
-                        defaultValue: bp_values[i].values[j].default_x,
-                        label: window.decodeURIComponent(bp_values[i].values[j].fullName),
-                        validFor:null,
-                        value: window.decodeURIComponent(bp_values[i].values[j].fullName)
-                    };
-                    rt_values.push(bp_value);
-                };
-                console.log(bp_values);
-                console.log(i);
-
-                if(sobject.fields[bp_values[i].picklist] != null)
-                sobject.fields[bp_values[i].picklist].describe.picklistValues = rt_values;
-            };
-        }
-
-        function handleBusinessProcessDetail(){
-            if(sobject.name != 'Opportunity'){
-                return;
-            }
-
-            var result = AjaxResponses.businessprocess;
-            console.log('remoting business process');
-            record.businessprocess_detail = result;//JSON.parse(window.atob(result));
-
-            var bp_values = [];
-            var bp_processed_values = [];
-
-            if(record.businessprocess_detail != null)
-            for (var i = 0; i < record.businessprocess_detail.length; i++) {
-                if(record.businessprocess_detail[i].fullName != null && record.businessprocess_detail[i].fullName == record.selected_recordtype_detail.businessProcess){
-                    bp_values = record.businessprocess_detail[i].values;
-                    break;
-                }
-            };
-
-            for (var i = bp_values.length - 1; i >= 0; i--) {
-                var bp_value = {
-                    active: true,
-                    defaultValue: false,
-                    label: window.decodeURIComponent(bp_values[i].fullName),
-                    validFor: null,
-                    value: window.decodeURIComponent(bp_values[i].fullName)
-                };
-                bp_processed_values.push(bp_value);
-            };
-
-            if(sobject.name == 'Opportunity'){
-                sobject.fields['StageName']['describe'].picklistValues = bp_processed_values;
-            }
         }
         
         function processFieldsDisplay(_row, _is_welink_layout){
