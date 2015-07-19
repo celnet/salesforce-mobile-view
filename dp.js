@@ -653,14 +653,6 @@ var UserAction = {
                 function(response){
                     AjaxResponses.record = response;
                     retrieveReferences(sobjectName, recordId, callbackFunction);
-                    //retrieveWelinkLayoutId(sobjectName, recordId, callbackFunction);
-                    /* if without welink layout, use this
-                    if(response.RecordTypeId != null){
-                        retrieveLayoutByRecordType(sobjectName, response.RecordTypeId, callbackFunction);
-                    } else {
-                        retrieveLayoutWithoutRecordType(sobjectName, callbackFunction);
-                    }
-                    */
                 }
             );
         }
@@ -734,7 +726,6 @@ var UserAction = {
                     record.references[ref_fields[i]] = refvalue;
                 }
             }
-            //doFinish();
             retrieveWelinkLayoutId(sobjectName, recordId, doFinish);
             //View.stopLoading('jqm-record');
         };
@@ -760,19 +751,6 @@ var UserAction = {
                     } else {
                         retrieveLayoutWithoutRecordType(sobjectName, callbackFunction);
                     }
-                }
-            );
-        }
-
-        var retrieveWelinkLayoutIdByRecordTypeId = function(sobjectName, recordTypeId, callbackFunction){
-            Ajax.remoting(
-                'retrieveSobjectWelinkLayoutIdByRecordTypeId',
-                [sobjectName || '',recordTypeId || ''],
-                function(result){
-                    AjaxResponses.welinklayoutid = result;
-                },
-                function(result, event){
-                    console.log(event);
                 }
             );
         }
@@ -1278,8 +1256,6 @@ var UserAction = {
                 } else {
                     options += option.replace('{{selected}}','');
                 }
-
-                //options += option_template.replace('{{option-value}}',sobject.ordered_listviews[i].id).replace('{{option-label}}',sobject.ordered_listviews[i].label);
             };
 
             var listview_select = templates.listview_select.replace('{{select-listview}}',context.labels.select_listview);
