@@ -1049,6 +1049,7 @@ var UserAction = {
             },
 
             retrieveSobjectRelated:function(sobjectName, callbackFunction){
+                /*
                 if(welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] == 'true'){
                     AjaxResponses.sobjectdescribe = JSON.parse(welinkStorage['welink_' + sobjectName + '_sobjectdescribe']);
                     AjaxResponses.listviews = JSON.parse(welinkStorage['welink_' + sobjectName + '_listviews']);
@@ -1062,13 +1063,13 @@ var UserAction = {
                 } else {
                     retrieveDescribe(sobjectName, callbackFunction);
                 }
-                /*
+                */
+                
                 if(AjaxResponses.has_retrieved_sobject_related){
                     callbackFunction();
                 } else {
                     retrieveDescribe(sobjectName, callbackFunction);
                 }
-                */
             },
 
             retrieveRecentlyViewed:function(callbackFunction){
