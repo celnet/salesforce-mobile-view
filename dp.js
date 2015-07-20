@@ -2458,7 +2458,7 @@ var UserAction = {
                 }
             } 
 
-            if((_is_welink_layout && _field_required) || (_field_editable && _field_required)){
+            if((_is_welink_layout && _field_required) || (_field_editable && _field_required) || _details.name == 'OwnerId'){
                 _field_label = '<span style="color:crimson">*</span>' + _field_label;
             } else {
                 _field_label = '<span>&nbsp;</span>' + _field_label;
