@@ -1049,7 +1049,6 @@ var UserAction = {
             },
 
             retrieveSobjectRelated:function(sobjectName, callbackFunction){
-                /*
                 if(welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] == 'true'){
                     AjaxResponses.sobjectdescribe = JSON.parse(welinkStorage['welink_' + sobjectName + '_sobjectdescribe']);
                     AjaxResponses.listviews = JSON.parse(welinkStorage['welink_' + sobjectName + '_listviews']);
@@ -1063,13 +1062,13 @@ var UserAction = {
                 } else {
                     retrieveDescribe(sobjectName, callbackFunction);
                 }
-                */
-                
+                /*
                 if(AjaxResponses.has_retrieved_sobject_related){
                     callbackFunction();
                 } else {
                     retrieveDescribe(sobjectName, callbackFunction);
                 }
+                */
             },
 
             retrieveRecentlyViewed:function(callbackFunction){
@@ -1321,7 +1320,7 @@ var UserAction = {
         function retrieveSobjectData(){
             handleDescribe();
             handleListViews();
-            handleSearchLayout();
+            sobject.search_layout_fields = AjaxResponses.searchlayout[0].searchColumns;
             handleMetadata();
             handleRecentlyViewed();
 
@@ -1375,10 +1374,6 @@ var UserAction = {
             for (var i = 0; i < sobject.listviews.listviews.length; i++) {
                 sobject.listviewsmap[sobject.listviews.listviews[i].id] = sobject.listviews.listviews[i];
             };
-        }
-
-        function handleSearchLayout(){
-            sobject.search_layout_fields = AjaxResponses.searchlayout[0].searchColumns;
         }
 
         function handleMetadata(){
