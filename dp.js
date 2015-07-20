@@ -137,6 +137,7 @@ var UserAction = {
 
     saveRecord:function(){
         var form_dataset = RecordForm.construct();
+        if(form_dataset != '')
         RecordForm.save(form_dataset);
     }, // loading
 
@@ -467,8 +468,33 @@ var UserAction = {
     };
 
     var RecordForm = {
-        validate:function(){
+        validate:function(field_name, field_value){
+            if(document.querySelector('label[for="record-field-' + field_name + '"] span') != null && (field_value == null || field_value == '')){
+                document.querySelector('#record-field-' + field_name).focus();
+                document.querySelector('#record-field-' + field_name).style.backgroundColor = 'pink';
 
+                var errorNode = document.createElement('div');
+                errorNode.id = 'error-message-' + field_name;
+                errorNode.style.textAlign = 'center';
+                errorNode.style.color = 'crimson';
+                var errorNodeText = document.createTextNode('必填');
+                errorNode.appendChild(errorNodeText);
+
+
+                if(document.querySelector('#error-message-' + field_name) == null){
+                    document.querySelector('#record-field-' + field_name).parentNode.parentNode.insertBefore(errorNode,document.querySelector('#record-field-' + field_name).parentNode);
+                }
+                
+
+                document.querySelector('#record-field-' + field_name).addEventListener('change',function(){
+                    document.querySelector('#record-field-' + field_name).style.backgroundColor = 'white';
+                    document.querySelector('#error-message-' + field_name).parentNode.removeChild(document.querySelector('#error-message-' + field_name));
+                });
+                
+                return false;
+            } else {
+                return true;
+            }
         },
 
         construct:function(){
@@ -517,6 +543,10 @@ var UserAction = {
                     default:
                         field_value = form_inputs[i].value;
                 }
+                
+                if(!RecordForm.validate(field_name,field_value)){
+                    return '';
+                }
 
                 form_dataset[field_name] = field_value;
             };
@@ -541,6 +571,10 @@ var UserAction = {
                 if(field_value == '--None--'){
                     field_value = '';
                 }
+                
+                if(!RecordForm.validate(field_name,field_value)){
+                    return '';
+                }
 
                 form_dataset[field_name] = field_value;
             };
@@ -548,7 +582,11 @@ var UserAction = {
             for (var i = 0; i < form_textareas.length; i++) {
                 var field_name = form_textareas[i].id.substring(13);
                 var field_value = form_textareas[i].value;
-
+                
+                if(!RecordForm.validate(field_name,field_value)){
+                    return '';
+                }
+                
                 form_dataset[field_name] = field_value;
             };
 
