@@ -1,3 +1,5 @@
+var welinkStorage = window.localStorage || {};
+
 if(window.location.search.indexOf('sobject') > -1 && window.location.search.indexOf('mode') < 0){
     window.history.replaceState('DPListView','DPListView','DP' + window.location.search + '&mode=list');
 }
@@ -830,6 +832,7 @@ var UserAction = {
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe', 
                 function(response){
+                    welinkStorage['welink_' + sobjectName + '_sobjectdescribe'] = JSON.stringify(response);
                     AjaxResponses.sobjectdescribe = response;
                     retrieveListViews(sobject.name, doFinish);
                 }
@@ -840,6 +843,7 @@ var UserAction = {
             Ajax.get(
                 '/sobjects/' + sobjectName + '/listviews', 
                 function(response){
+                    welinkStorage['welink_' + sobjectName + '_listviews'] = JSON.stringify(response);
                     AjaxResponses.listviews = response;
                     retrieveLayouts(sobjectName, doFinish);
                 }
@@ -850,6 +854,7 @@ var UserAction = {
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe/layouts/', 
                 function(response){
+                    welinkStorage['welink_' + sobjectName + '_layouts'] = JSON.stringify(response);
                     AjaxResponses.layouts = response;
                     retrieveMetadata(sobjectName, doFinish);
                 }
@@ -861,6 +866,7 @@ var UserAction = {
                 'retrieveSobjectMetadata',
                 [sobjectName],
                 function(result){
+                    welinkStorage['welink_' + sobjectName + '_metadata'] = JSON.stringify(result);
                     AjaxResponses.metadata = result;
                     retrieveSearchLayout(sobjectName, doFinish);
                 },
@@ -875,6 +881,7 @@ var UserAction = {
             Ajax.get(
                 '/search/layout/?q=' + sobjectName, 
                 function(response){
+                    welinkStorage['welink_' + sobjectName + '_searchlayout'] = JSON.stringify(response);
                     AjaxResponses.searchlayout = response;
                     retrieveRecentlyViewed(sobjectName, doFinish);
                 }
@@ -885,6 +892,7 @@ var UserAction = {
             Ajax.get(
                 '/query?q=' + window.encodeURIComponent("Select Id From RecentlyViewed Where Type='" + sobjectName + "'"),
                 function(response){
+                    welinkStorage['welink_' + sobjectName + '_recentlyviewed'] = JSON.stringify(response);
                     AjaxResponses.recentlyviewed = response;
                     retrieveRecordTypes(sobjectName, doFinish);
                 }
@@ -896,12 +904,11 @@ var UserAction = {
                 'retrieveMetadataRecordType',
                 [sobjectName],
                 function(result){
+                    welinkStorage['welink_' + sobjectName + '_recordtype'] = JSON.stringify(result);
                     AjaxResponses.recordtype = result;
                     retrieveBusinessProcess(sobjectName, doFinish);
                 },
                 function(){
-                    console.log(result);
-                    console.log(event);
                     retrieveBusinessProcess(sobjectName, doFinish);
                 }
             );
@@ -909,6 +916,7 @@ var UserAction = {
 
         var retrieveBusinessProcess = function(sobjectName, doFinish){
             if(sobjectName != 'Opportunity'){
+                welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
                 AjaxResponses.has_retrieved_sobject_related = true;
                 doFinish();
                 return;
@@ -919,12 +927,15 @@ var UserAction = {
                 [sobjectName],
                 function(result){
                     AjaxResponses.businessprocess = result;
+                    welinkStorage['welink_' + sobjectName + '_businessprocess'] = JSON.stringify(result);
+                    welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
                     AjaxResponses.has_retrieved_sobject_related = true;
                     doFinish();
                 },
                 function(result,event){
                     console.log(result);
                     console.log(event);
+                    welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
                     AjaxResponses.has_retrieved_sobject_related = true;
                     doFinish();
                 }
@@ -1038,6 +1049,20 @@ var UserAction = {
             },
 
             retrieveSobjectRelated:function(sobjectName, callbackFunction){
+                if(welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] == 'true'){
+                    AjaxResponses.sobjectdescribe = JSON.parse(welinkStorage['welink_' + sobjectName + '_sobjectdescribe']);
+                    AjaxResponses.listviews = JSON.parse(welinkStorage['welink_' + sobjectName + '_listviews']);
+                    AjaxResponses.layouts = JSON.parse(welinkStorage['welink_' + sobjectName + '_layouts']);
+                    AjaxResponses.metadata = JSON.parse(welinkStorage['welink_' + sobjectName + '_metadata']);
+                    AjaxResponses.searchlayout = JSON.parse(welinkStorage['welink_' + sobjectName + '_searchlayout']);
+                    AjaxResponses.recentlyviewed = JSON.parse(welinkStorage['welink_' + sobjectName + '_recentlyviewed']);
+                    AjaxResponses.recordtype = JSON.parse(welinkStorage['welink_' + sobjectName + '_recordtype']);
+                    AjaxResponses.businessprocess = JSON.parse(welinkStorage['welink_' + sobjectName + '_businessprocess']);
+                    callbackFunction();
+                } else {
+                    retrieveDescribe(sobjectName, callbackFunction);
+                }
+                
                 if(AjaxResponses.has_retrieved_sobject_related){
                     callbackFunction();
                 } else {
