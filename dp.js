@@ -1366,6 +1366,7 @@ var UserAction = {
 
         function handleRecentlyViewed(){
             var response = AjaxResponses.recentlyviewed;
+            sobject.recentlyviewed_ids = '';
             for (var i = response.records.length - 1; i >= 0; i--) {
                 sobject.recentlyviewed_ids += "'" + response.records[i].Id + "',";
             };
