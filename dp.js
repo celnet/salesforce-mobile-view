@@ -1062,12 +1062,13 @@ var UserAction = {
                 } else {
                     retrieveDescribe(sobjectName, callbackFunction);
                 }
-                
+                /*
                 if(AjaxResponses.has_retrieved_sobject_related){
                     callbackFunction();
                 } else {
                     retrieveDescribe(sobjectName, callbackFunction);
                 }
+                */
             },
 
             retrieveRecentlyViewed:function(callbackFunction){
