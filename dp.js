@@ -1000,7 +1000,6 @@ var UserAction = {
                     
                     AjaxResponses.metadata = JSON.parse(welinkStorage['welink_' + sobjectName + '_metadata']);
                     AjaxResponses.searchlayout = JSON.parse(welinkStorage['welink_' + sobjectName + '_searchlayout']);
-                    AjaxResponses.recentlyviewed = JSON.parse(welinkStorage['welink_' + sobjectName + '_recentlyviewed']);
                     AjaxResponses.recordtype = JSON.parse(welinkStorage['welink_' + sobjectName + '_recordtype']);
                     AjaxResponses.businessprocess = JSON.parse(welinkStorage['welink_' + sobjectName + '_businessprocess']);
                     callbackFunction();
