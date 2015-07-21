@@ -1983,15 +1983,15 @@ var UserAction = {
                     record.recordtypename = recordtype_options[i].label;
 
                     AjaxPools.retrieveLayoutByRecordType(sobject.name, record.recordtypeid, function(){
-                        sobject.layout = AjaxResponses.layout;
-                        record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);//processLayoutSection();
-                        
                         AjaxHandlers.recordTypes();
                         AjaxHandlers.businessProcesses();
 
                         if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
                             record.welink_processed = AjaxHandlers.welinklayout();
+                        } else {
+                            sobject.layout = AjaxResponses.layout;
+                            record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
                         }
 
                         renderLayout();
