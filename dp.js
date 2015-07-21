@@ -713,11 +713,11 @@ var UserAction = {
                     '/query/?q=' + window.encodeURIComponent(soql),
                     function(response){
                         AjaxResponses.references = response;
-                        retrieveWelinkLayoutId(sobjectName, recordId, callback_func);
+                        retrieveWelinkLayoutId(sobjectName, record.RecordTypeId, callback_func);
                     }
                 );
             } else {
-                retrieveWelinkLayoutId(sobjectName, recordId, callback_func);
+                retrieveWelinkLayoutId(sobjectName, record.RecordTypeId, callback_func);
             }
         };
 
