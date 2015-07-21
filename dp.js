@@ -685,19 +685,20 @@ var UserAction = {
          */
          
         var retrieveByBatchRequest = function(sobjectName, resourceNameArray, doFinish){
+            var version_number = context.rest_base_uri.substr(15);
             var reqBody = {
                 batchRequests:[
                     {
                         "method":"GET",
-                        "url":"/sobjects/" + sobjectName + "/describe"
+                        "url":version_number + "/sobjects/" + sobjectName + "/describe"
                     },
                     {
                         "method":"GET",
-                        "url":"/sobjects/" + sobjectName + "/describe/layouts/"
+                        "url":version_number + "/sobjects/" + sobjectName + "/describe/layouts/"
                     },
                     {
                         "method":"GET",
-                        "url":"/search/layout/?q=" + sobjectName
+                        "url":version_number + "/search/layout/?q=" + sobjectName
                     }
                 ]
             };
