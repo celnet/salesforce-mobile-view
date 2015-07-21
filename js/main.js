@@ -1,8 +1,20 @@
+window.addEventListener('DOMContentLoaded', function(){
+    getTemplates();
+    if(window.location.search.indexOf('sobject') < 0){
+        window.history.replaceState('ListView','ListView','DP?mode=list&sobject=Opportunity&listviewid=recentlyviewed');
+        route();
+    } else if(window.location.search.indexOf('sobject') > -1 && window.location.search.indexOf('mode') < 0){
+        window.history.replaceState('DPListView','DPListView','DP' + window.location.search + '&mode=list');
+        route();
+    } else if(window.location.search.indexOf('mode=list') > -1 && window.location.search.indexOf('listviewid') < 0){
+        window.history.replaceState('ListView','ListView','DP' + window.location.search + '&listviewid=recentlyviewed');
+        route();
+    } else {
+        route();
+    }
+},false);
+    
 var welinkStorage = window.localStorage || {};
-
-if(window.location.search.indexOf('sobject') > -1 && window.location.search.indexOf('mode') < 0){
-    window.history.replaceState('DPListView','DPListView','DP' + window.location.search + '&mode=list');
-}
 
 window.onpopstate = function(event){
     route();
