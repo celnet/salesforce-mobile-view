@@ -684,8 +684,35 @@ var UserAction = {
          * Sobject Related
          */
          
-        var retrieveByBatchRequest = function(sobjectName, resourceNameArraydoFinish){
+        var retrieveByBatchRequest = function(sobjectName, resourceNameArray, doFinish){
+            var reqBody = {
+                batchRequests:[
+                    {
+                        "method":"GET",
+                        "url":"/sobjects/" + sobjectName + "/describe"
+                    },
+                    {
+                        "method":"GET",
+                        "url":"/sobjects/" + sobjectName + "/describe/layouts/"
+                    },
+                    {
+                        "method":"GET",
+                        "url":"/search/layout/?q=" + sobjectName
+                    }
+                ]
+            };
             
+            Ajax.ajax(
+                "POST", 
+                "/composite/batch", 
+                reqBody, 
+                function(response){
+                    console.log(response);
+                }, 
+                function(response){
+                    
+                }
+            );
         };
         
         var retrieveDescribe = function(sobjectName, doFinish){
@@ -1026,7 +1053,9 @@ var UserAction = {
             
             retrieveLayoutByRecordType:function(sobjectName, recordTypeId, callbackFunction){
                 retrieveWelinkLayoutId(sobjectName, recordTypeId, callbackFunction);
-            }
+            },
+            
+            retrieveBatchRequest:retrieveByBatchRequest
         };
     })();
     
