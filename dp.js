@@ -795,7 +795,6 @@ var UserAction = {
         /**
          * Record Related
          */
-
         var retrieveRecord = function(sobjectName, recordId, callbackFunction){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/' + record.id, 
@@ -1012,13 +1011,6 @@ var UserAction = {
                 } else {
                     retrieveDescribe(sobjectName, callbackFunction);
                 }
-                /*
-                if(AjaxResponses.has_retrieved_sobject_related){
-                    callbackFunction();
-                } else {
-                    retrieveDescribe(sobjectName, callbackFunction);
-                }
-                */
             },
 
             retrieveRecentlyViewed:function(sobjectName, callbackFunction){
