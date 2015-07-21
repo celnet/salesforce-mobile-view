@@ -945,6 +945,8 @@ var UserAction = {
             );
         };
         
+        
+        
         var retrieveLayoutByRecordType = function(sobjectName, recordTypeId, callbackFunction){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe/layouts/' + recordTypeId, 
@@ -958,7 +960,7 @@ var UserAction = {
         /**
          * RecentlyViewed Related
          */
-        var constructSoqlStatement = function(){
+        var constructSoqlStatement = function(recentlyViewedIds){
             var fields = '';
 
             for (var i = 0; i < sobject.search_layout_fields.length; i++) {
@@ -973,9 +975,9 @@ var UserAction = {
             }
 
             var soql = 'Select Id' + fields + ' From ' + sobject.name + " Where ";
-            if(sobject.recentlyviewed_ids != ''){
+            if(recentlyViewedIds != ''){
                 soql += "Id IN (";
-                soql += sobject.recentlyviewed_ids;
+                soql += recentlyViewedIds;
                 soql += ") And (LastViewedDate != null Or LastReferencedDate != null)";
             } else {
                 soql += "LastViewedDate != null Or LastReferencedDate != null";
@@ -989,15 +991,24 @@ var UserAction = {
             Ajax.get(
                 '/query?q=' + window.encodeURIComponent("Select Id From RecentlyViewed Where Type='" + sobjectName + "'"),
                 function(response){
-                    AjaxResponses.recentlyviewed = response;
-                    retrieveRecentlyViewedwithFields(doFinish);
+                    var recentlyViewedIds = '';
+                    
+                    for (var i = response.records.length - 1; i >= 0; i--) {
+                        recentlyViewedIds += "'" + response.records[i].Id + "',";
+                    };
+        
+                    if(recentlyViewedIds != ''){
+                        recentlyViewedIds = recentlyViewedIds.substring(0,recentlyViewedIds.length - 1);
+                    } 
+            
+                    retrieveRecentlyViewedwithFields(recentlyViewedIds, doFinish);
                 }
             );
         };
 
-        var retrieveRecentlyViewedwithFields = function(doFinish){
+        var retrieveRecentlyViewedwithFields = function(recentlyViewedIds, doFinish){
             Ajax.get(
-                '/query?q=' + window.encodeURIComponent(constructSoqlStatement()), 
+                '/query?q=' + window.encodeURIComponent(constructSoqlStatement(recentlyViewedIds)), 
                 function(response){
                     AjaxResponses.recentlyviewedwithfields = response;
                     doFinish();
@@ -1070,9 +1081,7 @@ var UserAction = {
             
             retrieveLayoutByRecordType:function(sobjectName, recordTypeId, callbackFunction){
                 retrieveWelinkLayoutId(sobjectName, recordTypeId, callbackFunction);
-            },
-            
-            retrieveBatchRequest:retrieveByBatchRequest
+            }
         };
     })();
     
@@ -1334,7 +1343,6 @@ var UserAction = {
             handleListViews();
             sobject.search_layout_fields = AjaxResponses.searchlayout[0].searchColumns;
             handleMetadata();
-            //handleRecentlyViewed();
 
             if(params.listviewid != 'recentlyviewed'){
                 //View.animateLoading(context.labels.loading,'jqm-list');
@@ -1351,7 +1359,7 @@ var UserAction = {
                     renderListViewResultList(25);
                     View.stopLoading('jqm-list');
                 });
-            } else if(sobject.recentlyviewed_ids != ""){
+            } else {
                 AjaxPools.retrieveRecentlyViewed(sobject.name, function(){
                     sobject.recentlyviewed = AjaxResponses.recentlyviewedwithfields;
 
@@ -1359,11 +1367,7 @@ var UserAction = {
                     renderRecentlyViewedList();
                     View.stopLoading('jqm-list');
                 });
-            } else {
-                renderListViewSelects();
-                renderRecentlyViewedList();
-                View.stopLoading('jqm-list');
-            }
+            } 
         }
 
         function handleDescribe(){
@@ -1436,18 +1440,6 @@ var UserAction = {
             };
         }
 
-        function handleRecentlyViewed(){
-            var response = AjaxResponses.recentlyviewed;
-            sobject.recentlyviewed_ids = '';
-            for (var i = response.records.length - 1; i >= 0; i--) {
-                sobject.recentlyviewed_ids += "'" + response.records[i].Id + "',";
-            };
-
-            if(sobject.recentlyviewed_ids != ''){
-                sobject.recentlyviewed_ids = sobject.recentlyviewed_ids.substring(0,sobject.recentlyviewed_ids.length - 1);
-            } 
-        }
-
         function viewRecord(record_id){
             View.animateLoading(context.labels.loading,'jqm-list');
             window.history.pushState('DPRecordView','DPRecordView','DP?mode=view&sobject=' + sobject.name + '&id=' + record_id + '&listviewid=' + params.listviewid);
@@ -1469,7 +1461,7 @@ var UserAction = {
             if(selected_option_id == 'chooselistview'){
                 params.listviewid = 'recentlyviewed';
                 window.history.replaceState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=recentlyviewed');
-
+                View.animateLoading(context.labels.loading, 'jqm-list');
                 if(AjaxResponses.recentlyviewedwithfields != null){
                     renderRecentlyViewedList();
                 } else {
