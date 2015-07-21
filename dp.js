@@ -463,12 +463,6 @@ var UserAction = {
         }
     };
 
-    var ListViews = {
-        select:function(){
-
-        }
-    };
-
     var RecordForm = {
         validate:function(field_name, field_value){
             if(document.querySelector('label[for="record-field-' + field_name + '"] span') != null && (field_value == null || field_value == '')){
@@ -797,69 +791,7 @@ var UserAction = {
                 }
             );
         };
-/*
-        var retrieveWelinkLayoutId = function(sobjectName, recordId, callbackFunction){
-            Ajax.remoting(
-                'retrieveSobjectWelinkLayoutId',
-                [sobjectName || '',recordId || ''],
-                function(result){
-                    AjaxResponses.welinklayoutid = result;
-                    
-                    if(result != null && result != '' && result.indexOf('exception') < 0){
-                        var callback_func = function(){
-                            AjaxResponses.has_retrieved_record_related = true;
-                            AjaxResponses.welinklayout = AjaxResponses.welinklayout.Metadata;
-                            callbackFunction();
-                        };
-                        retrieveWelinkLayout(result, callback_func);
-                    } else if(AjaxResponses.record.RecordTypeId != null){
-                        retrieveLayoutByRecordType(sobjectName, AjaxResponses.record.RecordTypeId, callbackFunction);
-                    } else {
-                        AjaxResponses.has_retrieved_record_related = true;
-                    }
-                },
-                function(result, event){
-                    if(AjaxResponses.record.RecordTypeId != null){
-                        retrieveLayoutByRecordType(sobjectName, AjaxResponses.record.RecordTypeId, callbackFunction);
-                    } else {
-                        AjaxResponses.has_retrieved_record_related = true;
-                    }
-                }
-            );
-        }
-
-        var retrieveWelinkLayout = function(welinkLayoutId, callbackFunction){
-            Ajax.get(
-                '/tooling/sobjects/Layout/' + welinkLayoutId, 
-                function(response){
-                    AjaxResponses.welinklayout = response;
-                    callbackFunction();
-                }
-            );
-        }
         
-        var retrieveLayoutByRecordType = function(sobjectName, recordTypeId, callbackFunction){
-            Ajax.get(
-                '/sobjects/' + sobjectName + '/describe/layouts/' + recordTypeId, 
-                function(response){
-                    AjaxResponses.layout = response;
-                    AjaxResponses.has_retrieved_record_related = true;
-                    callbackFunction();
-                }
-            );
-        }
-        
-        function retrieveLayoutByRecordTypeIdNew(sobjectName, recordTypeId, callbackFunction){
-            Ajax.get(
-                '/sobjects/' + sobjectName + '/describe/layouts/' + recordTypeId, 
-                function(response){
-                    AjaxResponses.layout = response;
-
-                    retrieveWelinkLayoutIdNew(sobjectName, recordTypeId, callbackFunction);
-                }
-            );
-        }
-*/
         var retrieveDescribe = function(sobjectName, doFinish){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe', 
@@ -1039,37 +971,7 @@ var UserAction = {
                 }
             );
         };
-/*
-        function retrieveLayoutByRecordTypeIdNew(sobjectName, recordTypeId, callbackFunction){
-            Ajax.get(
-                '/sobjects/' + sobjectName + '/describe/layouts/' + recordTypeId, 
-                function(response){
-                    AjaxResponses.layout = response;
-
-                    retrieveWelinkLayoutIdNew(sobjectName, recordTypeId, callbackFunction);
-                }
-            );
-        }
-
-        function retrieveWelinkLayoutIdNew(sobjectName, recordTypeId, callbackFunction){
-            Ajax.remoting(
-                'retrieveSobjectWelinkLayoutIdByRecordTypeId',
-                [sobjectName || '',recordTypeId || ''],
-                function(result){
-                    AjaxResponses.welinklayoutid = result;
-                    
-                    if(result == '' || result.indexOf('exception') >= 0){
-                        callbackFunction();
-                    } else {
-                        retrieveWelinkLayout(result, callbackFunction);
-                    }
-                },
-                function(result, event){
-                    console.log(event);
-                }
-            );
-        }
-*/
+        
         return {
             retrieveRecordRelated:function(sobjectName, recordId, callbackFunction){
                 retrieveRecord(sobjectName, recordId, callbackFunction);
@@ -1091,6 +993,10 @@ var UserAction = {
                     AjaxResponses.recordtype = JSON.parse(welinkStorage['welink_' + sobjectName + '_recordtype']);
                     AjaxResponses.businessprocess = JSON.parse(welinkStorage['welink_' + sobjectName + '_businessprocess']);
                     callbackFunction();
+                    
+                    retrieveDescribe(sobjectName, function(){
+                        console.log('has refreshed');
+                    });
                 } else {
                     retrieveDescribe(sobjectName, callbackFunction);
                 }
@@ -1113,16 +1019,6 @@ var UserAction = {
             
             retrieveLayoutByRecordType:function(sobjectName, recordTypeId, callbackFunction){
                 retrieveWelinkLayoutId(sobjectName, recordTypeId, callbackFunction);
-            },
-
-            retrieveLayoutWithoutRecordType:function(sobjectName, recordTypeId, callbackFunction){
-                //retrieveWelinkLayoutIdNew(sobjectName, recordTypeId, callbackFunction);
-                retrieveWelinkLayoutId(sobjectName, recordTypeId, callbackFunction);
-            },
-
-            retrieveLayoutBySelectedRecordType:function(sobjectName, recordTypeId, callbackFunction){
-                retrieveWelinkLayoutId(sobjectName, recordTypeId, callbackFunction);
-                //retrieveLayoutByRecordTypeIdNew(sobjectName, recordTypeId, callbackFunction);
             }
         };
     })();
