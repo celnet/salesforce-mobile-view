@@ -683,6 +683,11 @@ var UserAction = {
         /**
          * Sobject Related
          */
+         
+        var retrieveByBatchRequest = function(sobjectName, resourceNameArraydoFinish){
+            
+        };
+        
         var retrieveDescribe = function(sobjectName, doFinish){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe', 
@@ -940,7 +945,6 @@ var UserAction = {
             Ajax.get(
                 '/query?q=' + window.encodeURIComponent("Select Id From RecentlyViewed Where Type='" + sobjectName + "'"),
                 function(response){
-                    welinkStorage['welink_' + sobjectName + '_recentlyviewed'] = JSON.stringify(response);
                     AjaxResponses.recentlyviewed = response;
                     retrieveRecentlyViewedwithFields(doFinish);
                 }
@@ -1284,7 +1288,7 @@ var UserAction = {
             handleListViews();
             sobject.search_layout_fields = AjaxResponses.searchlayout[0].searchColumns;
             handleMetadata();
-            handleRecentlyViewed();
+            //handleRecentlyViewed();
 
             if(params.listviewid != 'recentlyviewed'){
                 //View.animateLoading(context.labels.loading,'jqm-list');
