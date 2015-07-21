@@ -1,5 +1,6 @@
 window.addEventListener('DOMContentLoaded', function(){
     getTemplates();
+    
     if(window.location.search.indexOf('sobject') < 0){
         window.history.replaceState('ListView','ListView','DP?mode=list&sobject=Opportunity&listviewid=recentlyviewed');
         route();
