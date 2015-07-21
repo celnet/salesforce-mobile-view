@@ -684,7 +684,7 @@ var UserAction = {
          * Sobject Related
          */
          
-        var retrieveByBatchRequest = function(sobjectName, resourceNameArray, doFinish){
+        var retrieveSobjectRelatedByBatchRequest = function(sobjectName, callbackFunction){
             var version_number = context.rest_base_uri.substr(15);
             var reqBody = {
                 batchRequests:[
@@ -708,14 +708,30 @@ var UserAction = {
                 "/composite/batch", 
                 reqBody, 
                 function(response){
-                    console.log(response);
+                    if(response.results != null && response.results.length > 0){
+                        welinkStorage['welink_' + sobjectName + '_sobjectdescribe'] = JSON.stringify(response.results[0].result);
+                        AjaxResponses.sobjectdescribe = response.results[0].result;
+                        
+                        welinkStorage['welink_' + sobjectName + '_layouts'] = JSON.stringify(response.results[1].result);
+                        AjaxResponses.layouts = response.results[1].result;
+                        
+                        if(response.results[1].result.layouts != null && response.results[1].result.layouts.length > 0){
+                            welinkStorage['welink_' + sobjectName + '_layout'] = JSON.stringify(response.results[1].result.layouts[0]);
+                            AjaxResponses.layout = response.results[1].result.layouts[0];
+                        }
+                        
+                        welinkStorage['welink_' + sobjectName + '_searchlayout'] = JSON.stringify(response.results[2].result);
+                        AjaxResponses.searchlayout = response.results[2].result;
+                    }
+                    
+                    retrieveListViews(sobjectName, callbackFunction);
                 }, 
                 function(response){
                     
                 }
             );
         };
-        
+        /*
         var retrieveDescribe = function(sobjectName, doFinish){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe', 
@@ -726,18 +742,18 @@ var UserAction = {
                 }
             );
         };
-
+*/
         var retrieveListViews = function(sobjectName, doFinish){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/listviews', 
                 function(response){
                     welinkStorage['welink_' + sobjectName + '_listviews'] = JSON.stringify(response);
                     AjaxResponses.listviews = response;
-                    retrieveLayouts(sobjectName, doFinish);
+                    retrieveMetadata(sobjectName, doFinish);
                 }
             );
         };
-
+/*
         var retrieveLayouts = function(sobjectName, doFinish){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe/layouts/', 
@@ -754,7 +770,7 @@ var UserAction = {
                 }
             );
         };
-
+*/
         var retrieveMetadata = function(sobjectName, doFinish){
             Ajax.remoting(
                 'retrieveSobjectMetadata',
@@ -762,15 +778,15 @@ var UserAction = {
                 function(result){
                     welinkStorage['welink_' + sobjectName + '_metadata'] = JSON.stringify(result);
                     AjaxResponses.metadata = result;
-                    retrieveSearchLayout(sobjectName, doFinish);
+                    retrieveRecordTypes(sobjectName, doFinish);
                 },
                 function(result){
                     sobject.ordered_listviews = sobject.listviews.listviews;
-                    retrieveSearchLayout(sobjectName, doFinish);
+                    retrieveRecordTypes(sobjectName, doFinish);
                 }
             );
         };
-
+/*
         var retrieveSearchLayout = function(sobjectName, doFinish){
             Ajax.get(
                 '/search/layout/?q=' + sobjectName, 
@@ -781,7 +797,7 @@ var UserAction = {
                 }
             );
         };
-        
+        */
         var retrieveRecordTypes = function(sobjectName, doFinish){
             Ajax.remoting(
                 'retrieveMetadataRecordType',
@@ -1036,11 +1052,11 @@ var UserAction = {
                     AjaxResponses.businessprocess = JSON.parse(welinkStorage['welink_' + sobjectName + '_businessprocess']);
                     callbackFunction();
                     
-                    retrieveDescribe(sobjectName, function(){
-                        console.log('has refreshed');
+                    retrieveSobjectRelatedByBatchRequest(sobjectName, function(){
+                        console.log("has refreshed");
                     });
                 } else {
-                    retrieveDescribe(sobjectName, callbackFunction);
+                    retrieveSobjectRelatedByBatchRequest(sobjectName, callbackFunction);
                 }
             },
 
