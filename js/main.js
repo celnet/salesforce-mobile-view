@@ -744,18 +744,7 @@ var UserAction = {
                 }
             );
         };
-        /*
-        var retrieveDescribe = function(sobjectName, doFinish){
-            Ajax.get(
-                '/sobjects/' + sobjectName + '/describe', 
-                function(response){
-                    welinkStorage['welink_' + sobjectName + '_sobjectdescribe'] = JSON.stringify(response);
-                    AjaxResponses.sobjectdescribe = response;
-                    retrieveListViews(sobject.name, doFinish);
-                }
-            );
-        };
-*/
+        
         var retrieveListViews = function(sobjectName, doFinish){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/listviews', 
@@ -766,24 +755,7 @@ var UserAction = {
                 }
             );
         };
-/*
-        var retrieveLayouts = function(sobjectName, doFinish){
-            Ajax.get(
-                '/sobjects/' + sobjectName + '/describe/layouts/', 
-                function(response){
-                    welinkStorage['welink_' + sobjectName + '_layouts'] = JSON.stringify(response);
-                    AjaxResponses.layouts = response;
-                    
-                    if(response.layouts != null && response.layouts.length > 0){
-                        welinkStorage['welink_' + sobjectName + '_layout'] = JSON.stringify(response.layouts[0]);
-                        AjaxResponses.layout = response.layouts[0];
-                    }
-                    
-                    retrieveMetadata(sobjectName, doFinish);
-                }
-            );
-        };
-*/
+        
         var retrieveSobjectRelatedMetadata = function(sobjectName, callbackFunction){
             Ajax.remoting(
                 'retrieveSobjectRelated',
@@ -821,79 +793,6 @@ var UserAction = {
                 }
             );
         };
-        /*
-        var retrieveMetadata = function(sobjectName, doFinish){
-            Ajax.remoting(
-                'retrieveSobjectMetadata',
-                [sobjectName],
-                function(result){
-                    welinkStorage['welink_' + sobjectName + '_metadata'] = JSON.stringify(result);
-                    AjaxResponses.metadata = result;
-                    retrieveRecordTypes(sobjectName, doFinish);
-                },
-                function(result){
-                    sobject.ordered_listviews = sobject.listviews.listviews;
-                    retrieveRecordTypes(sobjectName, doFinish);
-                }
-            );
-        };
-        */
-/*
-        var retrieveSearchLayout = function(sobjectName, doFinish){
-            Ajax.get(
-                '/search/layout/?q=' + sobjectName, 
-                function(response){
-                    welinkStorage['welink_' + sobjectName + '_searchlayout'] = JSON.stringify(response);
-                    AjaxResponses.searchlayout = response;
-                    retrieveRecordTypes(sobjectName, doFinish);
-                }
-            );
-        };
-        */
-        /*
-        var retrieveRecordTypes = function(sobjectName, doFinish){
-            Ajax.remoting(
-                'retrieveMetadataRecordType',
-                [sobjectName],
-                function(result){
-                    welinkStorage['welink_' + sobjectName + '_recordtype'] = JSON.stringify(result);
-                    AjaxResponses.recordtype = result;
-                    retrieveBusinessProcess(sobjectName, doFinish);
-                },
-                function(){
-                    retrieveBusinessProcess(sobjectName, doFinish);
-                }
-            );
-        };
-
-        var retrieveBusinessProcess = function(sobjectName, doFinish){
-            if(sobjectName != 'Opportunity'){
-                welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
-                AjaxResponses.has_retrieved_sobject_related = true;
-                doFinish();
-                return;
-            }
-
-            Ajax.remoting(
-                'retrieveMetadataBusinessProcess',
-                [sobjectName],
-                function(result){
-                    AjaxResponses.businessprocess = result;
-                    welinkStorage['welink_' + sobjectName + '_businessprocess'] = JSON.stringify(result);
-                    welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
-                    AjaxResponses.has_retrieved_sobject_related = true;
-                    doFinish();
-                },
-                function(result,event){
-                    console.log(result);
-                    console.log(event);
-                    welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
-                    AjaxResponses.has_retrieved_sobject_related = true;
-                    doFinish();
-                }
-            );
-        };
-        */
         
         /**
          * Record Related
