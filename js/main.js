@@ -784,6 +784,20 @@ var UserAction = {
             );
         };
 */
+        var retrieveSobjectRelatedMetadata = function(sobjectName, doFinish){
+            Ajax.remoting(
+                'retrieveSobjectRelated',
+                [sobjectName],
+                function(result){
+                    console.log(result);
+                },
+                function(result, event){
+                    console.log(result);
+                    console.log(event);
+                }
+            );
+        };
+        
         var retrieveMetadata = function(sobjectName, doFinish){
             Ajax.remoting(
                 'retrieveSobjectMetadata',
@@ -1094,7 +1108,9 @@ var UserAction = {
             
             retrieveLayoutByRecordType:function(sobjectName, recordTypeId, callbackFunction){
                 retrieveWelinkLayoutId(sobjectName, recordTypeId, callbackFunction);
-            }
+            },
+            
+            retrieveSobjectRelatedMetadata:retrieveSobjectRelatedMetadata
         };
     })();
     
