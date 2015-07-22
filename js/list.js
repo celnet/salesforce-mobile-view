@@ -147,10 +147,11 @@ var ListView;
             if(selected_option_id == 'chooselistview'){
                 params.listviewid = 'recentlyviewed';
                 window.history.replaceState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=recentlyviewed');
-                View.animateLoading(context.labels.loading, 'jqm-list');
+                
                 if(AjaxResponses.recentlyviewedwithfields != null){
                     renderRecentlyViewedList();
                 } else {
+                    View.animateLoading(context.labels.loading, 'jqm-list');
                     AjaxPools.retrieveRecentlyViewed(sobject.name, function(){
                         sobject.recentlyviewed = AjaxResponses.recentlyviewedwithfields;
 
