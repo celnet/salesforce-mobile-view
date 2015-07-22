@@ -762,7 +762,7 @@ var UserAction = {
                 function(response){
                     welinkStorage['welink_' + sobjectName + '_listviews'] = JSON.stringify(response);
                     AjaxResponses.listviews = response;
-                    retrieveMetadata(sobjectName, doFinish);
+                    retrieveSobjectRelatedMetadata(sobjectName, doFinish);
                 }
             );
         };
@@ -784,20 +784,44 @@ var UserAction = {
             );
         };
 */
-        var retrieveSobjectRelatedMetadata = function(sobjectName, doFinish){
+        var retrieveSobjectRelatedMetadata = function(sobjectName, callbackFunction){
             Ajax.remoting(
                 'retrieveSobjectRelated',
                 [sobjectName],
                 function(result){
-                    console.log(result);
+                    if(result != null){
+                        if(result.listviewMetadata != null){
+                            welinkStorage['welink_' + sobjectName + '_metadata'] = JSON.stringify(result.listviewMetadata);
+                            AjaxResponses.metadata = result.listviewMetadata;
+                        } else {
+                            sobject.ordered_listviews = sobject.listviews.listviews;
+                        }
+                        
+                        if(result.businessprocessesMetadata != null){
+                            welinkStorage['welink_' + sobjectName + '_recordtype'] = JSON.stringify(result.businessprocessesMetadata);
+                            AjaxResponses.recordtype = result.businessprocessesMetadata;
+                        };
+                        if(result.recordtypesMetadata != null){
+                            AjaxResponses.businessprocess = result.recordtypesMetadata;
+                            welinkStorage['welink_' + sobjectName + '_businessprocess'] = JSON.stringify(result.recordtypesMetadata);
+                        };
+                    }
+                    
+                    welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
+                    AjaxResponses.has_retrieved_sobject_related = true;
+                    callbackFunction();
                 },
                 function(result, event){
                     console.log(result);
                     console.log(event);
+                    sobject.ordered_listviews = sobject.listviews.listviews;
+                    welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
+                    AjaxResponses.has_retrieved_sobject_related = true;
+                    callbackFunction();
                 }
             );
         };
-        
+        /*
         var retrieveMetadata = function(sobjectName, doFinish){
             Ajax.remoting(
                 'retrieveSobjectMetadata',
@@ -813,6 +837,7 @@ var UserAction = {
                 }
             );
         };
+        */
 /*
         var retrieveSearchLayout = function(sobjectName, doFinish){
             Ajax.get(
@@ -825,6 +850,7 @@ var UserAction = {
             );
         };
         */
+        /*
         var retrieveRecordTypes = function(sobjectName, doFinish){
             Ajax.remoting(
                 'retrieveMetadataRecordType',
@@ -867,6 +893,7 @@ var UserAction = {
                 }
             );
         };
+        */
         
         /**
          * Record Related
