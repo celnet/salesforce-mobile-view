@@ -1012,8 +1012,14 @@ var UserAction = {
                     
                     AjaxResponses.metadata = JSON.parse(welinkStorage['welink_' + sobjectName + '_metadata']);
                     AjaxResponses.searchlayout = JSON.parse(welinkStorage['welink_' + sobjectName + '_searchlayout']);
-                    AjaxResponses.recordtype = JSON.parse(welinkStorage['welink_' + sobjectName + '_recordtype']);
-                    AjaxResponses.businessprocess = JSON.parse(welinkStorage['welink_' + sobjectName + '_businessprocess']);
+                    
+                    if(welinkStorage['welink_' + sobjectName + '_recordtype'] != null){
+                        AjaxResponses.recordtype = JSON.parse(welinkStorage['welink_' + sobjectName + '_recordtype']);
+                    }
+                    
+                    if(welinkStorage['welink_' + sobjectName + '_businessprocess'] != null){
+                        AjaxResponses.businessprocess = JSON.parse(welinkStorage['welink_' + sobjectName + '_businessprocess']);
+                    }
                     callbackFunction();
                     
                     retrieveSobjectRelatedByBatchRequest(sobjectName, function(){
