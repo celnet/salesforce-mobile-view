@@ -70,72 +70,75 @@ var RecordView = {};
 
                 var _fields = '';
                 for(var j = 0; j < _p_tmp[i].rows.length; j++){
-                    var _field = field_template.replace('{{field-label}}',_p_tmp[i].rows[j].label);
+                    var fieldName = _p_tmp[i].rows[j].name;
+                    var fieldLabel = _p_tmp[i].rows[j].label;
+                    var fieldType = _p_tmp[i].rows[j].type;
+                    var fieldValue = record.detail[fieldName];
                     
-                    var _field_value = record.detail[_p_tmp[i].rows[j].name];
-
-                    if(_field_value != null)
-                    switch(_p_tmp[i].rows[j].type){
+                    var _field = field_template.replace('{{field-label}}',fieldLabel);
+                    
+                    if(fieldValue != null)
+                    switch(fieldType){
                         case 'reference':
-                            if(record.references[_p_tmp[i].rows[j].name] != null){
-                                    _field_value = record.references[_p_tmp[i].rows[j].name].Name || '';
+                            if(record.references[fieldName] != null){
+                                    fieldValue = record.references[fieldName].Name || '';
                             } else {
-                                    _field_value = '';
+                                    fieldValue = '';
                             }
                             
                             if(setup_objects.indexOf(_p_tmp[i].rows[j].referenceTo[0]) < 0 || _p_tmp[i].rows[j].referenceTo[0] == 'User'){
-                                _field_value = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + _p_tmp[i].rows[j].referenceTo[0] + '&id=' + record.detail[_p_tmp[i].rows[j].name] + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + _field_value + '</a>';
+                                fieldValue = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + _p_tmp[i].rows[j].referenceTo[0] + '&id=' + fieldValue + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + fieldValue + '</a>';
                             }
                             break;
                         case 'phone':
-                            _field_value = '<a data-role="none" href="tel:' + _field_value + '">' + _field_value + '</a>';
+                            fieldValue = '<a data-role="none" href="tel:' + fieldValue + '">' + fieldValue + '</a>';
                             break;
                         case 'url':
-                            _field_value = '<a data-role="none" href="' + _field_value + '">' + _field_value + '</a>';
+                            fieldValue = '<a data-role="none" href="' + fieldValue + '">' + fieldValue + '</a>';
                             break;
                         case 'currency':
                             if(record.detail.CurrencyIsoCode != undefined){
-                                _field_value = record.detail.CurrencyIsoCode + ' ' + _field_value;
+                                fieldValue = record.detail.CurrencyIsoCode + ' ' + fieldValue;
                             } 
                             break;
                         case 'percent':
-                            _field_value = _field_value + '%';
+                            fieldValue = fieldValue + '%';
                             break;
                         case 'boolean':
-                            if(_field_value){
-                                _field_value = '<img src="/img/checkbox_checked.gif" alt="true"/>';
+                            if(fieldValue){
+                                fieldValue = '<img src="/img/checkbox_checked.gif" alt="true"/>';
                             } else {
-                                _field_value = '<img src="/img/checkbox_unchecked.gif" alt="false" />';
+                                fieldValue = '<img src="/img/checkbox_unchecked.gif" alt="false" />';
                             }
                             break;
                         case 'datetime':
-                            if(_field_value != null){
-                                //_field_value = _field_value.substring(0,10) + ' ' +  _field_value.substring(11,16);
-                                //alert(_field_value);
+                            if(fieldValue != null){
+                                //fieldValue = fieldValue.substring(0,10) + ' ' +  fieldValue.substring(11,16);
+                                //alert(fieldValue);
                                 //alert(context.timezone);
 
-                                _field_value = TimezoneDatabase.formatDatetimeToLocal(_field_value, context.timezone);
-                                _field_value = _field_value.replace('T',' ');
-                                //alert(_field_value);
+                                fieldValue = TimezoneDatabase.formatDatetimeToLocal(fieldValue, context.timezone);
+                                fieldValue = fieldValue.replace('T',' ');
+                                //alert(fieldValue);
                             }
                             break;
                         case 'date':
-                            if(_field_value != null){
-                                _field_value = TimezoneDatabase.formatDateToLocal(_field_value, context.timezone);
+                            if(fieldValue != null){
+                                fieldValue = TimezoneDatabase.formatDateToLocal(fieldValue, context.timezone);
                             }
                             break;
                         case 'address':
-                            console.log(_field_value);
+                            console.log(fieldValue);
                             console.log('address..............');
-                            if(_field_value != null){
-                                _field_value = (_field_value.country || '') + ' ' + (_field_value.state || '') + ' ' + (_field_value.city || '') + ' ' + (_field_value.stateCode || '') + ' ' + (_field_value.street || '');
+                            if(fieldValue != null){
+                                fieldValue = (fieldValue.country || '') + ' ' + (fieldValue.state || '') + ' ' + (fieldValue.city || '') + ' ' + (fieldValue.stateCode || '') + ' ' + (fieldValue.street || '');
                             }
                             break;
                         default:
-                            console.log(_field_value);
+                            console.log(fieldValue);
                     }
                     
-                    _field = _field.replace('{{field-value}}', _field_value || '<br/>');
+                    _field = _field.replace('{{field-value}}', fieldValue || '<br/>');
                     _fields += _field;
                 }
                 
@@ -195,82 +198,78 @@ var RecordView = {};
 
                 var _fields = '';
                 for(var j = 0; j < _p_tmp[i].fields.length; j++){
-                    var _field_name = _p_tmp[i].fields[j].field;
-
-                    if(sobject.fields[_field_name] == undefined)
+                    var fieldName = _p_tmp[i].fields[j].field;
+                    var fieldLabel = sobject.fields[fieldName].describe.label;
+                    var fieldType = sobject.fields[fieldName].describe.type;
+                    var fieldValue = record.detail[fieldName];
+                    
+                    if(sobject.fields[fieldName] == undefined)
                         continue;
 
-                    console.log(_field_name);
-                    var _field_label = sobject.fields[_field_name].describe.label;
-                    var _field_type = sobject.fields[_field_name].describe.type;
-                    var _field_value = record.detail[_field_name];
-
-                    var _field = field_template.replace('{{field-label}}',_field_label);
+                    var _field = field_template.replace('{{field-label}}',fieldLabel);
                     
-                    var _field_value = record.detail[_field_name];
-
-                    if(_field_value != null)
-                    switch(_field_type){
+                    if(fieldValue != null)
+                    switch(fieldType){
                         case 'reference':
-                            if(record.references[_field_name] != null){
-                                    _field_value = record.references[_field_name].Name || '';
+                            if(record.references[fieldName] != null){
+                                    fieldValue = record.references[fieldName].Name || '';
                             } else {
-                                    _field_value = '';
+                                    fieldValue = '';
                             }
 
-                            if(setup_objects.indexOf(sobject.fields[_field_name].describe.referenceTo[0]) < 0 || sobject.fields[_field_name].describe.referenceTo[0] == 'User'){
-                                _field_value = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + sobject.fields[_field_name].describe.referenceTo[0] + '&id=' + record.detail[_field_name] + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + _field_value + '</a>';
+                            if(setup_objects.indexOf(sobject.fields[fieldName].describe.referenceTo[0]) < 0 || sobject.fields[fieldName].describe.referenceTo[0] == 'User'){
+                                fieldValue = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + sobject.fields[fieldName].describe.referenceTo[0] + '&id=' + fieldValue + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + fieldValue + '</a>';
                             }
                             break;
                         case 'phone':
-                            _field_value = '<a data-role="none" href="tel:' + _field_value + '">' + _field_value + '</a>';
+                            fieldValue = '<a data-role="none" href="tel:' + fieldValue + '">' + fieldValue + '</a>';
                             break;
                         case 'url':
-                            _field_value = '<a data-role="none" href="' + _field_value + '">' + _field_value + '</a>';
+                            fieldValue = '<a data-role="none" href="' + fieldValue + '">' + fieldValue + '</a>';
                             break;
                         case 'currency':
                             if(record.detail.CurrencyIsoCode != undefined){
-                                _field_value = record.detail.CurrencyIsoCode + ' ' + _field_value;
+                                fieldValue = record.detail.CurrencyIsoCode + ' ' + fieldValue;
                             } 
                             break;
                         case 'percent':
-                            _field_value = _field_value + '%';
+                            fieldValue = fieldValue + '%';
                             break;
                         case 'boolean':
-                            if(_field_value){
-                                _field_value = '<img src="/img/checkbox_checked.gif" alt="true"/>';
+                            if(fieldValue){
+                                fieldValue = '<img src="/img/checkbox_checked.gif" alt="true"/>';
                             } else {
-                                _field_value = '<img src="/img/checkbox_unchecked.gif" alt="false" />';
+                                fieldValue = '<img src="/img/checkbox_unchecked.gif" alt="false" />';
                             }
                             break;
                         case 'datetime':
-                            if(_field_value != null){
-                                //_field_value = _field_value.substring(0,10) + ' ' +  _field_value.substring(11,16);
-                                //alert(_field_value);
+                            if(fieldValue != null){
+                                //fieldValue = fieldValue.substring(0,10) + ' ' +  fieldValue.substring(11,16);
+                                //alert(fieldValue);
                                 //alert(context.timezone);
 
-                                _field_value = TimezoneDatabase.formatDatetimeToLocal(_field_value, context.timezone);
-                                _field_value = _field_value.replace('T',' ');
-                                //alert(_field_value);
+                                fieldValue = TimezoneDatabase.formatDatetimeToLocal(fieldValue, context.timezone);
+                                fieldValue = fieldValue.replace('T',' ');
+                                //alert(fieldValue);
                             }
                             break;
                         case 'date':
-                            if(_field_value != null){
-                                _field_value = TimezoneDatabase.formatDateToLocal(_field_value, context.timezone);
+                            if(fieldValue != null){
+                                fieldValue = TimezoneDatabase.formatDateToLocal(fieldValue, context.timezone);
                             }
                             break;
                         case 'address':
-                            console.log(_field_value);
+                            console.log(fieldValue);
                             console.log('address..............');
-                            if(_field_value != null){
-                                _field_value = (_field_value.country || '') + ' ' + (_field_value.state || '') + ' ' + (_field_value.city || '') + ' ' + (_field_value.stateCode || '') + ' ' + (_field_value.street || '');
+                            if(fieldValue != null){
+                                fieldValue = (fieldValue.country || '') + ' ' + (fieldValue.state || '') + ' ' + (fieldValue.city || '') + ' ' + (fieldValue.stateCode || '') + ' ' + (fieldValue.street || '');
                             }
                             break;
                         default:
-                            console.log(_field_value);
+                            console.log(fieldValue);
                     }
                     
-                    _field = _field.replace('{{field-value}}', _field_value || '<br/>');
+                    _field = _field.replace('{{field-value}}', fieldValue || '<br/>');
                     _fields += _field;
                 }
                 

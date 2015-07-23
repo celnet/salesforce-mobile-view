@@ -21,7 +21,6 @@ var RecordNew;
         Styles.tunePageStyle();
         
         View.animateLoading(context.labels.loading,'jqm-record');
-        //RecordNew.retrieveSobjectData();
         AjaxPools.retrieveSobjectRelated(sobject.name, function(){
             AjaxHandlers.describe();
             RecordNew.retrieveSobjectData();
@@ -159,24 +158,42 @@ var RecordNew;
         }
         
         function processFieldsDisplay(_row, _is_welink_layout){
-            var sobject_name = sobject.name;
-
-            var _field_name = _is_welink_layout?_row:_row.layoutComponents[0].details.name;
-
-
-            //var _details = _row.layoutComponents[0].details;
-            if(sobject.fields[_field_name] == undefined)
+            var sobjectsWithCompoundNames = ['user','contact','lead'];
+            var isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase());
+            
+            var fieldName;
+            var fieldLabel;
+            var fieldType;
+            var fieldPicklistValues;
+            var isFieldRequired;
+            var isFieldEditable;
+            var isFieldReadOnly;
+            
+            if(_is_welink_layout){
+                fieldName = _row;
+                fieldLabel = sobject.fields[fieldName].describe.label;
+                isFieldRequired = record.welink_required[fieldName];
+                isFieldEditable = record.welink_edit[fieldName];
+                isFieldReadOnly = record.welink_readonly[fieldName];
+            } else {
+                fieldName = _row.layoutComponents[0].details.name;
+                fieldLabel = _row.label;
+                isFieldRequired = _row.required;
+                isFieldEditable = _row.createable;
+                isFieldReadOnly = !_row.createable;
+            }
+            
+            fieldLabel += ':';
+            
+            if(sobject.fields[fieldName] == undefined){
                 return '';
-
-            var _details = sobject.fields[_field_name].describe;
+            }
+            
+            fieldType = sobject.fields[fieldName].describe.type;
+            fieldPicklistValues = sobject.fields[fieldName].describe.picklistValues;
+            
             var _field;
-            var _field_label = (_is_welink_layout?sobject.fields[_field_name].describe.label:_row.label) + ':';
-            //_details.label + ':';
-            var _sobject_name_lowercase = sobject.name.toLowerCase();
-
-            var _field_required = _is_welink_layout?record.welink_required[_field_name]:_row.required;
-            var _field_editable = _is_welink_layout?record.welink_edit[_field_name]:_details.createable;
-            var _field_readonly = _is_welink_layout?record.welink_readonly[_field_name]:(!_details.createable);
+            var _field_label = fieldLabel;
             
             var field_templates = {};
             field_templates.boolean = templates.field_checkbox;
@@ -195,7 +212,7 @@ var RecordNew;
             field_templates.multipicklist = templates.field_multipicklist_select;
             field_templates.readonly = templates.field_readonly;
             
-            if(_details.name == 'Name' && (sobject_name.toLowerCase() == 'user' || sobject_name.toLowerCase() == 'contact' || sobject_name.toLowerCase() == 'lead')){
+            if(fieldName == 'Name' && isCompoundName){
                 if(_is_welink_layout){
                     _field = processWelinkNameField();
                 } else {
@@ -205,7 +222,7 @@ var RecordNew;
                 return _field;// + '<br/>';
             }
 
-            if((_field_readonly && _details.type != 'address')){
+            if((isFieldReadOnly && fieldType != 'address')){
                 var _field_template = field_templates.readonly;
                 _field = _field_template.replace('{{field-label}}',_field_label);
                 _field = _field.replace('{{field-value}}','<br/>');
@@ -213,7 +230,7 @@ var RecordNew;
                 return _field;// + '<br/>';
             } 
 
-            if(_details.name == 'RecordTypeId'){
+            if(fieldName == 'RecordTypeId'){
                 var _field_template = field_templates.readonly;
                 _field = _field_template.replace('{{field-label}}',_field_label);
                 _field = _field.replace('{{field-value}}',record.recordtypename);
@@ -221,24 +238,24 @@ var RecordNew;
                 return _field;
             }
 
-            if(_field_required || _details.name == 'OwnerId'){
+            if(isFieldRequired || fieldName == 'OwnerId'){
                 _field_label = '<span style="color:crimson">*</span>' + _field_label;
             } else {
                 _field_label = '<span>&nbsp;</span>' + _field_label;
             }
 
-            switch(_details.type){
+            switch(fieldType){
                 case 'multipicklist':
                     var _select_template = field_templates.multipicklist;
                     _field = _select_template.replace('{{input-label}}',_field_label);
-                    _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
+                    _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
                     
                     var _option_template = templates.field_multipicklist_option;
                     var _options = '';
                     
-                    for(var i = 0; i < _details.picklistValues.length; i++){
-                        var _option = _option_template.replace('{{option-label}}',_details.picklistValues[i].label);
-                        _option = _option.replace('{{option-value}}',_details.picklistValues[i].value);
+                    for(var i = 0; i < fieldPicklistValues.length; i++){
+                        var _option = _option_template.replace('{{option-label}}',fieldPicklistValues[i].label);
+                        _option = _option.replace('{{option-value}}',fieldPicklistValues[i].value);
                         
                         _option = _option.replace('{{option-selected}}','');
                         
@@ -256,11 +273,11 @@ var RecordNew;
                     */
                     break;
                 case 'reference':
-                    var _field_template = field_templates[_details.type] || field_templates['string'];
+                    var _field_template = field_templates[fieldType] || field_templates['string'];
 
                     _field = _field_template.replace('{{input-label}}',_field_label);
 
-                    if(_details.name == 'OwnerId'){
+                    if(fieldName == 'OwnerId'){
                         _field = _field.replace('{{input-value}}',context.user_fullname);
                         _field = _field.replace('{{input-value-hidden}}',context.user_id);
                     } else {
@@ -268,23 +285,23 @@ var RecordNew;
                         _field = _field.replace('{{input-value-hidden}}','');
                     }
 
-                    var field_ref_type = sobject.fields[_details.name].describe.referenceTo[0];
-                    field_ref_type = field_ref_type == 'Group'?sobject.fields[_details.name].describe.referenceTo[1]:field_ref_type;
+                    var field_ref_type = sobject.fields[fieldName].describe.referenceTo[0];
+                    field_ref_type = field_ref_type == 'Group'?sobject.fields[fieldName].describe.referenceTo[1]:field_ref_type;
 
                     _field = _field.replace('{{reference-sobject-type}}',field_ref_type);
 
-                    _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
+                    _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
                     break;
                 case 'datetime':
-                    var _field_template = field_templates[_details.type] || field_templates['datetime'];
+                    var _field_template = field_templates[fieldType] || field_templates['datetime'];
                     _field = _field_template.replace('{{input-label}}',_field_label);
                     _field = _field.replace('{{input-value}}','');
-                    _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
+                    _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
                     break;
                 case 'picklist':
                     var _select_template = templates.field_picklist_select;
                     _field = _select_template.replace('{{input-label}}',_field_label);
-                    _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
+                    _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
                     
                     var _option_template = templates.field_picklist_option;
                     var _options = '';
@@ -293,17 +310,17 @@ var RecordNew;
                     _noselect_option = _noselect_option.replace('{{option-value}}','--None--');
                     _noselect_option = _noselect_option.replace('{{option-selected}}','');
 
-                    if(!_field_required){
+                    if(!isFieldRequired){
                         _options += _noselect_option;
                     }
                     
-                    for(var i = 0; i < _details.picklistValues.length; i++){
-                        if(!_details.picklistValues[i].active)
+                    for(var i = 0; i < fieldPicklistValues.length; i++){
+                        if(!fieldPicklistValues[i].active)
                             continue;
-                        var _option = _option_template.replace('{{option-label}}',_details.picklistValues[i].label);
-                        _option = _option.replace('{{option-value}}',_details.picklistValues[i].value);
+                        var _option = _option_template.replace('{{option-label}}',fieldPicklistValues[i].label);
+                        _option = _option.replace('{{option-value}}',fieldPicklistValues[i].value);
                         
-                        if(_details.picklistValues[i].defaultValue){
+                        if(fieldPicklistValues[i].defaultValue){
                             _option = _option.replace('{{option-selected}}','selected');
                         } else {
                             _option = _option.replace('{{option-selected}}','');
@@ -315,17 +332,17 @@ var RecordNew;
                     _field = _field.replace('{{options}}',_options);
                     break;
                 case 'boolean':
-                    var _field_template = field_templates[_details.type] || field_templates['string'];
+                    var _field_template = field_templates[fieldType] || field_templates['string'];
                     _field = _field_template.replace('{{input-label}}',_field_label);
                     _field = _field.replace('{{input-value}}','');
-                    _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
+                    _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
                     
                     _field = _field.replace('{{input-checked}}','');
                     //_field += '<br/>';
                     break;
                 case 'address':
                     if(_is_welink_layout){
-                        _field = processWelinkAddressField(_details.name);
+                        _field = processWelinkAddressField(fieldName);
                     } else {
                         _field  = processAddressField(_row.layoutComponents[0].components);
                     }
@@ -341,10 +358,10 @@ var RecordNew;
                     _field = _field.replace('{{field-value}}','');
                     break;
                 default:
-                    var _field_template = field_templates[_details.type] || field_templates['string'];
+                    var _field_template = field_templates[fieldType] || field_templates['string'];
                     _field = _field_template.replace('{{input-label}}',_field_label);
                     _field = _field.replace('{{input-value}}','');
-                    _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
+                    _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
             }
 
             return _field;// + '<br/>';

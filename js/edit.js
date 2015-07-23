@@ -1,6 +1,6 @@
     var RecordEdit = {};
 
-    function renderRecordEdit(){
+    var renderRecordEdit = function(){
         RecordEdit = initRecordEdit();
 
         //document.querySelector('body').innerHTML = templates.record_page_structure.replace(/{{page}}/g,'edit') + templates.page_lookup;
@@ -56,22 +56,44 @@
         }
         
         function processFieldsDisplay(_row, _is_welink_layout){
+            var sobjectsWithCompoundNames = ['user','contact','lead'];
+            var isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase());
+            
             var _timezone = context.timezone;
-            var _field_name = _is_welink_layout?_row:_row.layoutComponents[0].details.name;
-            if(sobject.fields[_field_name] == undefined){
+            var fieldName;
+            var fieldLabel;
+            var fieldPicklistValues;
+            var isFieldRequired;
+            var isFieldEditable;
+            var isFieldReadOnly;
+            
+            if(_is_welink_layout){
+                fieldName = _row;
+                fieldLabel = sobject.fields[fieldName].describe.label;
+                isFieldRequired = record.welink_required[fieldName];
+                isFieldEditable = record.welink_edit[fieldName] && sobject.fields[fieldName].describe.updateable;
+                isFieldReadOnly = record.welink_readonly[fieldName] && !sobject.fields[fieldName].describe.updateable;
+            } else {
+                fieldName = _row.layoutComponents[0].details.name;
+                fieldLabel = _row.label;
+                isFieldRequired = _row.required;
+                isFieldEditable = sobject.fields[fieldName].describe.updateable;
+                isFieldReadOnly = !sobject.fields[fieldName].describe.updateable;
+            }
+            
+            fieldLabel += ':';
+            
+            if(sobject.fields[fieldName] == undefined){
                 return '';
             }
-            var _details = sobject.fields[_field_name].describe;
+            
+            var _details = sobject.fields[fieldName].describe;
             //_row.layoutComponents[0].details;
 
             var _field;
-            var _field_label = (_is_welink_layout?sobject.fields[_field_name].describe.label:_row.label) + ':';//_details.label + ':';
-            var _sobject_name_lowercase = sobject.name.toLowerCase();
+            var _field_label = fieldLabel;
             var _record_detail = record.detail;
             var _ref_values = record.references;
-            var _field_required = _is_welink_layout?record.welink_required[_field_name]:_row.required;
-            var _field_editable = _is_welink_layout?(record.welink_edit[_field_name] && _details.updateable):_details.updateable;
-            var _field_readonly = _is_welink_layout?(record.welink_readonly[_field_name] && !_details.updateable):(!_details.updateable);
             
             var field_templates = {};
             field_templates.url = templates.field_url;
@@ -93,7 +115,7 @@
                 return _field;
             } 
 
-            if(_details.name == 'Name' && (_sobject_name_lowercase == 'user' || _sobject_name_lowercase == 'contact')){
+            if(_details.name == 'Name' && isCompoundName){
                 if(_is_welink_layout){
                     _field = processWelinkNameField(_record_detail, 'Name');
                 } else {
@@ -118,7 +140,7 @@
             }
 
             // hard-coded for ForecastCategoryName
-            if((_field_readonly && _details.type != 'address') || _details.name == 'ForecastCategoryName' || !sobject.fields[_field_name].describe.updateable){
+            if((isFieldReadOnly && _details.type != 'address') || _details.name == 'ForecastCategoryName' || !sobject.fields[fieldName].describe.updateable){
                 if(_details.type == 'reference' && _record_detail[_details.name] != '' && _record_detail[_details.name] != undefined){
 
                     var _ref_value = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + _details.referenceTo[0] + '&id=' + _ref_values[_details.name].Id + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + _ref_values[_details.name].Name + '</a>';
@@ -146,7 +168,7 @@
                 }
             } 
 
-            if((_is_welink_layout && _field_required) || (_field_editable && _field_required) || _details.name == 'OwnerId'){
+            if((_is_welink_layout && isFieldRequired) || (isFieldEditable && isFieldRequired) || _details.name == 'OwnerId'){
                 _field_label = '<span style="color:crimson">*</span>' + _field_label;
             } else {
                 _field_label = '<span>&nbsp;</span>' + _field_label;
@@ -181,9 +203,6 @@
                     
                     var _option_template = templates.field_multipicklist_option;
                     var _options = '';
-                    
-                    console.log(_details);
-                    console.log(_record_detail[_details.name]);
                     
                     var _multipicklist_value = [];
                     
@@ -238,7 +257,7 @@
                     _noselect_option = _noselect_option.replace('{{option-value}}','--None--');
                     _noselect_option = _noselect_option.replace('{{option-selected}}','');
 
-                    if(!_field_required){
+                    if(!isFieldRequired){
                         _options += _noselect_option;
                     }
                     
