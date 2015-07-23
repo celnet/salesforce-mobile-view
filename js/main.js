@@ -870,7 +870,8 @@ var UserAction = {
                     AjaxResponses.welinklayoutid = result;
                     
                     if(result != null && result != '' && result.indexOf('exception') < 0){
-                        retrieveWelinkLayout(result, callbackFunction);
+                        AjaxResponses.welinklayout = JSON.parse(window.decodeURIComponent(window.atob(result)));
+                        callbackFunction();
                     } else if(AjaxResponses.record.RecordTypeId != null){
                         retrieveLayoutByRecordType(sobjectName, AjaxResponses.record.RecordTypeId, callbackFunction);
                     } else {
@@ -886,7 +887,7 @@ var UserAction = {
                 }
             );
         };
-        
+        /*
         var retrieveWelinkLayout = function(welinkLayoutId, callbackFunction){
             Ajax.get(
                 '/tooling/sobjects/Layout/' + welinkLayoutId, 
@@ -896,7 +897,7 @@ var UserAction = {
                 }
             );
         };
-        
+        */
         
         
         var retrieveLayoutByRecordType = function(sobjectName, recordTypeId, callbackFunction){
