@@ -19,7 +19,6 @@ var welinkStorage = window.localStorage || {};
 
 window.onpopstate = function(event){
     route();
-    console.log('test');
     event.preventDefault();
 };
 
