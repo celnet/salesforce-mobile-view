@@ -736,7 +736,8 @@ var UserAction = {
                         AjaxResponses.searchlayout = response.results[2].result;
                     }
                     
-                    retrieveListViews(sobjectName, callbackFunction);
+                    
+                    retrieveLayouts(sobjectName, callbackFunction);
                 }, 
                 function(response){
                     
@@ -745,7 +746,33 @@ var UserAction = {
         };
         
         var retrieveLayouts = function(sobjectName, callbackFunction){
+            var recordTypeMappings = AjaxResponses.layouts;
+            var recordTypeIds = [];
+            var reqBody = {
+                batchRequests:[]
+            };
             
+            for(var i = 0; i < recordTypeMappings.length; i++){
+                var singleRequest = {
+                    "method":"GET",
+                    "url":recordTypeMappings[i].urls.layout.substring(15)
+                };
+                reqBody.batchRequests.push(singleRequest);
+                recordTypeIds.push(recordTypeMappings[i].recordTypeId);
+            };
+            
+            Ajax.ajax(
+                "POST", 
+                "/composite/batch", 
+                reqBody, 
+                function(response){
+                    console.log(response);
+                    retrieveListViews(sobjectName, callbackFunction);
+                }, 
+                function(response){
+                    retrieveListViews(sobjectName, callbackFunction);
+                }
+            );
         };
         
         var retrieveListViews = function(sobjectName, doFinish){
