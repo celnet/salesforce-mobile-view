@@ -746,7 +746,7 @@ var UserAction = {
         };
         
         var retrieveLayouts = function(sobjectName, callbackFunction){
-            var recordTypeMappings = AjaxResponses.layouts;
+            var recordTypeMappings = AjaxResponses.layouts.recordTypeMappings;
             var recordTypeIds = [];
             var reqBody = {
                 batchRequests:[]
