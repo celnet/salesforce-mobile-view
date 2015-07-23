@@ -780,6 +780,15 @@ var UserAction = {
                             AjaxResponses.businessprocess = result.recordtypesMetadata;
                             welinkStorage['welink_' + sobjectName + '_businessprocess'] = JSON.stringify(result.recordtypesMetadata);
                         };
+                        
+                        if(result.recordtypeLayouts != null){
+                            var welinkLayouts = {};
+                            for(var property in result.recordtypeLayouts){
+                                welinkLayouts[property] = JSON.parse(window.decodeURIComponent(window.atob(result.recordtypeLayouts[property])));
+                            };
+                            AjaxResponses.welinklayouts = welinkLayouts;
+                            welinkStorage['welink_' + sobjectName + '_welinklayouts'] = window.decodeURIComponent(window.atob(result.recordtypeLayouts[property]));
+                        };
                     }
                     
                     welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
