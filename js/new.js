@@ -66,7 +66,7 @@ var RecordNew;
                     break;
                 case '': // has no record type, direct to next step
                     AjaxPools.retrieveLayoutByRecordType(sobject.name, '', function(){
-                        if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
+                        if(AjaxResponses.welinklayout != null){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
                             record.welink_processed = AjaxHandlers.welinklayout();
                         }
@@ -82,7 +82,7 @@ var RecordNew;
                         AjaxHandlers.recordTypes();
                         AjaxHandlers.businessProcesses();
 
-                        if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
+                        if(AjaxResponses.welinklayout != null){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
                             record.welink_processed = AjaxHandlers.welinklayout();
                         }
@@ -143,7 +143,7 @@ var RecordNew;
                         AjaxHandlers.recordTypes();
                         AjaxHandlers.businessProcesses();
 
-                        if(AjaxResponses.welinklayoutid != null && AjaxResponses.welinklayoutid != '' && AjaxResponses.welinklayoutid.indexOf('exception') < 0){
+                        if(AjaxResponses.welinklayout != null){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
                             record.welink_processed = AjaxHandlers.welinklayout();
                         } else {

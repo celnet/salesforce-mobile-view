@@ -43,7 +43,7 @@ var RecordView = {};
                 document.title = sobject.describe.label;
 
                 if(AjaxResponses.welinklayout != null){
-                    sobject.welink_layout = AjaxResponses.welinklayout;
+                    sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
                     record.welink_processed = AjaxHandlers.welinklayout();
 
                     displayWelinkLayout();

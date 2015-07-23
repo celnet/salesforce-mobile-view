@@ -42,7 +42,7 @@
             document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
             document.title = sobject.describe.label;
 
-            sobject.welink_layout = AjaxResponses.welinklayout;
+            sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
             record.layout = AjaxResponses.layout;
 
             if(sobject.welink_layout != null){
