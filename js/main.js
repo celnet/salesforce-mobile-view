@@ -787,7 +787,7 @@ var UserAction = {
                                 welinkLayouts[property] = JSON.parse(window.decodeURIComponent(window.atob(result.recordtypeLayouts[property])));
                             };
                             AjaxResponses.welinklayouts = welinkLayouts;
-                            welinkStorage['welink_' + sobjectName + '_welinklayouts'] = window.decodeURIComponent(window.atob(result.recordtypeLayouts[property]));
+                            welinkStorage['welink_' + sobjectName + '_welinklayouts'] = JSON.stringify(welinkLayouts);
                         };
                     }
                     
