@@ -218,15 +218,16 @@ var UserAction = {
             has_retrieved_sobject_related:false,
             sobjectdescribe:null,
             layouts:null,
+            layoutsMapping:null,
             metadata:null,
             searchlayout:null,
             recentlyviewed:null,
             recordtype:null,
             businessprocess:null,
+            welinklayouts:null,
 
             has_retrieved_record_related:false,
             record:null,
-            welinklayoutid:null,
             welinklayout:null,
             layout:null,
             references:null,
@@ -871,9 +872,9 @@ var UserAction = {
                 "/composite/batch", 
                 reqBody, 
                 function(response){
-                    AjaxResponses.record = response.results[0];
+                    AjaxResponses.record = response.results[0].result;
                     
-                    var recordTypeId = response.results[0].RecordTypeId;
+                    var recordTypeId = response.results[0].result.RecordTypeId;
                     
                     if(recordTypeId == null || recordTypeId == ''){
                         recordTypeId = 'norecordtype';
@@ -885,7 +886,7 @@ var UserAction = {
                         AjaxResponses.layout = AjaxResponses.layoutsMapping[recordTypeId];
                     }
                     
-                    AjaxResponses.references = response;
+                    AjaxResponses.references = response.results[1].result;
                     AjaxResponses.has_retrieved_record_related = true;
                     callbackFunction();
                 }, 
