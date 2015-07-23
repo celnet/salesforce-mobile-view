@@ -307,7 +307,7 @@ var UserAction = {
         },
 
         ajax:function(method, endpoint, data, success, failure){
-            endpoint = context.rest_base_uri + endpoint + (endpoint.indexOf('?') > -1?'&':'?') + '_t=' + new Date().getTime();
+            endpoint = '/services/data/v' + context.api_version + endpoint + (endpoint.indexOf('?') > -1?'&':'?') + '_t=' + new Date().getTime();
 
             var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 
@@ -697,7 +697,7 @@ var UserAction = {
          */
          
         var retrieveSobjectRelatedByBatchRequest = function(sobjectName, callbackFunction){
-            var version_number = context.rest_base_uri.substr(15);
+            var version_number = 'v' + context.api_version;
             var reqBody = {
                 batchRequests:[
                     {
@@ -742,6 +742,10 @@ var UserAction = {
                     
                 }
             );
+        };
+        
+        var retrieveLayouts = function(sobjectName, callbackFunction){
+            
         };
         
         var retrieveListViews = function(sobjectName, doFinish){
@@ -831,14 +835,14 @@ var UserAction = {
         };
 
         var getReferenceFields = function(sobjectName, recordId){
+            var sobjectsWithoutName = ['DelegatedApproverId','CallCenterId','ConnectionSentId','ConnectionReceivedId'];
             var soql_fields = 'Id';
 
             for (var i = 0; i < sobject.describe.fields.length; i++) {
                 if(sobject.describe.fields[i].type == 'reference'){
                     var field_name = sobject.describe.fields[i].name;
-                    console.log(field_name);
-                    if(field_name == 'DelegatedApproverId' || field_name == 'CallCenterId' || field_name == 'ConnectionSentId' || field_name == 'ConnectionReceivedId'){
-                        console.log('===== in ');
+                    
+                    if(sobjectsWithoutName.indexOf(field_name) > 0){
                         continue;
                     }
 
@@ -887,18 +891,6 @@ var UserAction = {
                 }
             );
         };
-        /*
-        var retrieveWelinkLayout = function(welinkLayoutId, callbackFunction){
-            Ajax.get(
-                '/tooling/sobjects/Layout/' + welinkLayoutId, 
-                function(response){
-                    AjaxResponses.welinklayout = response;
-                    callbackFunction();
-                }
-            );
-        };
-        */
-        
         
         var retrieveLayoutByRecordType = function(sobjectName, recordTypeId, callbackFunction){
             Ajax.get(
