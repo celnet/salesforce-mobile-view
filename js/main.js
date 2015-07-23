@@ -269,7 +269,7 @@ var UserAction = {
 
             animateLoading:function(loading_text, jqm_page_id){
                 document.querySelector('#' + jqm_page_id).classList.add('ui-state-disabled');
-                var loading_image_src = context.welink_logo_src;//"{!URLFOR($Resource.DPResource, '/DPResource/welinklogo.png')}";
+                var loading_image_src = context.welink_logo_src;
                 
                 $j.mobile.loading( 'show', {
                     text: loading_text,
@@ -826,7 +826,7 @@ var UserAction = {
                         if(result.recordtypeLayouts != null){
                             var welinkLayouts = {};
                             for(var property in result.recordtypeLayouts){
-                                welinkLayouts[property] = JSON.parse(window.decodeURIComponent(window.atob(result.recordtypeLayouts[property])));
+                                welinkLayouts[property] = JSON.parse(window.decodeURIComponent(window.escape(window.atob(result.recordtypeLayouts[property]))));
                             };
                             AjaxResponses.welinklayouts = welinkLayouts;
                             welinkStorage['welink_' + sobjectName + '_welinklayouts'] = JSON.stringify(welinkLayouts);
@@ -894,48 +894,8 @@ var UserAction = {
                     
                 }
             );
-            /*
-            Ajax.get(
-                '/sobjects/' + sobjectName + '/' + record.id, 
-                function(response){
-                    AjaxResponses.record = response;
-                    
-                    var recordTypeId = response.RecordTypeId;
-                    
-                    if(recordTypeId == null || recordTypeId == ''){
-                        recordTypeId = 'norecordtype';
-                    }
-                    
-                    if(AjaxResponses.welinklayouts[recordTypeId] != null){
-                        AjaxResponses.welinklayout = AjaxResponses.welinklayouts[recordTypeId];
-                    } else {
-                        AjaxResponses.layout = AjaxResponses.layoutsMapping[recordTypeId];
-                    }
-                    
-                    retrieveReferences(sobjectName, recordId, callbackFunction);
-                }
-            );
-            */
         }
-/*
-        var retrieveReferences = function(sobjectName, recordId, record, doFinish){
-            var refSoql = getReferenceFields(sobjectName, recordId);
-            
-            if(refSoql != 'Id'){
-                Ajax.get(
-                    '/query/?q=' + window.encodeURIComponent(refSoql),
-                    function(response){
-                        AjaxResponses.references = response;
-                        AjaxResponses.has_retrieved_record_related = true;
-                        doFinish();
-                    }
-                );
-            } else {
-                AjaxResponses.has_retrieved_record_related = true;
-                doFinish();
-            }
-        };
-*/
+        
         var getReferenceFields = function(sobjectName, recordId){
             var sobjectsWithoutName = ['DelegatedApproverId','CallCenterId','ConnectionSentId','ConnectionReceivedId'];
             var soql_fields = 'Id';
@@ -963,19 +923,7 @@ var UserAction = {
 
             return 'Select ' + soql_fields + ' From ' + sobjectName + ' Where Id = \'' + recordId + '\'';
         };
-        /*
-        var retrieveWelinkLayoutId = function(sobjectName, recordTypeId, callbackFunction){
-            if(recordTypeId == null || recordTypeId == ''){
-                recordTypeId = 'norecordtype';
-            }
-            if(AjaxResponses.welinklayouts[recordTypeId] != null){
-                AjaxResponses.welinklayout = AjaxResponses.welinklayouts[recordTypeId];
-            } else {
-                AjaxResponses.layout = AjaxResponses.layoutsMapping[recordTypeId];
-            }
-            callbackFunction();
-        };
-        */
+        
         /**
          * RecentlyViewed Related
          */
