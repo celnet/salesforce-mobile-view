@@ -904,6 +904,9 @@ var UserAction = {
         };
         
         var retrieveWelinkLayoutId = function(sobjectName, recordTypeId, callbackFunction){
+            if(recordTypeId == null || recordTypeId == ''){
+                recordTypeId = 'norecordtype';
+            }
             if(AjaxResponses.welinklayouts[recordTypeId] != null){
                 AjaxResponses.welinklayout = AjaxResponses.welinklayouts[recordTypeId];
             } else {
