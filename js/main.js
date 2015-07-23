@@ -766,7 +766,8 @@ var UserAction = {
                 "/composite/batch", 
                 reqBody, 
                 function(response){
-                    console.log(response);
+                    welinkStorage['welink_' + sobjectName + '_layoutsMapping'] = response;
+                    AjaxResponses.layoutsMapping = response;
                     retrieveListViews(sobjectName, callbackFunction);
                 }, 
                 function(response){
@@ -903,6 +904,13 @@ var UserAction = {
         };
         
         var retrieveWelinkLayoutId = function(sobjectName, recordTypeId, callbackFunction){
+            if(AjaxResponses.welinklayouts[recordTypeId] != null){
+                AjaxResponses.welinklayout = AjaxResponses.welinklayouts[recordTypeId];
+            } else {
+                AjaxResponses.layout = AjaxResponses.layoutsMapping[recordTypeId];
+            }
+            callbackFunction();
+            /*
             Ajax.remoting(
                 'retrieveSobjectWelinkLayoutIdByRecordTypeId',
                 [sobjectName || '',recordTypeId || ''],
@@ -926,8 +934,9 @@ var UserAction = {
                     }
                 }
             );
+            */
         };
-        
+        /*
         var retrieveLayoutByRecordType = function(sobjectName, recordTypeId, callbackFunction){
             Ajax.get(
                 '/sobjects/' + sobjectName + '/describe/layouts/' + recordTypeId, 
@@ -937,7 +946,7 @@ var UserAction = {
                 }
             );
         };
-        
+        */
         /**
          * RecentlyViewed Related
          */
