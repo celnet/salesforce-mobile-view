@@ -159,7 +159,7 @@ var RecordNew;
         
         function processFieldsDisplay(_row, _is_welink_layout){
             var sobjectsWithCompoundNames = ['user','contact','lead'];
-            var isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase());
+            var isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase()) > 0;
             
             var fieldName;
             var fieldLabel;

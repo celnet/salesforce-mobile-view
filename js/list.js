@@ -31,9 +31,6 @@ var ListView;
             handleMetadata();
 
             if(params.listviewid != 'recentlyviewed'){
-                //View.animateLoading(context.labels.loading,'jqm-list');
-                renderListViewSelects();
-                //retrieveSelectListView(params.listviewid);
                 AjaxPools.retrieveSelectedListView(sobject.name, params.listviewid, function(){
                     var response = AjaxResponses.listviews[params.listviewid].describe;
                     for (var i = response.columns.length - 1; i >= 0; i--) {
@@ -42,6 +39,7 @@ var ListView;
                     };
 
                     listview.queryresult = AjaxResponses.listviews[params.listviewid].result;
+                    renderListViewSelects();
                     renderListViewResultList(25);
                     View.stopLoading('jqm-list');
                 });
