@@ -1056,7 +1056,7 @@ var UserAction = {
             retrieveSelectedListView:function(sobjectName, listviewId, callbackFunction){
                 retrieveListViewDescribe(sobjectName, listviewId, callbackFunction);
             },
-            
+            /*
             retrieveLayoutByRecordType:function(sobjectName, recordTypeId, callbackFunction){
                 if(recordTypeId == null || recordTypeId == ''){
                     recordTypeId = 'norecordtype';
@@ -1068,7 +1068,7 @@ var UserAction = {
                 }
                 callbackFunction();
             },
-            
+            */
             retrieveSobjectRelatedMetadata:retrieveSobjectRelatedMetadata
         };
     })();

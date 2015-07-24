@@ -58,6 +58,21 @@ var RecordNew;
                     record.recordtypeid = 'pending select';
             }
         }
+        
+        function getLayoutByRecordType(recordTypeId){
+            if(recordTypeId == null || recordTypeId == ''){
+                recordTypeId = 'norecordtype';
+            }
+            if(AjaxResponses.welinklayouts[recordTypeId] != null){
+                AjaxResponses.welinklayout = AjaxResponses.welinklayouts[recordTypeId];
+                sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
+                record.welink_processed = AjaxHandlers.welinklayout();
+            } else {
+                AjaxResponses.layout = AjaxResponses.layoutsMapping[recordTypeId];
+                sobject.layout = AjaxResponses.layout;
+                record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
+            }
+        }
 
         function checkRecordType(){
             switch(record.recordtypeid){
@@ -65,6 +80,9 @@ var RecordNew;
                     renderRecordTypeSelect();
                     break;
                 case '': // has no record type, direct to next step
+                    getLayoutByRecordType('');
+                    renderLayout();
+                    /*
                     AjaxPools.retrieveLayoutByRecordType(sobject.name, '', function(){
                         if(AjaxResponses.welinklayout != null){
                             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
@@ -73,8 +91,14 @@ var RecordNew;
 
                         renderLayout();
                     });
+                    */
                     break;
                 default: // has given record type, direct to next step
+                    AjaxHandlers.recordTypes();
+                    AjaxHandlers.businessProcesses();
+                    getLayoutByRecordType(record.recordtypeid);
+                    renderLayout();
+                    /*
                     AjaxPools.retrieveLayoutByRecordType(sobject.name, record.recordtypeid, function(){
                         sobject.layout = AjaxResponses.layout;
                         record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
@@ -89,6 +113,7 @@ var RecordNew;
 
                         renderLayout();
                     });
+                    */
             }
         }
 
@@ -138,7 +163,13 @@ var RecordNew;
                     document.querySelector('#jqm-header-right-button').href = 'javascript:UserAction.saveRecord()';
                     record.recordtypeid = recordtype_options[i].value;
                     record.recordtypename = recordtype_options[i].label;
-
+                    
+                    AjaxHandlers.recordTypes();
+                    AjaxHandlers.businessProcesses();
+                    getLayoutByRecordType(record.recordtypeid);
+                    renderLayout();
+                    
+                    /*
                     AjaxPools.retrieveLayoutByRecordType(sobject.name, record.recordtypeid, function(){
                         AjaxHandlers.recordTypes();
                         AjaxHandlers.businessProcesses();
@@ -153,6 +184,7 @@ var RecordNew;
 
                         renderLayout();
                     });
+                    */
                 }
             }
         }
