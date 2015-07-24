@@ -77,7 +77,6 @@ var ListView;
 
         function handleMetadata(){
             var orderedListviews = AjaxResponses.orderedListviews;
-            //var result = AjaxResponses.metadata;
 
             sobject.ordered_listviews = [];
             
@@ -85,20 +84,7 @@ var ListView;
                 sobject.ordered_listviews = sobject.listviews.listviews;
                 return;
             }
-/*
-            if(result == 'exception'){
-                sobject.ordered_listviews = sobject.listviews.listviews;
-                return;
-            }
-
-            var sobject_metadata = result.split('==');
-            var _md = sobject.metadata;
-            _md.filter_by_my_listview = orderedListviews.filteredByMy;
-            _md.visible_to_me_listview = orderedListviews.visibleToMe;
-            _md.created_by_me_listview = orderedListviews.createdByMe;
             
-            _md.tab_list_fields = sobject_metadata[3].split('=');
-*/
             var ordered_listview_ids = [];
 
             for (var i = 0; i < orderedListviews.filteredByMy.length; i++) {

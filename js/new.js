@@ -36,7 +36,6 @@ var RecordNew;
         function handleSobjectLayouts(){
             var response = AjaxResponses.layouts;
             var recordtype_mappings = response.recordTypeMappings;
-            sobject.recordtype_mappings = response.recordTypeMappings;
             switch(true){
                 case (response.layouts != null && response.layouts.length > 0):
                     console.log('no recordtype, no recordtype select needed');
@@ -59,21 +58,6 @@ var RecordNew;
             }
         }
         
-        function getLayoutByRecordType(recordTypeId){
-            if(recordTypeId == null || recordTypeId == ''){
-                recordTypeId = 'norecordtype';
-            }
-            if(AjaxResponses.welinklayouts[recordTypeId] != null){
-                AjaxResponses.welinklayout = AjaxResponses.welinklayouts[recordTypeId];
-                sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                record.welink_processed = AjaxHandlers.welinklayout();
-            } else {
-                AjaxResponses.layout = AjaxResponses.layoutsMapping[recordTypeId];
-                sobject.layout = AjaxResponses.layout;
-                record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
-            }
-        }
-
         function checkRecordType(){
             switch(record.recordtypeid){
                 case 'pending select': // has record types pending selection
@@ -92,7 +76,7 @@ var RecordNew;
         }
 
         function renderRecordTypeSelect(){
-            var recordtype_mappings = sobject.recordtype_mappings;
+            var recordtype_mappings = AjaxResponses.layouts.recordTypeMappings;
             var recordtype_options = '';
             var has_default = false;
             for (var i = 0; i < recordtype_mappings.length - 1; i++) {
@@ -142,6 +126,21 @@ var RecordNew;
                     getLayoutByRecordType(record.recordtypeid);
                     renderLayout();
                 }
+            }
+        }
+        
+        function getLayoutByRecordType(recordTypeId){
+            if(recordTypeId == null || recordTypeId == ''){
+                recordTypeId = 'norecordtype';
+            }
+            if(AjaxResponses.welinklayouts[recordTypeId] != null){
+                AjaxResponses.welinklayout = AjaxResponses.welinklayouts[recordTypeId];
+                sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
+                record.welink_processed = AjaxHandlers.welinklayout();
+            } else {
+                AjaxResponses.layout = AjaxResponses.layoutsMapping[recordTypeId];
+                sobject.layout = AjaxResponses.layout;
+                record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
             }
         }
         
@@ -356,153 +355,19 @@ var RecordNew;
         }
 
         function processWelinkNameField(){
-            var name_labels = {
-                firstname:sobject.fields['FirstName'].describe.label,
-                lastname:sobject.fields['LastName'].describe.label
-            }
-
-            var _field = '';
-            var _field_template = templates.field_user_name;//document.querySelector('#user-name').text;
-
-            _field = _field_template.replace('{{lastname-value}}','');
-            _field = _field.replace('{{lastname-label}}',name_labels.lastname);
-
-            _field = _field.replace('{{firstname-value}}','');
-            _field = _field.replace('{{firstname-label}}',name_labels.firstname);
-
-            return _field;
+            return FieldRenderer.processWelinkNameField({});
         }
 
         function processWelinkAddressField(fullfieldname){
-            var _address_prefix = fullfieldname.substring(0,fullfieldname.indexOf('Address'));
-            var address_labels = {
-                country:sobject.fields[_address_prefix + 'Country'].describe.label,
-                state:sobject.fields[_address_prefix + 'State'].describe.label,
-                city:sobject.fields[_address_prefix + 'City'].describe.label,
-                postalCode:sobject.fields[_address_prefix + 'PostalCode'].describe.label,
-                street:sobject.fields[_address_prefix + 'Street'].describe.label
-            };
-
-            var address_apinames = {
-                country:_address_prefix + 'Country',
-                state:_address_prefix + 'State',
-                city:_address_prefix + 'City',
-                postalCode:_address_prefix + 'PostalCode',
-                street:_address_prefix + 'Street'
-            }
-
-            var _field = '';
-            var _field_template = templates.field_address;//document.querySelector('#address').text;
-
-            _field = _field_template.replace(/{{address-country-id}}/g,'record-field-' + address_apinames.country);
-            _field = _field.replace('{{country-label}}',address_labels.country);
-            _field = _field.replace('{{country-value}}','');
-
-            _field = _field.replace(/{{address-state-id}}/g,'record-field-' + address_apinames.state);
-            _field = _field.replace('{{state-label}}',address_labels.state);
-            _field = _field.replace('{{state-value}}','');
-
-            _field = _field.replace(/{{address-city-id}}/g,'record-field-' + address_apinames.city);
-            _field = _field.replace('{{city-label}}',address_labels.city);
-            _field = _field.replace('{{city-value}}','');
-
-            _field = _field.replace(/{{address-postalCode-id}}/g,'record-field-' + address_apinames.postalCode);
-            _field = _field.replace('{{postalCode-label}}',address_labels.postalCode);
-            _field = _field.replace('{{postalCode-value}}','');
-
-            _field = _field.replace(/{{address-street-id}}/g,'record-field-' + address_apinames.street);
-            _field = _field.replace('{{street-label}}',address_labels.street);
-            _field = _field.replace('{{street-value}}','');
-
-            return _field;
+            return FieldRenderer.processWelinkAddressField({},fullfieldname);
         }
 
         function processNameField(name_components){
-            var name_labels = {
-                firstname:'',
-                lastname:''
-            }
-
-            for (var i = name_components.length - 1; i >= 0; i--) {
-                if(name_components[i].value.toLowerCase().match(/first/) != null){
-                    name_labels.firstname = name_components[i].details.label;
-                } else if(name_components[i].value.toLowerCase().match(/last/) != null){
-                    name_labels.lastname = name_components[i].details.label;
-                }
-            }
-
-            var _field = '';
-            var _field_template = templates.field_user_name;//document.querySelector('#user-name').text;
-
-            _field = _field_template.replace('{{lastname-value}}','');
-            _field = _field.replace('{{lastname-label}}',name_labels.lastname);
-
-            _field = _field.replace('{{firstname-value}}','');
-            _field = _field.replace('{{firstname-label}}',name_labels.firstname);
-
-            return _field;
+            return FieldRenderer.processNameField({}, name_components);
         }
 
         function processAddressField(address_components){
-            var address_labels = {
-                country:'',
-                state:'',
-                city:'',
-                postalCode:'',
-                street:''
-            };
-
-            var address_apinames = {
-                country:'',
-                state:'',
-                city:'',
-                postalCode:'',
-                street:''
-            }
-
-            for (var i = address_components.length - 1; i >= 0; i--) {
-                if(address_components[i].value.toLowerCase().match(/street/) != null){
-                    address_labels.street = address_components[i].details.label;
-                    address_apinames.street = address_components[i].details.name;
-                } else if(address_components[i].value.toLowerCase().match(/country/) != null){
-                    address_labels.country = address_components[i].details.label;
-                    address_apinames.country = address_components[i].details.name;
-                } else if(address_components[i].value.toLowerCase().match(/city/) != null){
-                    address_labels.city = address_components[i].details.label;
-                    address_apinames.city = address_components[i].details.name;
-                } else if(address_components[i].value.toLowerCase().match(/state/) != null){
-                    address_labels.state = address_components[i].details.label;
-                    address_apinames.state = address_components[i].details.name;
-                } else if(address_components[i].value.toLowerCase().match(/postalcode/) != null){
-                    address_labels.postalCode = address_components[i].details.label;
-                    address_apinames.postalCode = address_components[i].details.name;
-                }
-            };
-
-            var _field = '';
-            var _field_template = templates.field_address;//document.querySelector('#address').text;
-
-            _field = _field_template.replace(/{{address-country-id}}/g,'record-field-' + address_apinames.country);
-            _field = _field.replace('{{country-label}}',address_labels.country);
-            _field = _field.replace('{{country-value}}','');
-
-            _field = _field.replace(/{{address-state-id}}/g,'record-field-' + address_apinames.state);
-            _field = _field.replace('{{state-label}}',address_labels.state);
-            _field = _field.replace('{{state-value}}','');
-
-            _field = _field.replace(/{{address-city-id}}/g,'record-field-' + address_apinames.city);
-            _field = _field.replace('{{city-label}}',address_labels.city);
-            _field = _field.replace('{{city-value}}','');
-
-            _field = _field.replace(/{{address-postalCode-id}}/g,'record-field-' + address_apinames.postalCode);
-            _field = _field.replace('{{postalCode-label}}',address_labels.postalCode);
-            _field = _field.replace('{{postalCode-value}}','');
-
-            _field = _field.replace(/{{address-street-id}}/g,'record-field-' + address_apinames.street);
-            _field = _field.replace('{{street-label}}',address_labels.street);
-            _field = _field.replace('{{street-value}}','');
-
-            return _field;
+            return FieldRenderer.processAddressField({}, address_components);
         }
 
         function renderLayout(){
