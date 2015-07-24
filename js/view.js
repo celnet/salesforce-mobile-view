@@ -138,7 +138,11 @@ var RecordView = {};
                             console.log(fieldValue);
                     }
                     
-                    _field = _field.replace('{{field-value}}', fieldValue || '<br/>');
+                    if(fieldValue == null || fieldValue == undefined){
+                        fieldValue = '<br/>';
+                    }
+                    
+                    _field = _field.replace('{{field-value}}', fieldValue);
                     _fields += _field;
                 }
                 
@@ -269,7 +273,11 @@ var RecordView = {};
                             console.log(fieldValue);
                     }
                     
-                    _field = _field.replace('{{field-value}}', fieldValue || '<br/>');
+                    if(fieldValue == null || fieldValue == undefined){
+                        fieldValue = '<br/>';
+                    }
+                    
+                    _field = _field.replace('{{field-value}}', fieldValue);
                     _fields += _field;
                 }
                 

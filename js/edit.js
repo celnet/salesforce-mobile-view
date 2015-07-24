@@ -322,7 +322,14 @@
                 default:
                     var _field_template = field_templates[_details.type] || field_templates['string'];
                     _field = _field_template.replace('{{input-label}}',_field_label);
-                    _field = _field.replace('{{input-value}}',_record_detail[_details.name] || '');
+                    
+                    var fieldValue = _record_detail[_details.name];
+                    
+                    if(fieldValue == null || fieldValue == undefined){
+                        fieldValue = '';
+                    }
+                    
+                    _field = _field.replace('{{input-value}}',fieldValue);
                     _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
             }
 
