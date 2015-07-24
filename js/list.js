@@ -15,7 +15,6 @@ var ListView;
         Styles.tunePageStyle();
 
         View.animateLoading(context.labels.loading,'jqm-list');
-        // ListView.retrieveSobjectData();
         AjaxPools.retrieveSobjectRelated(sobject.name, function(){
             AjaxHandlers.describe();
             ListView.retrieveSobjectData();
@@ -186,11 +185,6 @@ var ListView;
         function renderListViewSelects(){
             var options = '';
             var option_template = templates.listview_option;
-            /*
-            for(var i = 0; i < sobject.listviews.listviews.length;i++){
-                options += option_template.replace('{{option-value}}',sobject.listviews.listviews[i].id).replace('{{option-label}}',sobject.listviews.listviews[i].label);
-            }
-            */
 
             for (var i = 0; i < sobject.ordered_listviews.length; i++) {
                 var option = option_template.replace('{{option-value}}',sobject.ordered_listviews[i].id).replace('{{option-label}}',sobject.ordered_listviews[i].label);

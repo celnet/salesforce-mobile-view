@@ -2,7 +2,7 @@ var RecordView = {};
 
     function renderRecordView(){
         RecordView = initRecordView();
-        document.querySelector('body').innerHTML = templates.record_page_structure;//.replace(/{{page}}/g,'view');
+        document.querySelector('body').innerHTML = templates.record_page_structure;
 
         document.querySelector('#jqm-header-left-button')['href'] = "javascript:UserAction.viewList('jqm-record')";
         document.querySelector('#jqm-header-right-button')['href'] = "javascript:UserAction.editRecord('jqm-record')";

@@ -82,43 +82,16 @@ var RecordNew;
                 case '': // has no record type, direct to next step
                     getLayoutByRecordType('');
                     renderLayout();
-                    /*
-                    AjaxPools.retrieveLayoutByRecordType(sobject.name, '', function(){
-                        if(AjaxResponses.welinklayout != null){
-                            sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                            record.welink_processed = AjaxHandlers.welinklayout();
-                        }
-
-                        renderLayout();
-                    });
-                    */
                     break;
                 default: // has given record type, direct to next step
                     AjaxHandlers.recordTypes();
                     AjaxHandlers.businessProcesses();
                     getLayoutByRecordType(record.recordtypeid);
                     renderLayout();
-                    /*
-                    AjaxPools.retrieveLayoutByRecordType(sobject.name, record.recordtypeid, function(){
-                        sobject.layout = AjaxResponses.layout;
-                        record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
-
-                        AjaxHandlers.recordTypes();
-                        AjaxHandlers.businessProcesses();
-
-                        if(AjaxResponses.welinklayout != null){
-                            sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                            record.welink_processed = AjaxHandlers.welinklayout();
-                        }
-
-                        renderLayout();
-                    });
-                    */
             }
         }
 
         function renderRecordTypeSelect(){
-            //record.recordtypeid = '';
             var recordtype_mappings = sobject.recordtype_mappings;
             var recordtype_options = '';
             var has_default = false;
@@ -168,23 +141,6 @@ var RecordNew;
                     AjaxHandlers.businessProcesses();
                     getLayoutByRecordType(record.recordtypeid);
                     renderLayout();
-                    
-                    /*
-                    AjaxPools.retrieveLayoutByRecordType(sobject.name, record.recordtypeid, function(){
-                        AjaxHandlers.recordTypes();
-                        AjaxHandlers.businessProcesses();
-
-                        if(AjaxResponses.welinklayout != null){
-                            sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                            record.welink_processed = AjaxHandlers.welinklayout();
-                        } else {
-                            sobject.layout = AjaxResponses.layout;
-                            record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
-                        }
-
-                        renderLayout();
-                    });
-                    */
                 }
             }
         }

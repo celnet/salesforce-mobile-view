@@ -201,9 +201,7 @@ var UserAction = {
             welink_edit:{},
             recordtypeid:'', // user select
             recordtypename:'',
-            recordtype_detail:{},
-            selected_recordtype_detail:{},
-            businessprocess_detail:{}
+            selected_recordtype_detail:{}
         };
 
         var listview = {
@@ -808,6 +806,7 @@ var UserAction = {
                 [sobjectName],
                 function(result){
                     if(result != null){
+                        console.log(result.listviewsMetadata);
                         if(result.listviewMetadata != null){
                             welinkStorage['welink_' + sobjectName + '_metadata'] = JSON.stringify(result.listviewMetadata);
                             AjaxResponses.metadata = result.listviewMetadata;
@@ -1011,10 +1010,6 @@ var UserAction = {
         };
         
         return {
-            retrieveRecordRelated:function(sobjectName, recordId, callbackFunction){
-                retrieveRecord(sobjectName, recordId, callbackFunction);
-            },
-
             retrieveSobjectRelated:function(sobjectName, callbackFunction){
                 if(welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] == 'true'){
                     AjaxResponses.sobjectdescribe = JSON.parse(welinkStorage['welink_' + sobjectName + '_sobjectdescribe']);
@@ -1049,6 +1044,10 @@ var UserAction = {
                     retrieveSobjectRelatedByBatchRequest(sobjectName, callbackFunction);
                 }
             },
+            
+            retrieveRecordRelated:function(sobjectName, recordId, callbackFunction){
+                retrieveRecord(sobjectName, recordId, callbackFunction);
+            },
 
             retrieveRecentlyViewed:function(sobjectName, callbackFunction){
                 retrieveRecentlyViewed(sobjectName, callbackFunction);
@@ -1056,21 +1055,7 @@ var UserAction = {
 
             retrieveSelectedListView:function(sobjectName, listviewId, callbackFunction){
                 retrieveListViewDescribe(sobjectName, listviewId, callbackFunction);
-            },
-            /*
-            retrieveLayoutByRecordType:function(sobjectName, recordTypeId, callbackFunction){
-                if(recordTypeId == null || recordTypeId == ''){
-                    recordTypeId = 'norecordtype';
-                }
-                if(AjaxResponses.welinklayouts[recordTypeId] != null){
-                    AjaxResponses.welinklayout = AjaxResponses.welinklayouts[recordTypeId];
-                } else {
-                    AjaxResponses.layout = AjaxResponses.layoutsMapping[recordTypeId];
-                }
-                callbackFunction();
-            },
-            */
-            retrieveSobjectRelatedMetadata:retrieveSobjectRelatedMetadata
+            }
         };
     })();
     
@@ -1199,14 +1184,14 @@ var UserAction = {
         };
         
         var handleRecordTypes = function(){
-            record.recordtype_detail = AjaxResponses.recordtype;//JSON.parse(window.atob(result));
+            var recordtypes = AjaxResponses.recordtype;//JSON.parse(window.atob(result));
             var bp_values = [];
 
-            if(record.recordtype_detail != null){
-                for (var i = 0; i < record.recordtype_detail.length; i++) {
-                    if(record.recordtype_detail[i].fullName != null && record.recordtype_detail[i].label == record.recordtypename){
-                        bp_values = record.recordtype_detail[i].picklistValues;
-                        record.selected_recordtype_detail = record.recordtype_detail[i];
+            if(recordtypes != null){
+                for (var i = 0; i < recordtypes.length; i++) {
+                    if(recordtypes[i].fullName != null && recordtypes[i].label == record.recordtypename){
+                        bp_values = recordtypes[i].picklistValues;
+                        record.selected_recordtype_detail = recordtypes[i];
                         break;
                     }
                 };
@@ -1235,17 +1220,15 @@ var UserAction = {
                 return;
             }
 
-            var result = AjaxResponses.businessprocess;
-            console.log('remoting business process');
-            record.businessprocess_detail = result;//JSON.parse(window.atob(result));
+            var businessprocesses = AjaxResponses.businessprocess;
 
             var bp_values = [];
             var bp_processed_values = [];
 
-            if(record.businessprocess_detail != null)
-            for (var i = 0; i < record.businessprocess_detail.length; i++) {
-                if(record.businessprocess_detail[i].fullName != null && record.businessprocess_detail[i].fullName == record.selected_recordtype_detail.businessProcess){
-                    bp_values = record.businessprocess_detail[i].values;
+            if(businessprocesses != null)
+            for (var i = 0; i < businessprocesses.length; i++) {
+                if(businessprocesses[i].fullName != null && businessprocesses[i].fullName == record.selected_recordtype_detail.businessProcess){
+                    bp_values = businessprocesses[i].values;
                     break;
                 }
             };
