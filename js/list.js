@@ -76,10 +76,16 @@ var ListView;
         }
 
         function handleMetadata(){
-            var result = AjaxResponses.metadata;
+            var orderedListviews = AjaxResponses.orderedListviews;
+            //var result = AjaxResponses.metadata;
 
             sobject.ordered_listviews = [];
-
+            
+            if(orderedListviews == null){
+                sobject.ordered_listviews = sobject.listviews.listviews;
+                return;
+            }
+/*
             if(result == 'exception'){
                 sobject.ordered_listviews = sobject.listviews.listviews;
                 return;
@@ -87,28 +93,29 @@ var ListView;
 
             var sobject_metadata = result.split('==');
             var _md = sobject.metadata;
-            _md.filter_by_my_listview = sobject_metadata[0].split('=');
-            _md.visible_to_me_listview = sobject_metadata[1].split('=');
-            _md.created_by_me_listview = sobject_metadata[2].split('=');
+            _md.filter_by_my_listview = orderedListviews.filteredByMy;
+            _md.visible_to_me_listview = orderedListviews.visibleToMe;
+            _md.created_by_me_listview = orderedListviews.createdByMe;
+            
             _md.tab_list_fields = sobject_metadata[3].split('=');
-
+*/
             var ordered_listview_ids = [];
 
-            for (var i = 0; i < _md.filter_by_my_listview.length; i++) {
-                if(_md.filter_by_my_listview[i] != ''){
-                    ordered_listview_ids.push(_md.filter_by_my_listview[i]);
+            for (var i = 0; i < orderedListviews.filteredByMy.length; i++) {
+                if(orderedListviews.filteredByMy[i] != ''){
+                    ordered_listview_ids.push(orderedListviews.filteredByMy[i]);
                 }
             };
 
-            for (var i = 0; i < _md.visible_to_me_listview.length; i++) {
-                if(_md.visible_to_me_listview[i] != ''){
-                    ordered_listview_ids.push(_md.visible_to_me_listview[i]);
+            for (var i = 0; i < orderedListviews.visibleToMe.length; i++) {
+                if(orderedListviews.visibleToMe[i] != ''){
+                    ordered_listview_ids.push(orderedListviews.visibleToMe[i]);
                 }
             };
 
-            for (var i = 0; i < _md.created_by_me_listview.length; i++) {
-                if(_md.created_by_me_listview[i] != ''){
-                    ordered_listview_ids.push(_md.created_by_me_listview[i]);
+            for (var i = 0; i < orderedListviews.createdByMe.length; i++) {
+                if(orderedListviews.createdByMe[i] != ''){
+                    ordered_listview_ids.push(orderedListviews.createdByMe[i]);
                 }
             };
 

@@ -218,6 +218,7 @@ var UserAction = {
             layouts:null,
             layoutsMapping:null,
             metadata:null,
+            orderedListviews:null,
             searchlayout:null,
             recentlyviewed:null,
             recordtype:null,
@@ -806,7 +807,13 @@ var UserAction = {
                 [sobjectName],
                 function(result){
                     if(result != null){
-                        console.log(result.listviewsMetadata);
+                        if(result.listviewsMetadata != null){
+                            welinkStorage['welink_' + sobjectName + '_orderedlistviews'] = JSON.stringify(result.listviewsMetadata);
+                            AjaxResponses.orderedListviews = result.listviewsMetadata;
+                        } else {
+                            sobject.ordered_listviews = sobject.listviews.listviews;
+                        }
+                        
                         if(result.listviewMetadata != null){
                             welinkStorage['welink_' + sobjectName + '_metadata'] = JSON.stringify(result.listviewMetadata);
                             AjaxResponses.metadata = result.listviewMetadata;
@@ -1018,6 +1025,10 @@ var UserAction = {
                     
                     if(welinkStorage['welink_' + sobjectName + '_layout'] != null){
                         AjaxResponses.layout = JSON.parse(welinkStorage['welink_' + sobjectName + '_layout']);
+                    }
+                    
+                    if(welinkStorage['welink_' + sobjectName + '_orderedlistviews'] != null){
+                        AjaxResponses.orderedListviews = JSON.parse(welinkStorage['welink_' + sobjectName + '_orderedlistviews']);
                     }
                     
                     AjaxResponses.metadata = JSON.parse(welinkStorage['welink_' + sobjectName + '_metadata']);
