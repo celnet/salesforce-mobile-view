@@ -816,12 +816,12 @@ var UserAction = {
                         }
                         
                         if(result.businessprocessesMetadata != null){
-                            welinkStorage['welink_' + sobjectName + '_recordtype'] = JSON.stringify(result.businessprocessesMetadata);
+                            welinkStorage['welink_' + sobjectName + '_recordtype'] = JSON.stringify(result.recordtypesMetadata);
                             AjaxResponses.recordtype = result.recordtypesMetadata;
                         };
                         if(result.recordtypesMetadata != null){
                             AjaxResponses.businessprocess = result.businessprocessesMetadata;
-                            welinkStorage['welink_' + sobjectName + '_businessprocess'] = JSON.stringify(result.recordtypesMetadata);
+                            welinkStorage['welink_' + sobjectName + '_businessprocess'] = JSON.stringify(result.businessprocessesMetadata);
                         };
                         
                         if(result.recordtypeLayouts != null){
