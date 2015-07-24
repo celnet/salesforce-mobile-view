@@ -330,11 +330,11 @@
         }
 
         function processWelinkNameField(allfields){
-            return FieldRenderer.processWelinkNameField(allfields);
+            return FieldRenderer.processNameField(allfields, []);
         }
 
         function processWelinkAddressField(address_field,fullfieldname){
-            return FieldRenderer.processWelinkAddressField(address_field,fullfieldname);
+            return FieldRenderer.processAddressField(address_field,[],fullfieldname);
         }
 
         function processNameField(allfields, name_components){
@@ -342,7 +342,7 @@
         }
 
         function processAddressField(address_field, address_components){
-            return FieldRenderer.processAddressField(address_field, address_components);
+            return FieldRenderer.processAddressField(address_field, address_components, null);
         }
         
         function displayLayout(){

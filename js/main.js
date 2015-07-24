@@ -1283,72 +1283,10 @@ var UserAction = {
     })();
 
 var FieldRenderer = {
-    processWelinkNameField:function(allfields){
+    processNameField:function(allfields, name_components){
         var name_labels = {
             firstname:sobject.fields['FirstName'].describe.label,
             lastname:sobject.fields['LastName'].describe.label
-        }
-
-        var _field = '';
-        var _field_template = templates.field_username;
-
-        _field = _field_template.replace('{{lastname-value}}',allfields.LastName || '');
-        _field = _field.replace('{{lastname-label}}',name_labels.lastname);
-
-        _field = _field.replace('{{firstname-value}}',allfields.FirstName || '');
-        _field = _field.replace('{{firstname-label}}',name_labels.firstname);
-
-        return _field;
-    },
-
-    processWelinkAddressField:function(address_field,fullfieldname){
-        var _address_prefix = fullfieldname.substring(0,fullfieldname.indexOf('Address'));
-        var address_labels = {
-            country:sobject.fields[_address_prefix + 'Country'].describe.label,
-            state:sobject.fields[_address_prefix + 'State'].describe.label,
-            city:sobject.fields[_address_prefix + 'City'].describe.label,
-            postalCode:sobject.fields[_address_prefix + 'PostalCode'].describe.label,
-            street:sobject.fields[_address_prefix + 'Street'].describe.label
-        };
-
-        var address_apinames = {
-            country:_address_prefix + 'Country',
-            state:_address_prefix + 'State',
-            city:_address_prefix + 'City',
-            postalCode:_address_prefix + 'PostalCode',
-            street:_address_prefix + 'Street'
-        }
-
-        var _field = '';
-        var _field_template = templates.field_address;
-
-        _field = _field_template.replace(/{{address-country-id}}/g,'record-field-' + address_apinames.country);
-        _field = _field.replace('{{country-label}}',address_labels.country);
-        _field = _field.replace('{{country-value}}',address_field != null?(address_field.country || ''):'');
-
-        _field = _field.replace(/{{address-state-id}}/g,'record-field-' + address_apinames.state);
-        _field = _field.replace('{{state-label}}',address_labels.state);
-        _field = _field.replace('{{state-value}}',address_field != null?(address_field.state || ''):'');
-
-        _field = _field.replace(/{{address-city-id}}/g,'record-field-' + address_apinames.city);
-        _field = _field.replace('{{city-label}}',address_labels.city);
-        _field = _field.replace('{{city-value}}',address_field != null?(address_field.city || ''):'');
-
-        _field = _field.replace(/{{address-postalCode-id}}/g,'record-field-' + address_apinames.postalCode);
-        _field = _field.replace('{{postalCode-label}}',address_labels.postalCode);
-        _field = _field.replace('{{postalCode-value}}',address_field != null?(address_field.postalCode || ''):'');
-
-        _field = _field.replace(/{{address-street-id}}/g,'record-field-' + address_apinames.street);
-        _field = _field.replace('{{street-label}}',address_labels.street);
-        _field = _field.replace('{{street-value}}',address_field != null?(address_field.street || ''):'');
-
-        return _field;
-    },
-
-    processNameField:function(allfields, name_components){
-        var name_labels = {
-            firstname:'',
-            lastname:''
         }
 
         for (var i = name_components.length - 1; i >= 0; i--) {
@@ -1371,21 +1309,40 @@ var FieldRenderer = {
         return _field;
     },
 
-    processAddressField:function(address_field, address_components){
-        var address_labels = {
-            country:'',
-            state:'',
-            city:'',
-            postalCode:'',
-            street:''
-        };
-
-        var address_apinames = {
-            country:'',
-            state:'',
-            city:'',
-            postalCode:'',
-            street:''
+    processAddressField:function(address_field, address_components, fullfieldname){
+        if(fullfieldname != null){
+            var address_prefix = fullfieldname.substring(0,fullfieldname.indexOf('Address'));
+            var address_labels = {
+                country:sobject.fields[address_prefix + 'Country'].describe.label,
+                state:sobject.fields[address_prefix + 'State'].describe.label,
+                city:sobject.fields[address_prefix + 'City'].describe.label,
+                postalCode:sobject.fields[address_prefix + 'PostalCode'].describe.label,
+                street:sobject.fields[address_prefix + 'Street'].describe.label
+            };
+    
+            var address_apinames = {
+                country:address_prefix + 'Country',
+                state:address_prefix + 'State',
+                city:address_prefix + 'City',
+                postalCode:address_prefix + 'PostalCode',
+                street:address_prefix + 'Street'
+            };
+        } else {
+            var address_labels = {
+                country:'',
+                state:'',
+                city:'',
+                postalCode:'',
+                street:''
+            };
+    
+            var address_apinames = {
+                country:'',
+                state:'',
+                city:'',
+                postalCode:'',
+                street:''
+            };
         }
 
         for (var i = address_components.length - 1; i >= 0; i--) {
