@@ -826,7 +826,7 @@ var UserAction = {
                         if(result.recordtypeLayouts != null){
                             var welinkLayouts = {};
                             for(var property in result.recordtypeLayouts){
-                                welinkLayouts[property] = JSON.parse(window.decodeURIComponent(window.escape(window.atob(result.recordtypeLayouts[property]))));
+                                welinkLayouts[property] = JSON.parse(window.decodeURIComponent(window.atob(result.recordtypeLayouts[property]).replace(/spaceescaper/g,' ')));
                             };
                             AjaxResponses.welinklayouts = welinkLayouts;
                             welinkStorage['welink_' + sobjectName + '_welinklayouts'] = JSON.stringify(welinkLayouts);
