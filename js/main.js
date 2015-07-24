@@ -817,10 +817,10 @@ var UserAction = {
                         
                         if(result.businessprocessesMetadata != null){
                             welinkStorage['welink_' + sobjectName + '_recordtype'] = JSON.stringify(result.businessprocessesMetadata);
-                            AjaxResponses.recordtype = result.businessprocessesMetadata;
+                            AjaxResponses.recordtype = result.recordtypesMetadata;
                         };
                         if(result.recordtypesMetadata != null){
-                            AjaxResponses.businessprocess = result.recordtypesMetadata;
+                            AjaxResponses.businessprocess = result.businessprocessesMetadata;
                             welinkStorage['welink_' + sobjectName + '_businessprocess'] = JSON.stringify(result.recordtypesMetadata);
                         };
                         
