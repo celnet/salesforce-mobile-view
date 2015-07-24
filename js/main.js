@@ -478,7 +478,8 @@ var UserAction = {
 
     var RecordForm = {
         validate:function(field_name, field_value){
-            if(document.querySelector('label[for="record-field-' + field_name + '"] span') != null && (field_value == null || field_value == '')){
+            var isFieldRequired = document.querySelector('label[for="record-field-' + field_name + '"] span') != null && document.querySelector('label[for="record-field-' + field_name + '"] span').innerHTML.indexOf('*') >= 0;
+            if(isFieldRequired && (field_value == null || field_value == '')){
                 document.querySelector('#record-field-' + field_name).focus();
                 document.querySelector('#record-field-' + field_name).style.backgroundColor = 'pink';
 
