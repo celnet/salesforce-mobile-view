@@ -1011,25 +1011,25 @@ var UserAction = {
                     AjaxResponses.listviews = JSON.parse(welinkStorage['welink_' + sobjectName + '_listviews']);
                     AjaxResponses.layouts = JSON.parse(welinkStorage['welink_' + sobjectName + '_layouts']);
                     
-                    if(welinkStorage['welink_' + sobjectName + '_layout'] != null){
+                    if(welinkStorage['welink_' + sobjectName + '_layout'] != 'undefined'){
                         AjaxResponses.layout = JSON.parse(welinkStorage['welink_' + sobjectName + '_layout']);
                     }
                     
-                    if(welinkStorage['welink_' + sobjectName + '_orderedlistviews'] != null){
+                    if(welinkStorage['welink_' + sobjectName + '_orderedlistviews'] != 'undefined'){
                         AjaxResponses.orderedListviews = JSON.parse(welinkStorage['welink_' + sobjectName + '_orderedlistviews']);
                     }
                     
                     AjaxResponses.searchlayout = JSON.parse(welinkStorage['welink_' + sobjectName + '_searchlayout']);
                     
-                    if(welinkStorage['welink_' + sobjectName + '_recordtype'] != null){
+                    if(welinkStorage['welink_' + sobjectName + '_recordtype'] != 'undefined'){
                         AjaxResponses.recordtype = JSON.parse(welinkStorage['welink_' + sobjectName + '_recordtype']);
                     }
                     
-                    if(welinkStorage['welink_' + sobjectName + '_businessprocess'] != null){
+                    if(welinkStorage['welink_' + sobjectName + '_businessprocess'] != 'undefined'){
                         AjaxResponses.businessprocess = JSON.parse(welinkStorage['welink_' + sobjectName + '_businessprocess']);
                     }
                     
-                    if(welinkStorage['welink_' + sobjectName + '_welinklayouts'] != null){
+                    if(welinkStorage['welink_' + sobjectName + '_welinklayouts'] != 'undefined'){
                         AjaxResponses.welinklayouts = JSON.parse(welinkStorage['welink_' + sobjectName + '_welinklayouts']);
                     }
                     
