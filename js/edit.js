@@ -201,7 +201,7 @@
                     _field = _select_template.replace('{{input-label}}',_field_label);
                     _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
                     
-                    var _option_template = templates.field_multipicklist_option;
+                    var _option_template = templates.option;
                     var _options = '';
                     
                     var _multipicklist_value = [];
@@ -250,7 +250,7 @@
                     _field = _select_template.replace('{{input-label}}',_field_label);
                     _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
                     
-                    var _option_template = templates.field_picklist_option;
+                    var _option_template = templates.option;
                     var _options = '';
                     
                     var _noselect_option = _option_template.replace('{{option-label}}','--' + context.labels.select_none + '--');

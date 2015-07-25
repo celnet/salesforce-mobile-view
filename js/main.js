@@ -70,7 +70,6 @@ var getTemplates = function(){
         // ListView
         listview_page_structure:document.querySelector('#template-listview-page-structure').text,
         listview_select:document.querySelector('#template-listview-select').text,
-        listview_option:document.querySelector('#template-listview-option').text,
         listview_resultlist:document.querySelector('#template-listview-resultlist').text,
         listview_resultitem:document.querySelector('#template-listview-resultitem').text,
         listview_result_noitem:document.querySelector('#template-listview-result-noitem').text,
@@ -81,7 +80,8 @@ var getTemplates = function(){
         section:document.querySelector('#template-recordedit-section').text,
         section_without_heading:document.querySelector('#template-recordedit-section-without-heading').text,
         recordtype_select:document.querySelector('#template-recordtype-select').text,
-        recordtype_option:document.querySelector('#template-option').text,
+        
+        option:document.querySelector('#template-option').text,
         
         field_readonly:document.querySelector('#template-field-edit-readonly').text,
         field_lookup:document.querySelector('#template-field-edit-lookup').text,
@@ -95,9 +95,7 @@ var getTemplates = function(){
         field_percent:document.querySelector('#template-jqm-textinput').text.replace(/{{input-type}}/g,'text'),
         field_phone:document.querySelector('#template-jqm-textinput').text.replace(/{{input-type}}/g,'tel'),
         field_picklist_select:document.querySelector('#template-field-edit-picklist-select').text,
-        field_picklist_option:document.querySelector('#template-option').text,
         field_multipicklist_select:document.querySelector('#template-field-edit-multipicklist-select').text,
-        field_multipicklist_option:document.querySelector('#template-option').text,
         field_text:document.querySelector('#template-jqm-textinput').text.replace(/{{input-type}}/g,'text'),
         field_textarea:document.querySelector('#template-field-edit-textarea').text,
         field_text_encrypted:document.querySelector('#template-field-edit-text-encrypted').text,

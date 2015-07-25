@@ -177,7 +177,7 @@ var ListView;
 
         function renderListViewSelects(){
             var options = '';
-            var option_template = templates.listview_option;
+            var option_template = templates.option;
 
             for (var i = 0; i < sobject.ordered_listviews.length; i++) {
                 var option = option_template.replace('{{option-value}}',sobject.ordered_listviews[i].id).replace('{{option-label}}',sobject.ordered_listviews[i].label);

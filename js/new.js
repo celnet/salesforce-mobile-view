@@ -80,7 +80,7 @@ var RecordNew;
             var recordtype_options = '';
             var has_default = false;
             for (var i = 0; i < recordtype_mappings.length - 1; i++) {
-                var option = templates.recordtype_option.replace('{{option-label}}',recordtype_mappings[i].name).replace('{{option-value}}',recordtype_mappings[i].recordTypeId);
+                var option = templates.option.replace('{{option-label}}',recordtype_mappings[i].name).replace('{{option-value}}',recordtype_mappings[i].recordTypeId);
                 if(record.recordtypeid != '' && record.recordtypeid != 'pending select'){
                     if(recordtype_mappings[i].recordTypeId == record.recordtypeid){
 
@@ -237,7 +237,7 @@ var RecordNew;
                     _field = _select_template.replace('{{input-label}}',_field_label);
                     _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
                     
-                    var _option_template = templates.field_multipicklist_option;
+                    var _option_template = templates.option;
                     var _options = '';
                     
                     for(var i = 0; i < fieldPicklistValues.length; i++){
@@ -290,7 +290,7 @@ var RecordNew;
                     _field = _select_template.replace('{{input-label}}',_field_label);
                     _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
                     
-                    var _option_template = templates.field_picklist_option;
+                    var _option_template = templates.option;
                     var _options = '';
                     
                     var _noselect_option = _option_template.replace('{{option-label}}','--' + context.labels.select_none + '--');
