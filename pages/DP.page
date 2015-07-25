@@ -1,0 +1,432 @@
+<apex:page docType="html-5.0" applyHtmlTag="false" standardStylesheets="false" showHeader="false" controller="DPController">
+<html>
+<head>
+    <title>{!sobjectLabel}</title>
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+    <meta http-equiv='cache-control' content='no-cache' />
+    <meta http-equiv='expires' content='0' />
+    <meta http-equiv='pragma' content='no-cache' />
+    <meta content="telephone=no" name="format-detection" />
+    
+    <link rel="stylesheet" href="{!URLFOR($Resource.DPResource, '/DPResource/jquerymobilewelinkthemes/jquery.mobile.icons.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.DPResource, '/DPResource/jquerymobilewelinkthemes/welink.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.DPResource, '/DPResource/jquerymobile145/jquery.mobile.structure-1.4.5.min.css')}" />
+
+    <script src="{!URLFOR($Resource.DPResource, '/DPResource/jquery1113/jquery-1.11.3.min.js')}"></script>
+    
+    <script>
+        $j = jQuery.noConflict();
+        
+        $j( document ).on( "mobileinit", function() {
+            $j.mobile.autoInitializePage = false;
+            $j.mobile.ajaxEnabled = false;
+            //$j.mobile.linkBindingEnabled = false;
+            $j.mobile.hashListeningEnabled = false;
+            $j.mobile.pushStateEnabled = false;
+        });
+    </script>
+
+    <script src="{!URLFOR($Resource.DPResource, '/DPResource/jquerymobile145/jquery.mobile-1.4.5.min.js')}"></script>
+    <script src="{!URLFOR($Resource.DPResource, '/DPResource/timezoneconverter.js')}"></script>
+
+    <!-- Page Structure Template -->
+    <script type="text/template" id="template-listview-page-structure">
+    <div data-role="page" id="jqm-list">
+        <div id="jqm-header" data-role="header" data-position="fixed">
+          <a id="jqm-header-left-button" href="" style="display:none;"></a>
+          <h1 id="jqm-page-title"></h1>
+          <a id="jqm-header-right-button" href="" class="ui-btn ui-corner-all ui-icon-plus ui-btn-icon-notext" ></a>
+      </div>
+      <div id="listview-picklist">
+      </div>
+      <div data-role="main" class="ui-content">
+        <div id="listview-resultlist">
+        </div>
+      </div>
+    </div>
+    </script>
+
+    <!-- ListView Select Template -->
+    <script type="text/template" id="template-listview-select">
+    <fieldset class="ui-field-contain" style="margin-top:0px;padding:0px 10px;">
+        <select name="listviewlist" id="listviewlist" onchange="ListView.selectListView()">
+          <option value="chooselistview">{{select-listview}}</option>
+          {{options}}
+        </select>
+    </fieldset>
+    </script>
+
+    <!-- ListView Option Template -->
+    <script type="text/template" id="template-listview-option">
+    <option value="{{option-value}}" {{selected}}>{{option-label}}</option>
+    </script>
+    
+    <!-- ListView Result List Template -->
+    <script type="text/template" id="template-listview-resultlist">
+    <ul data-role="listview" data-autodividers="false" data-inset="false">
+        {{items}}
+    </ul>
+    </script>
+    
+    <!-- ListView Result Item Template -->
+    <script type="text/template" id="template-listview-resultitem">
+    <li data-icon="false">
+        <a href="javascript:ListView.viewRecord('{{record-id}}');">
+            <div style="font-weight:normal;">
+                <h1 style="margin-top:0px;">
+                    {{itemname}}
+                </h1>
+                {{itemfields}}
+            </div>
+        </a>
+    </li>
+    </script>
+    
+    <!-- ListView Result No Item Template -->
+    <script type="text/template" id="template-listview-result-noitem">
+    <div style="text-align:center;color:#bbb;">{{no-record}}</div>
+    </script>
+
+    <!-- Record jqm Page Template -->
+    <script type="text/template" id="template-record-jqm-page">
+    <div data-role="page" id="jqm-record">
+      <div id="jqm-header" data-role="header" data-position="fixed" >
+          <a id="jqm-header-left-button" href="" class="ui-btn ui-corner-all ui-btn-icon-notext"></a>
+          <h1 id="jqm-page-title"></h1>
+          <a id="jqm-header-right-button" href="" class="ui-btn ui-corner-all ui-btn-icon-notext"></a>
+      </div>
+      <div data-role="main" class="ui-content">
+          <div id="field-container">
+          </div>
+      </div>
+    </div> 
+    </script>
+
+    <!-- RecordType Selector -->
+    <script type="text/template" id="template-recordtype-select">
+    <div class="ui-field-contain">
+    <label for="recordtype">{{label}}</label>
+    <select name="recordtype" id="recordtype">
+      {{options}}
+    </select>
+    </div>
+    </script>
+
+    <script type="text/template" id="template-recordtype-option">
+    <option value="{{option-value}}" {{selected}} >{{option-label}}</option>
+    </script>
+
+    <script type="text/template" id="template-lookup-jqm-page">
+    <div id="lookup-search-page" data-role="page" data-url="lookup-search-page">
+      <div data-role="header" data-position="fixed">
+        <a id="jqm-lookup-header-left-button" href="" class="ui-btn ui-corner-all ui-icon-back ui-btn-icon-notext"></a>
+        <h1 class="ui-title" role="heading" aria-level="1" style="margin-left: 40px;margin-right: 40px;padding-top: 0px;padding-bottom: 0px;">
+            <input type="text" id="lookup-search-box" data-type="search" placeholder=""/>
+        </h1>
+        <a id="jqm-lookup-header-right-button" href="" class="ui-btn ui-corner-all ui-icon-search ui-btn-icon-notext"></a>
+      </div>
+      <div data-role="main" class="ui-content">
+        <div id="lookup-record-list-container">
+          <ul id="lookup-record-list" data-role="listview" data-autodividers="false" data-inset="false">
+            
+          </ul>
+        </div>
+      </div>
+    </div>
+    </script>
+
+    <script type="text/template" id="template-lookup-record">
+    <li data-icon="false">
+        <a href="javascript:Lookup.select('{{field-name}}','{{record-name}}','{{record-id}}','{{jqm-page}}')">
+            {{record-name}}
+        </a>
+    </li>
+    </script>
+
+    <!-- RECORD EDIT -->
+
+    <!-- Section Template -->
+    <script type="text/template" id="template-recordedit-section">
+    <div id="{{section-number}}">
+        <div style="padding:10px;font-weight:bold;background-color:#88C543;color:white;text-shadow:none;margin:-5px -16px;">
+            {{section-title}}
+        </div>
+        <div>
+            {{fields}}
+        </div>
+    </div>
+    </script>
+
+    <!-- Section Template without Heading -->
+    <script type="text/template" id="template-recordedit-section-without-heading">
+    <div id="{{section-number}}">
+        <div>
+            {{fields}}
+        </div>
+    </div>
+    </script>
+    
+    <!-- Field Template -->
+    <!-- 
+        auto number -> string 
+        master detail -> reference
+        rich text area -> textarea
+        long text area -> textarea
+        roll up summary -> depends on roll up logic
+        formula -> depends on formula logic
+    -->
+    <script type="text/template" id="template-field-edit-readonly">
+    <div class="ui-field-contain">
+        <label><span>&nbsp;</span>{{field-label}}</label>
+        <div><span>&nbsp;</span>{{field-value}}</div>
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-lookup">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="search" id="{{input-id}}" name="{{input-id}}" value="{{input-value}}" readonly />
+    <input type="hidden" id="{{input-id}}-hidden" name="{{input-id}}-hidden" value="{{input-value-hidden}}" />
+    <input type="hidden" id="{{input-id}}-sobject-type" name="{{input-id}}-sobject-type" value="{{reference-sobject-type}}" />
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-checkbox">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="checkbox" id="{{input-id}}" name="{{input-id}}" {{input-checked}} data-role="flipswitch">
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-currency">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="text" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-date">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="date" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-datetime">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="datetime-local" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-email">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="email" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-geolocation">
+    
+    </script>
+    
+    <script type="text/template" id="template-field-edit-number">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="text" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-percent">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="number" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-phone">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="tel" id="{{input-id}}" name="{{input-id}}" value="{{input-value}}"/>
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-picklist-select">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <select name="{{input-id}}" id="{{input-id}}">
+      {{options}}
+    </select>
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-picklist-option">
+    <option value="{{option-value}}" {{option-selected}}>{{option-label}}</option>
+    </script>
+    
+    <!-- iOS native multiple menu bug with jQuery Mobile -->
+    <script type="text/template" id="template-field-edit-multipicklist-select">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <select name="{{input-id}}" id="{{input-id}}" multiple="multiple" data-native-menu="false">
+      {{options}}
+    </select>
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-multipicklist-option">
+    <option value="{{option-value}}" {{option-selected}}>{{option-label}}</option>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-text">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="text" id="{{input-id}}" name="{{input-id}}" value="{{input-value}}"/>
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-textarea">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <textarea name="{{input-id}}" id="{{input-id}}" style="resize:none;">{{input-value}}</textarea>
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-text-encrypted">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="text" id="{{input-id}}" name="{{input-id}}" value="{{input-value}}"/>
+    </div>
+    </script>
+    
+    <script type="text/template" id="template-field-edit-url">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="url" id="{{input-id}}" name="{{input-id}}" value="{{input-value}}"/>
+    </div>
+    </script>
+
+    <script type="text/template" id="template-field-edit-address">
+    <div class="ui-field-contain">
+    <label for="{{address-country-id}}">{{country-label}}</label>
+    <input type="text" id="{{address-country-id}}" name="address-country" value="{{country-value}}"/>
+    </div>
+    <div class="ui-field-contain">
+    <label for="{{address-state-id}}">{{state-label}}</label>
+    <input type="text" id="{{address-state-id}}" name="address-state" value="{{state-value}}"/>
+    </div>
+    <div class="ui-field-contain">
+    <label for="{{address-city-id}}">{{city-label}}</label>
+    <input type="text" id="{{address-city-id}}" name="address-city" value="{{city-value}}"/>
+    </div>
+    <div class="ui-field-contain">
+    <label for="{{address-postalCode-id}}">{{postalCode-label}}</label>
+    <input type="text" id="{{address-postalCode-id}}" name="address-postalCode" value="{{postalCode-value}}"/>
+    </div>
+    <div class="ui-field-contain">
+    <label for="{{address-street-id}}">{{street-label}}</label>
+    <input type="text" id="{{address-street-id}}" name="address-street" value="{{street-value}}"/>
+    </div>
+    </script>
+
+    <script type="text/template" id="template-field-edit-contact-name">
+    <div class="ui-field-contain">
+    <label for="record-detail-Salutation">{{salutation-label}}</label>
+    <input type="text" id="record-detail-Salutation" name="contact-name-salutation" value="{{salutation-value}}"/>
+    </div>
+    <div class="ui-field-contain">
+    <label for="record-detail-LastName"><span style="color:crimson;">*</span>{{lastname-label}}</label>
+    <input type="text" id="record-detail-LastName" name="contact-name-lastname" value="{{lastname-value}}"/>
+    </div>
+    <div class="ui-field-contain">
+    <label for="record-detail-FirstName">{{firstname-label}}</label>
+    <input type="text" id="record-detail-FirstName" name="contact-name-firstname" value="{{firstname-value}}"/>
+    </div>
+    </script>
+
+    <script type="text/template" id="template-field-edit-user-name">
+    <div class="ui-field-contain">
+    <label for="record-field-LastName"><span style="color:crimson;">*</span>{{lastname-label}}</label>
+    <input type="text" id="record-field-LastName" name="user-name-lastname" value="{{lastname-value}}"/>
+    </div>
+    <div class="ui-field-contain">
+    <label for="record-field-FirstName">{{firstname-label}}</label>
+    <input type="text" id="record-field-FirstName" name="user-name-firstname" value="{{firstname-value}}"/>
+    </div>
+    </script>
+
+    <!-- RECORD VIEW -->
+    
+    <!-- Section Template -->
+    <script type="text/template" id="template-recordview-section">
+    <div id="{{section-number}}">
+        <div style="padding:10px;font-weight:bold;background-color:#88C543;color:white;text-shadow:none;margin:-5px -16px;">
+            {{section-title}}
+        </div>
+        <br/>
+        <ul data-role="listview">
+            {{fields}}
+        </ul>
+        <br/>
+        <br/>
+    </div>
+    </script>
+
+    <!-- Section Template without Heading -->
+    <script type="text/template" id="template-recordview-section-without-heading">
+    <div id="{{section-number}}">
+        <ul data-role="listview" style="padding-bottom:15px;">
+            {{fields}}
+        </ul>
+    </div>
+    </script>
+    
+    <!-- Field Template -->
+    <script type="text/template" id="template-field-view-readonly">
+    <li><strong>{{field-label}}</strong>: <br/>{{field-value}}</li>
+    </script>
+
+    <script>
+    var Context = {
+        api_version:'{!apiVersion}',
+        timeout_amount:'{!timeoutAmount}',
+        show_dev_error:'{!showDevError}',
+        timezone:'{!userTimezone}',// timezone sid key of current user
+        device_type:'',
+        session_id:'{!$Api.SESSION_ID}',
+        welink_logo_src:'{!$Resource.CelnetLogo}',
+        user_fullname:'{!$User.FirstName} {!$User.LastName}',
+        user_id:'{!$User.Id}',
+        remote_action:'{!$RemoteAction.DPController.remote}',
+        labels:{
+            listview:'{!$Label.Wlink__DP_ListView}',
+            list:'{!$Label.Wlink__DP_List}',
+            new:'{!$Label.Wlink__DP_New}',
+            save:'{!$Label.Wlink__DP_Save}',
+            cancel:'{!$Label.Wlink__DP_Cancel}',
+            search:'{!$Label.Wlink__DP_Search}',
+            saving:'{!$Label.Wlink__DP_Saving}',
+            loading:'{!$Label.Wlink__DP_Loading}',
+            error:'{!$Label.Wlink__DP_Error}',
+            retry:'{!$Label.Wlink__DP_Retry}',
+            close:'{!$Label.Wlink__DP_Close}',
+            more:'{!$Label.Wlink__DP_More}',
+            select_none:'{!$Label.Wlink__DP_Select_None}',
+            select_listview:'{!$Label.Wlink__DP_Select_ListView}',
+            back:'{!$Label.Wlink__DP_Back}',
+            no_record:'{!$Label.Wlink__DP_No_Record_Display}',
+            select_recordtype:'{!$Label.Wlink__DP_Select_Record_Type}',
+            search_tip:'{!$Label.Wlink__DP_Search_Tip}',
+            edit:'{!$Label.Wlink__DP_Edit}'
+        }
+    };
+    </script>
+    <script src="https://rawgit.com/celnet/welink-mobile-view/master/js/main.js"></script>
+    <script src="https://rawgit.com/celnet/welink-mobile-view/master/js/list.js"></script>
+    <script src="https://rawgit.com/celnet/welink-mobile-view/master/js/edit.js"></script>
+    <script src="https://rawgit.com/celnet/welink-mobile-view/master/js/new.js"></script>
+    <script src="https://rawgit.com/celnet/welink-mobile-view/master/js/view.js"></script>
+</head>
+<body></body>
+</html>
+</apex:page>
