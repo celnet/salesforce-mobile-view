@@ -86,10 +86,10 @@ var RecordNew;
 
                     }
                 } else if(recordtype_mappings[i].defaultRecordTypeMapping && !has_default){
-                    option = option.replace('{{selected}}','selected');
+                    option = option.replace('{{option-selected}}','selected');
                     has_default = true;
                 } else {
-                    option = option.replace('{{selected}}','');
+                    option = option.replace('{{option-selected}}','');
                 }
 
                 recordtype_options += option;
