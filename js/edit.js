@@ -96,14 +96,14 @@
             var _ref_values = record.references;
             
             var field_templates = {};
-            field_templates.url = templates.field_url;
-            field_templates.textarea = templates.field_textarea;
-            field_templates.string = templates.field_text;
-            field_templates.currency = templates.field_currency;
-            field_templates.phone = templates.field_phone;
-            field_templates.percent = templates.field_percent;
-            field_templates.double = templates.field_number;
-            field_templates.email = templates.field_email;
+            field_templates.url = templates.jqm_textinput.replace(/{{input-type}}/g,'url');
+            field_templates.textarea = templates.jqm_textarea;
+            field_templates.string = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
+            field_templates.currency = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
+            field_templates.phone = templates.jqm_textinput.replace(/{{input-type}}/g,'tel');
+            field_templates.percent = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
+            field_templates.double = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
+            field_templates.email = templates.jqm_textinput.replace(/{{input-type}}/g,'email');
             
             if(_details.type == 'address'){
                 if(_is_welink_layout){
@@ -232,7 +232,7 @@
                     _field = '';
                     break;
                 case 'datetime':
-                    var _field_template = templates.field_datetime;//field_templates[_details.type] || field_templates['string'];
+                    var _field_template = templates.jqm_textinput.replace(/{{input-type}}/g,'datetime-local');
                     _field = _field_template.replace('{{input-label}}',_field_label);
                     
                     var _dt_val = '';
@@ -277,7 +277,7 @@
                     _field = _field.replace('{{options}}',_options);
                     break;
                 case 'boolean':
-                    var _field_template = templates.field_checkbox;
+                    var _field_template = templates.jqm_checkboxradio;
                     _field = _field_template.replace('{{input-label}}',_field_label);
                     _field = _field.replace('{{input-value}}',_record_detail[_details.name] || '');
                     _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
@@ -295,7 +295,7 @@
                         date_value = TimezoneDatabase.formatDateToLocal(date_value, _timezone);
                     }
 
-                    var _field_template = templates.field_date;
+                    var _field_template = templates.jqm_textinput.replace(/{{input-type}}/g,'date');
                     _field = _field_template.replace('{{input-label}}',_field_label);
                     _field = _field.replace('{{input-value}}',date_value || '');
                     _field = _field.replace(/{{input-id}}/g,'record-field-' + _details.name);
