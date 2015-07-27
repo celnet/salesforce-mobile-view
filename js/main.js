@@ -16,6 +16,7 @@ window.addEventListener('DOMContentLoaded', function(){
 },false);
     
 var welinkStorage = window.localStorage || {};
+var RecordNew,RecordEdit,RecordView,ListView;
 
 window.onpopstate = function(event){
     route();
