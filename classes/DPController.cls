@@ -1,5 +1,5 @@
 /**
- * Author: steven.ke@celnet.com.cn
+ * Author: Steven Ke
  * Date: 2015-5-18
  * Description: 动态页面控制类，用于从 Custom Setting 里获取 show dev error 和 timeout
  */
@@ -50,8 +50,6 @@ public with sharing class DPController{
     }
 
     public class DPSobjectRelatedMetadataWrapper{
-        public String listviewMetadata{get;set;}
-
         public Map<String, List<String>> listviewsMetadata{get;set;}
         public String tabLayoutFields{get;set;}
         public MetadataService.RecordType[] recordtypesMetadata{get;set;}

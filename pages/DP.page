@@ -13,19 +13,7 @@
     <link rel="stylesheet" href="{!URLFOR($Resource.DPResource, '/DPResource/jquerymobile145/jquery.mobile.structure-1.4.5.min.css')}" />
 
     <script src="{!URLFOR($Resource.DPResource, '/DPResource/jquery1113/jquery-1.11.3.min.js')}"></script>
-    
-    <script>
-        $j = jQuery.noConflict();
-        
-        $j( document ).on( "mobileinit", function() {
-            $j.mobile.autoInitializePage = false;
-            $j.mobile.ajaxEnabled = false;
-            //$j.mobile.linkBindingEnabled = false;
-            $j.mobile.hashListeningEnabled = false;
-            $j.mobile.pushStateEnabled = false;
-        });
-    </script>
-
+    <script src="https://rawgit.com/celnet/welink-mobile-view/master/js/jqm-config.js"></script>
     <script src="{!URLFOR($Resource.DPResource, '/DPResource/jquerymobile145/jquery.mobile-1.4.5.min.js')}"></script>
     <script src="{!URLFOR($Resource.DPResource, '/DPResource/timezoneconverter.js')}"></script>
 
@@ -54,11 +42,6 @@
           {{options}}
         </select>
     </fieldset>
-    </script>
-
-    <!-- ListView Option Template -->
-    <script type="text/template" id="template-listview-option">
-    <option value="{{option-value}}" {{selected}}>{{option-label}}</option>
     </script>
     
     <!-- ListView Result List Template -->
@@ -110,10 +93,6 @@
       {{options}}
     </select>
     </div>
-    </script>
-
-    <script type="text/template" id="template-recordtype-option">
-    <option value="{{option-value}}" {{selected}} >{{option-label}}</option>
     </script>
 
     <script type="text/template" id="template-lookup-jqm-page">
@@ -175,6 +154,31 @@
         roll up summary -> depends on roll up logic
         formula -> depends on formula logic
     -->
+    <script type="text/template" id="template-jqm-textinput">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="{{input-type}}" id="{{input-id}}" name="{{input-id}}" value="{{input-value}}" />
+    </div>
+    </script>
+
+    <script type="text/template" id="template-jqm-checkboxradio">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <input type="checkbox" id="{{input-id}}" name="{{input-id}}" {{input-checked}} data-role="flipswitch">
+    </div>
+    </script>
+
+    <script type="text/template" id="template-jqm-textarea">
+    <div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <textarea name="{{input-id}}" id="{{input-id}}" style="resize:none;">{{input-value}}</textarea>
+    </div>
+    </script>
+
+    <script type="text/template" id="template-option">
+    <option value="{{option-value}}" {{option-selected}}>{{option-label}}</option>
+    </script>
+
     <script type="text/template" id="template-field-edit-readonly">
     <div class="ui-field-contain">
         <label><span>&nbsp;</span>{{field-label}}</label>
@@ -190,67 +194,11 @@
     <input type="hidden" id="{{input-id}}-sobject-type" name="{{input-id}}-sobject-type" value="{{reference-sobject-type}}" />
     </div>
     </script>
-    
-    <script type="text/template" id="template-field-edit-checkbox">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="checkbox" id="{{input-id}}" name="{{input-id}}" {{input-checked}} data-role="flipswitch">
-    </div>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-currency">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="text" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
-    </div>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-date">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="date" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
-    </div>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-datetime">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="datetime-local" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
-    </div>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-email">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="email" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
-    </div>
-    </script>
-    
+
     <script type="text/template" id="template-field-edit-geolocation">
     
     </script>
-    
-    <script type="text/template" id="template-field-edit-number">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="text" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
-    </div>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-percent">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="number" id="{{input-id}}" name="{{input-name}}" value="{{input-value}}" />
-    </div>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-phone">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="tel" id="{{input-id}}" name="{{input-id}}" value="{{input-value}}"/>
-    </div>
-    </script>
-    
+
     <script type="text/template" id="template-field-edit-picklist-select">
     <div class="ui-field-contain">
     <label for="{{input-id}}">{{input-label}}</label>
@@ -260,10 +208,6 @@
     </div>
     </script>
     
-    <script type="text/template" id="template-field-edit-picklist-option">
-    <option value="{{option-value}}" {{option-selected}}>{{option-label}}</option>
-    </script>
-    
     <!-- iOS native multiple menu bug with jQuery Mobile -->
     <script type="text/template" id="template-field-edit-multipicklist-select">
     <div class="ui-field-contain">
@@ -271,38 +215,6 @@
     <select name="{{input-id}}" id="{{input-id}}" multiple="multiple" data-native-menu="false">
       {{options}}
     </select>
-    </div>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-multipicklist-option">
-    <option value="{{option-value}}" {{option-selected}}>{{option-label}}</option>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-text">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="text" id="{{input-id}}" name="{{input-id}}" value="{{input-value}}"/>
-    </div>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-textarea">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <textarea name="{{input-id}}" id="{{input-id}}" style="resize:none;">{{input-value}}</textarea>
-    </div>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-text-encrypted">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="text" id="{{input-id}}" name="{{input-id}}" value="{{input-value}}"/>
-    </div>
-    </script>
-    
-    <script type="text/template" id="template-field-edit-url">
-    <div class="ui-field-contain">
-    <label for="{{input-id}}">{{input-label}}</label>
-    <input type="url" id="{{input-id}}" name="{{input-id}}" value="{{input-value}}"/>
     </div>
     </script>
 
