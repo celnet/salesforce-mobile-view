@@ -1,0 +1,11 @@
+<div id="{{section-number}}">
+    <div style="padding:10px;font-weight:bold;background-color:#88C543;color:white;text-shadow:none;margin:-5px -16px;">
+        {{section-title}}
+    </div>
+    <br/>
+    <ul data-role="listview">
+        {{fields}}
+    </ul>
+    <br/>
+    <br/>
+</div>

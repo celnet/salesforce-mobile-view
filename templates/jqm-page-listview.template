@@ -1,0 +1,13 @@
+<div data-role="page" id="jqm-list">
+    <div id="jqm-header" data-role="header" data-position="fixed">
+      <a id="jqm-header-left-button" href="" style="display:none;"></a>
+      <h1 id="jqm-page-title"></h1>
+      <a id="jqm-header-right-button" href="" class="ui-btn ui-corner-all ui-icon-plus ui-btn-icon-notext" ></a>
+  </div>
+  <div id="listview-picklist">
+  </div>
+  <div data-role="main" class="ui-content">
+    <div id="listview-resultlist">
+    </div>
+  </div>
+</div>

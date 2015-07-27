@@ -1,0 +1,6 @@
+<div class="ui-field-contain">
+    <label for="{{input-id}}">{{input-label}}</label>
+    <select name="{{input-id}}" id="{{input-id}}" multiple="multiple" data-native-menu="false">
+      {{options}}
+    </select>
+</div>

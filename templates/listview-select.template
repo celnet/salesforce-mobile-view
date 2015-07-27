@@ -1,0 +1,6 @@
+<fieldset class="ui-field-contain" style="margin-top:0px;padding:0px 10px;">
+    <select name="listviewlist" id="listviewlist" onchange="ListView.selectListView()">
+      <option value="chooselistview">{{select-listview}}</option>
+      {{options}}
+    </select>
+</fieldset>

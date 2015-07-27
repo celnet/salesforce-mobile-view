@@ -1,0 +1,8 @@
+<div class="ui-field-contain">
+    <label for="record-field-LastName"><span style="color:crimson;">*</span>{{lastname-label}}</label>
+    <input type="text" id="record-field-LastName" name="user-name-lastname" value="{{lastname-value}}"/>
+</div>
+<div class="ui-field-contain">
+    <label for="record-field-FirstName">{{firstname-label}}</label>
+    <input type="text" id="record-field-FirstName" name="user-name-firstname" value="{{firstname-value}}"/>
+</div>

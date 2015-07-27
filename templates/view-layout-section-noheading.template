@@ -1,0 +1,5 @@
+<div id="{{section-number}}">
+    <ul data-role="listview" style="padding-bottom:15px;">
+        {{fields}}
+    </ul>
+</div>

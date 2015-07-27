@@ -1,0 +1,20 @@
+<div class="ui-field-contain">
+    <label for="{{address-country-id}}">{{country-label}}</label>
+    <input type="text" id="{{address-country-id}}" name="address-country" value="{{country-value}}"/>
+</div>
+<div class="ui-field-contain">
+    <label for="{{address-state-id}}">{{state-label}}</label>
+    <input type="text" id="{{address-state-id}}" name="address-state" value="{{state-value}}"/>
+</div>
+<div class="ui-field-contain">
+    <label for="{{address-city-id}}">{{city-label}}</label>
+    <input type="text" id="{{address-city-id}}" name="address-city" value="{{city-value}}"/>
+</div>
+<div class="ui-field-contain">
+    <label for="{{address-postalCode-id}}">{{postalCode-label}}</label>
+    <input type="text" id="{{address-postalCode-id}}" name="address-postalCode" value="{{postalCode-value}}"/>
+</div>
+<div class="ui-field-contain">
+    <label for="{{address-street-id}}">{{street-label}}</label>
+    <input type="text" id="{{address-street-id}}" name="address-street" value="{{street-value}}"/>
+</div>

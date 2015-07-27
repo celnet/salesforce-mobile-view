@@ -1,0 +1,12 @@
+<div class="ui-field-contain">
+    <label for="record-detail-Salutation">{{salutation-label}}</label>
+    <input type="text" id="record-detail-Salutation" name="contact-name-salutation" value="{{salutation-value}}"/>
+</div>
+<div class="ui-field-contain">
+    <label for="record-detail-LastName"><span style="color:crimson;">*</span>{{lastname-label}}</label>
+    <input type="text" id="record-detail-LastName" name="contact-name-lastname" value="{{lastname-value}}"/>
+</div>
+<div class="ui-field-contain">
+    <label for="record-detail-FirstName">{{firstname-label}}</label>
+    <input type="text" id="record-detail-FirstName" name="contact-name-firstname" value="{{firstname-value}}"/>
+</div>
