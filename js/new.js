@@ -171,7 +171,7 @@ var initRecordNew = function(){
             fieldReferenceTos = layoutItem.layoutComponents[0].details.referenceTo;
             fieldComponents = layoutItem.layoutComponents[0].components;
             isFieldRequired = layoutItem.required;
-            isFieldEditable = layoutItem.createable;
+            isFieldEditable = layoutItem.editableForNew;
             isFieldReadOnly = !isFieldEditable;
         }
         
