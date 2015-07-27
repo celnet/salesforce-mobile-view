@@ -56,15 +56,13 @@ var initRecordEdit = function(){
         View.stopLoading('jqm-record');
     }
     
-    function getFieldDisplay(fieldName, isWelinkLayout){
+    function processFieldsDisplay(fieldName, fieldDescribe, isWelinkLayout){
+        var _is_welink_layout = isWelinkLayout;
+        var _row = _is_welink_layout?fieldName:fieldDescribe;
         
-    }
-    
-    function processFieldsDisplay(_row, _is_welink_layout){
         var sobjectsWithCompoundNames = ['user','contact','lead'];
         var isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase()) > 0;
         
-        var fieldName;
         var fieldLabel;
         var fieldType;
         var fieldPicklistValues;
@@ -363,7 +361,7 @@ var initRecordEdit = function(){
         var record_display = '';
         
         var _p_tmp;
-        if(record.welink_processed.length > 0){
+        if(record.welink_processed != null && record.welink_processed.length > 0){
             _p_tmp = record.welink_processed;
             for (var i = 0; i < _p_tmp.length; i++) {
                 if(_p_tmp[i].fields.length > 0){
