@@ -47,7 +47,7 @@ var initRecordView = function(){
                 displayWelinkLayout();
             } else {
                 record.layout = AjaxResponses.layout;
-                record.processed = AjaxHandlers.viewlayout(record.layout.detailLayoutSections);
+                record.processed = AjaxHandlers.layout(record.layout.detailLayoutSections);
                 
                 displayLayout();
             }
@@ -68,9 +68,10 @@ var initRecordView = function(){
 
             var _fields = '';
             for(var j = 0; j < _p_tmp[i].rows.length; j++){
-                var fieldName = _p_tmp[i].rows[j].name;
-                var fieldLabel = _p_tmp[i].rows[j].label;
-                var fieldType = _p_tmp[i].rows[j].type;
+                var fieldDescribe = _p_tmp[i].rows[j].layoutComponents[0].details;
+                var fieldName = fieldDescribe.name;
+                var fieldLabel = fieldDescribe.label;
+                var fieldType = fieldDescribe.type;
                 var fieldValue = record.detail[fieldName];
                 
                 var _field = field_template.replace('{{field-label}}',fieldLabel);
@@ -84,8 +85,8 @@ var initRecordView = function(){
                                 fieldValue = '';
                         }
                         
-                        if(setup_objects.indexOf(_p_tmp[i].rows[j].referenceTo[0]) < 0 || _p_tmp[i].rows[j].referenceTo[0] == 'User'){
-                            fieldValue = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + _p_tmp[i].rows[j].referenceTo[0] + '&id=' + fieldValue + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + fieldValue + '</a>';
+                        if(setup_objects.indexOf(fieldDescribe.referenceTo[0]) < 0 || fieldDescribe.referenceTo[0] == 'User'){
+                            fieldValue = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + fieldDescribe.referenceTo[0] + '&id=' + fieldValue + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + fieldValue + '</a>';
                         }
                         break;
                     case 'phone':

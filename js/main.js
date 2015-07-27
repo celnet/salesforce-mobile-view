@@ -1138,39 +1138,6 @@ var UserAction = {
             return processedLayout;
         };
         
-        var handleViewLayout = function(layoutSections){
-            
-             var processRows = function(rows){
-                var processed = [];
-                for(var i = 0; i < rows.length; i++){
-                    processed = processed.concat(processItems(rows[i].layoutItems));
-                }
-                return processed;
-            };
-            
-            var processItems = function(items){
-                var processed = [];
-                for(var i = 0; i < items.length; i++){
-                    if(items[i].layoutComponents != null && items[i].layoutComponents.length > 0 && items[i].layoutComponents[0].type == 'Field'){
-                        processed.push(items[i].layoutComponents[0].details);
-                    }
-                }
-                return processed;
-            };
-            
-            var processedLayout = [];
-            
-            for(var i = 0; i < layoutSections.length; i++){
-                var section = {};
-                section.heading = layoutSections[i].heading;
-                section.useHeading = layoutSections[i].useHeading;
-                section.rows = processRows(layoutSections[i].layoutRows);
-                processedLayout.push(section);
-            }
-            
-            return processedLayout;
-        };
-        
         var handleRecordTypes = function(){
             var recordtypes = AjaxResponses.recordtype;//JSON.parse(window.atob(result));
             var bp_values = [];
@@ -1265,7 +1232,6 @@ var UserAction = {
             describe:handleDescribe,
             welinklayout:handleWelinkLayout,
             layout:handleLayout,
-            viewlayout:handleViewLayout,
             recordTypes:handleRecordTypes,
             businessProcesses:handleBusinessProcesses,
             handleReferenceFields:handleReferenceFields
