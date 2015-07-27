@@ -1001,6 +1001,10 @@ var UserAction = {
                     
                     var null_values = [undefined, null, 'null', 'undefined'];
                     
+                    if(null_values.indexOf(welinkStorage['welink_' + sobjectName + '_layoutsMapping']) < 0){
+                        AjaxResponses.layoutsMapping = JSON.parse(welinkStorage['welink_' + sobjectName + '_layoutsMapping']);
+                    }
+                    
                     if(null_values.indexOf(welinkStorage['welink_' + sobjectName + '_layout']) < 0){
                         AjaxResponses.layout = JSON.parse(welinkStorage['welink_' + sobjectName + '_layout']);
                     }
