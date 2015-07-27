@@ -172,7 +172,7 @@ var initRecordNew = function(){
             fieldComponents = layoutItem.layoutComponents[0].components;
             isFieldRequired = layoutItem.required;
             isFieldEditable = layoutItem.createable;
-            isFieldReadOnly = !layoutItem.createable;
+            isFieldReadOnly = !isFieldEditable;
         }
         
         fieldLabel += ':';
@@ -184,7 +184,6 @@ var initRecordNew = function(){
         var _field;
         
         var field_templates = {};
-        field_templates.boolean = templates.jqm_checkboxradio;
         field_templates.url = templates.jqm_textinput.replace(/{{input-type}}/g,'url');
         field_templates.date = templates.jqm_textinput.replace(/{{input-type}}/g,'date');
         field_templates.encryptedstring = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
@@ -197,7 +196,6 @@ var initRecordNew = function(){
         field_templates.percent = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
         field_templates.double = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
         field_templates.email = templates.jqm_textinput.replace(/{{input-type}}/g,'email');
-        field_templates.multipicklist = templates.field_multipicklist_select;
         field_templates.readonly = templates.field_readonly;
         
         if(fieldName == 'Name' && isCompoundName){
@@ -205,7 +203,7 @@ var initRecordNew = function(){
         }
 
         if((isFieldReadOnly && fieldType != 'address')){
-            var _field_template = field_templates.readonly;
+            var _field_template = templates.field_readonly;
             _field = _field_template.replace('{{field-label}}',fieldLabel);
             _field = _field.replace('{{field-value}}','<br/>');
             
@@ -213,7 +211,7 @@ var initRecordNew = function(){
         } 
 
         if(fieldName == 'RecordTypeId'){
-            var _field_template = field_templates.readonly;
+            var _field_template = templates.field_readonly;
             _field = _field_template.replace('{{field-label}}',fieldLabel);
             _field = _field.replace('{{field-value}}',record.recordtypename);
             
@@ -227,8 +225,28 @@ var initRecordNew = function(){
         }
 
         switch(fieldType){
+            case 'reference':
+                var _field_template = templates.field_lookup;
+
+                _field = _field_template.replace('{{input-label}}',fieldLabel);
+
+                if(fieldName == 'OwnerId'){
+                    _field = _field.replace('{{input-value}}',context.user_fullname);
+                    _field = _field.replace('{{input-value-hidden}}',context.user_id);
+                } else {
+                    _field = _field.replace('{{input-value}}','');
+                    _field = _field.replace('{{input-value-hidden}}','');
+                }
+
+                var field_ref_type = fieldReferenceTos[0];
+                field_ref_type = field_ref_type == 'Group'?fieldReferenceTos[1]:field_ref_type;
+
+                _field = _field.replace('{{reference-sobject-type}}',field_ref_type);
+
+                _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
+                break;
             case 'multipicklist':
-                var _select_template = field_templates.multipicklist;
+                var _select_template = templates.field_multipicklist_select;
                 _field = _select_template.replace('{{input-label}}',fieldLabel);
                 _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
                 
@@ -248,34 +266,9 @@ var initRecordNew = function(){
                 break;
             case 'encryptedstring':
                 _field = '';
-                /*
-                var _field_template = document.querySelector('#field-template').text;
-                _field = _field_template.replace('{{field-label}}',fieldLabel);
-                _field = _field.replace('{{field-value}}','');
-                */
-                break;
-            case 'reference':
-                var _field_template = field_templates[fieldType] || field_templates['string'];
-
-                _field = _field_template.replace('{{input-label}}',fieldLabel);
-
-                if(fieldName == 'OwnerId'){
-                    _field = _field.replace('{{input-value}}',context.user_fullname);
-                    _field = _field.replace('{{input-value-hidden}}',context.user_id);
-                } else {
-                    _field = _field.replace('{{input-value}}','');
-                    _field = _field.replace('{{input-value-hidden}}','');
-                }
-
-                var field_ref_type = fieldReferenceTos[0];
-                field_ref_type = field_ref_type == 'Group'?fieldReferenceTos[1]:field_ref_type;
-
-                _field = _field.replace('{{reference-sobject-type}}',field_ref_type);
-
-                _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
                 break;
             case 'datetime':
-                var _field_template = field_templates[fieldType] || field_templates['datetime'];
+                var _field_template = templates.jqm_textinput.replace(/{{input-type}}/g,'datetime-local');
                 _field = _field_template.replace('{{input-label}}',fieldLabel);
                 _field = _field.replace('{{input-value}}','');
                 _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
@@ -314,7 +307,7 @@ var initRecordNew = function(){
                 _field = _field.replace('{{options}}',_options);
                 break;
             case 'boolean':
-                var _field_template = field_templates[fieldType] || field_templates['string'];
+                var _field_template = templates.checkboxradio;
                 _field = _field_template.replace('{{input-label}}',fieldLabel);
                 _field = _field.replace('{{input-value}}','');
                 _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
@@ -337,7 +330,7 @@ var initRecordNew = function(){
                 _field = _field.replace('{{field-value}}','');
                 break;
             default:
-                var _field_template = field_templates[fieldType] || field_templates['string'];
+                var _field_template = field_templates[fieldType] || templates.jqm_textinput.replace(/{{input-type}}/g,'text');
                 _field = _field_template.replace('{{input-label}}',fieldLabel);
                 _field = _field.replace('{{input-value}}','');
                 _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);

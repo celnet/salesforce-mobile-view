@@ -110,14 +110,14 @@ var initRecordEdit = function(){
         field_templates.double = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
         field_templates.email = templates.jqm_textinput.replace(/{{input-type}}/g,'email');
         
-        if(fieldType == 'address'){
-            return FieldRenderer.processAddressField(_record_detail[fieldName], fieldComponents || [], fieldName);
-        } 
-
         if(fieldName == 'Name' && isCompoundName){
             return FieldRenderer.processNameField(_record_detail, fieldComponents || []);
         }
-
+        
+        if(fieldType == 'address'){
+            return FieldRenderer.processAddressField(_record_detail[fieldName], fieldComponents || [], fieldName);
+        } 
+        
         if(fieldName == 'RecordTypeId'){
             var recordtype_value = '';
 
@@ -181,12 +181,12 @@ var initRecordEdit = function(){
                     _field = _field.replace('{{input-value-hidden}}','');
                 }
 
-                var field_ref_type = sobject.fields[fieldName].describe.referenceTo[0];
-                field_ref_type = field_ref_type == 'Group'?sobject.fields[fieldName].describe.referenceTo[1]:field_ref_type;
+                var field_ref_type = fieldReferenceTos[0];
+                field_ref_type = field_ref_type == 'Group'?fieldReferenceTos[1]:field_ref_type;
 
                 _field = _field.replace('{{reference-sobject-type}}',field_ref_type);
                 
-                _field = _field.replace('{{input-value}}','');
+                //_field = _field.replace('{{input-value}}','');
                 _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
                 break;
             case 'multipicklist':
@@ -229,10 +229,8 @@ var initRecordEdit = function(){
                 _field = _field_template.replace('{{input-label}}',fieldLabel);
                 
                 var _dt_val = '';
-                
                 if(_record_detail[fieldName] != null){
                     _dt_val = TimezoneDatabase.formatDatetimeToLocal(_record_detail[fieldName], _timezone);
-                    //_dt_val = _record_detail[fieldName].substr(0,16);
                 }
                 
                 _field = _field.replace('{{input-value}}',_dt_val);
@@ -308,7 +306,7 @@ var initRecordEdit = function(){
                 _field = _field.replace('{{field-value}}',_record_detail[fieldName] || '');
                 break;
             default:
-                var _field_template = field_templates[fieldType] || field_templates['string'];
+                var _field_template = field_templates[fieldType] || templates.jqm_textinput.replace(/{{input-type}}/g,'text');
                 _field = _field_template.replace('{{input-label}}',fieldLabel);
                 
                 var fieldValue = _record_detail[fieldName];
