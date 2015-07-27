@@ -142,31 +142,37 @@ var initRecordNew = function(){
         }
     }
     
-    function processFieldsDisplay(_row, _is_welink_layout){
+    function processFieldsDisplay(fieldName, layoutItem, isWelinkLayout){
         var sobjectsWithCompoundNames = ['user','contact','lead'];
         var isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase()) > 0;
         
-        var fieldName;
         var fieldLabel;
         var fieldType;
         var fieldPicklistValues;
         var fieldReferenceTos;
+        var fieldComponents;
         var isFieldRequired;
         var isFieldEditable;
         var isFieldReadOnly;
         
-        if(_is_welink_layout){
-            fieldName = _row;
+        if(isWelinkLayout){
             fieldLabel = sobject.fields[fieldName].describe.label;
+            fieldType = sobject.fields[fieldName].describe.type;
+            fieldPicklistValues = sobject.fields[fieldName].describe.picklistValues;
+            fieldReferenceTos = sobject.fields[fieldName].describe.referenceTo;
             isFieldRequired = record.welink_required[fieldName];
             isFieldEditable = record.welink_edit[fieldName];
             isFieldReadOnly = record.welink_readonly[fieldName];
         } else {
-            fieldName = _row.layoutComponents[0].details.name;
-            fieldLabel = _row.label;
-            isFieldRequired = _row.required;
-            isFieldEditable = _row.createable;
-            isFieldReadOnly = !_row.createable;
+            fieldName = layoutItem.layoutComponents[0].details.name;
+            fieldLabel = layoutItem.label;
+            fieldType = layoutItem.layoutComponents[0].details.type;
+            fieldPicklistValues = layoutItem.layoutComponents[0].details.picklistValues;
+            fieldReferenceTos = layoutItem.layoutComponents[0].details.referenceTo;
+            fieldComponents = layoutItem.layoutComponents[0].components;
+            isFieldRequired = layoutItem.required;
+            isFieldEditable = layoutItem.createable;
+            isFieldReadOnly = !layoutItem.createable;
         }
         
         fieldLabel += ':';
@@ -174,10 +180,6 @@ var initRecordNew = function(){
         if(sobject.fields[fieldName] == undefined){
             return '';
         }
-        
-        fieldType = sobject.fields[fieldName].describe.type;
-        fieldPicklistValues = sobject.fields[fieldName].describe.picklistValues;
-        fieldReferenceTos = sobject.fields[fieldName].describe.referenceTo;
         
         var _field;
         
@@ -199,13 +201,7 @@ var initRecordNew = function(){
         field_templates.readonly = templates.field_readonly;
         
         if(fieldName == 'Name' && isCompoundName){
-            if(_is_welink_layout){
-                _field = processWelinkNameField();
-            } else {
-                _field = processNameField(_row.layoutComponents[0].components);
-            }
-            
-            return _field;// + '<br/>';
+            return FieldRenderer.processNameField({}, fieldComponents);
         }
 
         if((isFieldReadOnly && fieldType != 'address')){
@@ -327,11 +323,8 @@ var initRecordNew = function(){
                 //_field += '<br/>';
                 break;
             case 'address':
-                if(_is_welink_layout){
-                    _field = processWelinkAddressField(fieldName);
-                } else {
-                    _field  = processAddressField(_row.layoutComponents[0].components);
-                }
+                _field = FieldRenderer.processAddressField({}, fieldComponents, fieldName);
+                
                 break;
             case 'geolocation':
                 var _field_template = templates.field_readonly;
@@ -353,22 +346,6 @@ var initRecordNew = function(){
         return _field;// + '<br/>';
     }
 
-    function processWelinkNameField(){
-        return FieldRenderer.processNameField({}, []);
-    }
-
-    function processWelinkAddressField(fullfieldname){
-        return FieldRenderer.processAddressField({},[],fullfieldname);
-    }
-
-    function processNameField(name_components){
-        return FieldRenderer.processNameField({}, name_components);
-    }
-
-    function processAddressField(address_components){
-        return FieldRenderer.processAddressField({}, address_components,null);
-    }
-
     function renderLayout(){
         
         var section_template = templates.section;
@@ -383,7 +360,7 @@ var initRecordNew = function(){
             for(var i = 0; i < _processed.length;i++){
                 var _fields = '';
                 for(var j = 0; j < _processed[i].fields.length; j++){
-                    _fields += processFieldsDisplay(_processed[i].fields[j].field, true);
+                    _fields += processFieldsDisplay(_processed[i].fields[j].field, null, true);
                 }
                 
                 if(_processed[i].editHeading && _processed[i].fields.length > 0){
@@ -404,7 +381,7 @@ var initRecordNew = function(){
             for(var i = 0; i < _processed.length;i++){
                 var _fields = '';
                 for(var j = 0; j < _processed[i].rows.length; j++){
-                    _fields += processFieldsDisplay(_processed[i].rows[j], false);
+                    _fields += processFieldsDisplay(null, _processed[i].rows[j], false);
                 }
                 
                 if(_processed[i].useHeading && _processed[i].rows.length > 0){

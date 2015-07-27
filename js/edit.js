@@ -56,10 +56,7 @@ var initRecordEdit = function(){
         View.stopLoading('jqm-record');
     }
     
-    function processFieldsDisplay(fieldName, fieldDescribe, isWelinkLayout){
-        var _is_welink_layout = isWelinkLayout;
-        var _row = _is_welink_layout?fieldName:fieldDescribe;
-        
+    function processFieldsDisplay(fieldName, layoutItem, isWelinkLayout){
         var sobjectsWithCompoundNames = ['user','contact','lead'];
         var isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase()) > 0;
         
@@ -67,22 +64,30 @@ var initRecordEdit = function(){
         var fieldType;
         var fieldPicklistValues;
         var fieldReferenceTos;
+        var fieldComponents;
         var isFieldRequired;
         var isFieldEditable;
         var isFieldReadOnly;
         var _timezone = context.timezone;
-        if(_is_welink_layout){
-            fieldName = _row;
+        
+        if(isWelinkLayout){
             fieldLabel = sobject.fields[fieldName].describe.label;
+            fieldType = sobject.fields[fieldName].describe.type;
+            fieldPicklistValues = sobject.fields[fieldName].describe.picklistValues;
+            fieldReferenceTos = sobject.fields[fieldName].describe.referenceTo;
             isFieldRequired = record.welink_required[fieldName];
             isFieldEditable = record.welink_edit[fieldName] && sobject.fields[fieldName].describe.updateable;
             isFieldReadOnly = record.welink_readonly[fieldName] && !sobject.fields[fieldName].describe.updateable;
         } else {
-            fieldName = _row.layoutComponents[0].details.name;
-            fieldLabel = _row.label;
-            isFieldRequired = _row.required;
-            isFieldEditable = sobject.fields[fieldName].describe.updateable;
-            isFieldReadOnly = !sobject.fields[fieldName].describe.updateable;
+            fieldName = layoutItem.layoutComponents[0].details.name;
+            fieldLabel = layoutItem.label;
+            fieldType = layoutItem.layoutComponents[0].details.type;
+            fieldPicklistValues = layoutItem.layoutComponents[0].details.picklistValues;
+            fieldReferenceTos = layoutItem.layoutComponents[0].details.referenceTo;
+            fieldComponents = layoutItem.layoutComponents[0].components;
+            isFieldRequired = layoutItem.required;
+            isFieldEditable = layoutItem.layoutComponents[0].details.updateable;
+            isFieldReadOnly = !isFieldEditable;
         }
         
         fieldLabel += ':';
@@ -90,10 +95,6 @@ var initRecordEdit = function(){
         if(sobject.fields[fieldName] == undefined){
             return '';
         }
-        
-        fieldType = sobject.fields[fieldName].describe.type;
-        fieldPicklistValues = sobject.fields[fieldName].describe.picklistValues;
-        fieldReferenceTos = sobject.fields[fieldName].describe.referenceTo;
         
         var _field;
         var _record_detail = record.detail;
@@ -110,23 +111,11 @@ var initRecordEdit = function(){
         field_templates.email = templates.jqm_textinput.replace(/{{input-type}}/g,'email');
         
         if(fieldType == 'address'){
-            if(_is_welink_layout){
-                _field = processWelinkAddressField(_record_detail[fieldName],fieldName);
-            } else {
-                _field = processAddressField(_record_detail[fieldName],_row.layoutComponents[0].components);
-            }
-
-            return _field;
+            return FieldRenderer.processAddressField(_record_detail[fieldName], fieldComponents || [], fieldName);
         } 
 
         if(fieldName == 'Name' && isCompoundName){
-            if(_is_welink_layout){
-                _field = processWelinkNameField(_record_detail, 'Name');
-            } else {
-                _field = processNameField(_record_detail, _row.layoutComponents[0].components);
-            }
-
-            return _field;
+            return FieldRenderer.processNameField(_record_detail, fieldComponents || []);
         }
 
         if(fieldName == 'RecordTypeId'){
@@ -172,7 +161,7 @@ var initRecordEdit = function(){
             }
         } 
 
-        if((_is_welink_layout && isFieldRequired) || (isFieldEditable && isFieldRequired) || fieldName == 'OwnerId'){
+        if((isWelinkLayout && isFieldRequired) || (isFieldEditable && isFieldRequired) || fieldName == 'OwnerId'){
             fieldLabel = '<span style="color:crimson">*</span>' + fieldLabel;
         } else {
             fieldLabel = '<span>&nbsp;</span>' + fieldLabel;
@@ -305,11 +294,7 @@ var initRecordEdit = function(){
 
                 break;
             case 'address':
-                if(_is_welink_layout){
-                    _field = processWelinkAddressField(_record_detail[fieldName],fieldName);
-                } else {
-                    _field = processAddressField(_record_detail[fieldName],_row.layoutComponents[0].components);
-                }
+                _field = FieldRenderer.processAddressField(_record_detail[fieldName], fieldComponents || [], fieldName);
                 
                 break;
             case 'geolocation':
@@ -338,22 +323,6 @@ var initRecordEdit = function(){
 
         return _field;// + '<br/>';
     }
-
-    function processWelinkNameField(allfields){
-        return FieldRenderer.processNameField(allfields, []);
-    }
-
-    function processWelinkAddressField(address_field,fullfieldname){
-        return FieldRenderer.processAddressField(address_field,[],fullfieldname);
-    }
-
-    function processNameField(allfields, name_components){
-        return FieldRenderer.processNameField(allfields, name_components);
-    }
-
-    function processAddressField(address_field, address_components){
-        return FieldRenderer.processAddressField(address_field, address_components, null);
-    }
     
     function displayLayout(){
         var section_template = templates.section;
@@ -367,7 +336,7 @@ var initRecordEdit = function(){
                 if(_p_tmp[i].fields.length > 0){
                     var _fields = '';
                     for (var j = 0; j < _p_tmp[i].fields.length; j++) {
-                        _fields += processFieldsDisplay(_p_tmp[i].fields[j].field, true);
+                        _fields += processFieldsDisplay(_p_tmp[i].fields[j].field, null, true);
                     };
 
                     if(_p_tmp[i].editHeading){
@@ -390,7 +359,7 @@ var initRecordEdit = function(){
                 if(_p_tmp[i].rows.length > 0){
                     var _fields = '';
                     for(var j = 0; j < _p_tmp[i].rows.length; j++){
-                        _fields += processFieldsDisplay(_p_tmp[i].rows[j], false);
+                        _fields += processFieldsDisplay(null, _p_tmp[i].rows[j], false);
                     }
 
                     if(_p_tmp[i].useHeading){
