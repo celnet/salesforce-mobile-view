@@ -1,36 +1,3 @@
-function renderRecordView(){
-    RecordView = initRecordView();
-    document.querySelector('body').innerHTML = templates.record_page_structure;
-
-    document.querySelector('#jqm-header-left-button')['href'] = "javascript:UserAction.viewList('jqm-record')";
-    document.querySelector('#jqm-header-right-button')['href'] = "javascript:UserAction.editRecord('jqm-record')";
-    document.querySelector('#jqm-header-left-button').innerHTML = context.labels.list;
-    document.querySelector('#jqm-header-right-button').innerHTML = context.labels.edit;
-    document.querySelector('#jqm-header-left-button').classList.add('ui-icon-bars');
-    document.querySelector('#jqm-header-right-button').classList.add('ui-icon-edit');
-
-    if(params.crossref == 'true'){
-        document.querySelector('#jqm-header-left-button').href = 'javascript:window.history.back()';
-        document.querySelector('#jqm-header-left-button').innerHTML = context.labels.back;
-        document.querySelector('#jqm-header-left-button').classList.remove('ui-icon-bars');
-        document.querySelector('#jqm-header-left-button').classList.add('ui-icon-back');
-    }
-
-    if(setup_objects.indexOf(sobject.name) > 0){
-        $j('#jqm-header-right-button').remove();
-    }
-
-    $j.mobile.initializePage();
-    Styles.tunePageStyle();
-
-    View.animateLoading(context.labels.loading,'jqm-record');
-
-    AjaxPools.retrieveSobjectRelated(sobject.name, function(){
-        AjaxHandlers.describe();
-        RecordView.retrieveSobjectData();
-    });
-}
-
 var initRecordView = function(){
     function retrieveSobjectData(){
         AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){

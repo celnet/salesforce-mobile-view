@@ -1,28 +1,3 @@
-var renderRecordNew = function(){
-    RecordNew = initRecordNew();
-    
-    document.querySelector('body').innerHTML = templates.record_page_structure + templates.page_lookup;
-    
-    document.querySelector('#jqm-page-title').innerHTML = context.labels.new;
-    document.title = sobject.describe.label;
-    document.querySelector('#jqm-header-left-button')['href'] = 'javascript:UserAction.cancel()';
-    document.querySelector('#jqm-header-right-button')['href'] = 'javascript:UserAction.saveRecord()';
-    document.querySelector('#jqm-header-left-button').innerHTML = context.labels.cancel;
-    document.querySelector('#jqm-header-right-button').innerHTML = context.labels.save;
-    document.querySelector('#jqm-header-left-button').classList.add('ui-icon-back');
-    document.querySelector('#jqm-header-right-button').classList.add('ui-icon-check');
-
-    
-    $j.mobile.initializePage();
-    Styles.tunePageStyle();
-    
-    View.animateLoading(context.labels.loading,'jqm-record');
-    AjaxPools.retrieveSobjectRelated(sobject.name, function(){
-        AjaxHandlers.describe();
-        RecordNew.retrieveSobjectData();
-    });
-}
-
 var initRecordNew = function(){
     function retrieveSobjectData(){
         handleSobjectLayouts();
@@ -142,88 +117,14 @@ var initRecordNew = function(){
     }
 
     function renderLayout(processedLayout, welinkProcessedLayout, newOrUpdate, isWelinkLayout){
-        /*
-        var section_template = templates.section;
-        var section_template_without_heading = templates.section_without_heading;
-        var record_display = '';
-
-        var _processed;
-        if(record.welink_processed != null && record.welink_processed.length > 0){
-            _processed = record.welink_processed;
-            for(var i = 0; i < _processed.length;i++){
-                if(_processed[i].fields.length > 0){
-                    var _fields = '';
-                    for(var j = 0; j < _processed[i].fields.length; j++){
-                        _fields += FieldRenderer.processFieldDisplay(_processed[i].fields[j].field, null, 'new', true);
-                    }
-                    
-                    if(_processed[i].editHeading && _processed[i].fields.length > 0){
-                        var _section = section_template;
-                        _section = _section.replace('{{fields}}',_fields);
-                        _section = _section.replace('{{section-number}}','section-' + i);
-                        _section = _section.replace('{{section-title}}', _processed[i].label);
-                        record_display += _section;
-                    } else {
-                        var _section = section_template_without_heading;
-                        _section = _section.replace('{{fields}}',_fields);
-                        _section = _section.replace('{{section-number}}','section-' + i);
-                        record_display += _section;
-                    }
-                }
-            }
-        } else {
-            _processed = record.processed;
-            for(var i = 0; i < _processed.length;i++){
-                var _fields = '';
-                for(var j = 0; j < _processed[i].rows.length; j++){
-                    _fields += FieldRenderer.processFieldDisplay(null, _processed[i].rows[j], 'new', false);
-                }
-                
-                if(_processed[i].useHeading && _processed[i].rows.length > 0){
-                    var _section = section_template;
-                    _section = _section.replace('{{fields}}',_fields);
-                    _section = _section.replace('{{section-number}}','section-' + i);
-                    _section = _section.replace('{{section-title}}', _processed[i].heading);
-                    record_display += _section;
-                } else {
-                    var _section = section_template_without_heading;
-                    _section = _section.replace('{{fields}}',_fields);
-                    _section = _section.replace('{{section-number}}','section-' + i);
-                    record_display += _section;
-                }
-            }
-        }
-        */
         var record_display = FieldRenderer.processLayoutDisplay(processedLayout, welinkProcessedLayout, newOrUpdate, isWelinkLayout);
-        
         document.querySelector('#field-container').innerHTML = record_display;
         
-        $j('ul').listview();
-        $j('input[type="text"]').textinput();
-        $j('input[type="tel"]').textinput();
-        $j('input[type="url"]').textinput();
-        $j('input[type="number"]').textinput();
-        $j('input[type="date"]').textinput();
-        $j('input[type="email"]').textinput();
-        $j('input[type="datetime"]').textinput();
-        $j('input[type="datetime-local"]').textinput();
-        $j('input[type="search"]').textinput();
-        $j('textarea').textinput({
-            autogrow: true
-        });
-        $j('textarea').css('resize','vertical');
-        $j('select').selectmenu();
-        $j('input[type="checkbox"]').flipswitch();
-        
-        $j('input[id!="lookup-search-box"]').css('height','44.375px');
-        $j('label').css('font-weight','bold');
-
         $j('input[type="search"]').bind('click',function(){
             Lookup.popup(this,'jqm-record');
         });
-
-        // 分割线改为点线
-        $j('.ui-field-contain').css('border-bottom-style','dashed');
+        
+        Styles.styleEdit();
     }
 
     return {

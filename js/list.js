@@ -1,24 +1,3 @@
-function renderListView(){
-    ListView = initListView();
-
-    document.querySelector('body').innerHTML = templates.listview_page_structure;
-
-    document.querySelector('#jqm-header-left-button')['href'] = '';
-    document.querySelector('#jqm-header-right-button')['href'] = "javascript:UserAction.newRecord('jqm-list')";
-
-    document.querySelector('#jqm-header-left-button').innerHTML = '';
-    document.querySelector('#jqm-header-right-button').innerHTML = '';
-
-    $j.mobile.initializePage();
-    Styles.tunePageStyle();
-
-    View.animateLoading(context.labels.loading,'jqm-list');
-    AjaxPools.retrieveSobjectRelated(sobject.name, function(){
-        AjaxHandlers.describe();
-        ListView.retrieveSobjectData();
-    });
-}
-
 var initListView = function(){
 
     function retrieveSobjectData(){
