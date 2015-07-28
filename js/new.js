@@ -1,9 +1,7 @@
 var renderRecordNew = function(){
     RecordNew = initRecordNew();
-
-    var recordnew_page = templates.record_page_structure;
-
-    document.querySelector('body').innerHTML = recordnew_page + templates.page_lookup;
+    
+    document.querySelector('body').innerHTML = templates.record_page_structure + templates.page_lookup;
     
     document.querySelector('#jqm-page-title').innerHTML = context.labels.new;
     document.title = sobject.describe.label;
@@ -142,18 +140,27 @@ var initRecordNew = function(){
         }
     }
     
-    function processFieldsDisplay(fieldName, layoutItem, isWelinkLayout){
-        var sobjectsWithCompoundNames = ['user','contact','lead'];
-        var isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase()) > 0;
-        
-        var fieldLabel;
-        var fieldType;
-        var fieldPicklistValues;
-        var fieldReferenceTos;
-        var fieldComponents;
-        var isFieldRequired;
-        var isFieldEditable;
-        var isFieldReadOnly;
+    function processFieldsDisplay(fieldName, layoutItem, newOrUpdate, isWelinkLayout){
+        var sobjectsWithCompoundNames = ['user','contact','lead'],
+            isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase()) > 0,
+                
+            fieldHTML,
+            
+            fieldTemplate,
+            fieldLabel,
+            fieldType,
+            fieldValue,
+            refValue,
+            fieldPicklistValues,
+            fieldReferenceTos,
+            fieldComponents,
+            
+            isNew = (newOrUpdate == 'new'),
+            isUpdate = (newOrUpdate == 'update'),
+            isFieldRequired,
+            isFieldEditable,
+            isFieldReadOnly,
+            timezone = context.timezone;
         
         if(isWelinkLayout){
             fieldLabel = sobject.fields[fieldName].describe.label;
@@ -161,8 +168,8 @@ var initRecordNew = function(){
             fieldPicklistValues = sobject.fields[fieldName].describe.picklistValues;
             fieldReferenceTos = sobject.fields[fieldName].describe.referenceTo;
             isFieldRequired = record.welink_required[fieldName];
-            isFieldEditable = record.welink_edit[fieldName];
-            isFieldReadOnly = record.welink_readonly[fieldName];
+            isFieldEditable = record.welink_edit[fieldName] && sobject.fields[fieldName].describe.updateable;
+            isFieldReadOnly = record.welink_readonly[fieldName] || !sobject.fields[fieldName].describe.updateable;
         } else {
             fieldName = layoutItem.layoutComponents[0].details.name;
             fieldLabel = layoutItem.label;
@@ -181,102 +188,140 @@ var initRecordNew = function(){
             return '';
         }
         
-        var _field;
+        var recordDetail;
+        var recordReferences;
         
-        var field_templates = {};
-        field_templates.url = templates.jqm_textinput.replace(/{{input-type}}/g,'url');
-        field_templates.date = templates.jqm_textinput.replace(/{{input-type}}/g,'date');
-        field_templates.encryptedstring = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
-        field_templates.textarea = templates.jqm_textarea;
-        field_templates.string = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
-        field_templates.currency = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
-        field_templates.reference = templates.field_lookup;
-        field_templates.datetime = templates.jqm_textinput.replace(/{{input-type}}/g,'datetime-local');
-        field_templates.phone = templates.jqm_textinput.replace(/{{input-type}}/g,'tel');
-        field_templates.percent = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
-        field_templates.double = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
-        field_templates.email = templates.jqm_textinput.replace(/{{input-type}}/g,'email');
-        field_templates.readonly = templates.field_readonly;
+        if(isNew){
+            recordDetail = {};
+            recordReferences = {};
+        } else {
+            recordDetail = record.detail;
+            recordReferences = record.references;
+        }
+        
+        fieldValue = recordDetail[fieldName];
+        refValue = recordReferences[fieldName];
         
         if(fieldName == 'Name' && isCompoundName){
-            return FieldRenderer.processNameField({}, fieldComponents);
+            return FieldRenderer.processNameField(recordDetail, fieldComponents || []);
         }
-
-        if((isFieldReadOnly && fieldType != 'address')){
-            var _field_template = templates.field_readonly;
-            _field = _field_template.replace('{{field-label}}',fieldLabel);
-            _field = _field.replace('{{field-value}}','<br/>');
-            
-            return _field;// + '<br/>';
+        
+        if(fieldType == 'address'){
+            return FieldRenderer.processAddressField(fieldValue, fieldComponents || [], fieldName);
         } 
-
+        
         if(fieldName == 'RecordTypeId'){
-            var _field_template = templates.field_readonly;
-            _field = _field_template.replace('{{field-label}}',fieldLabel);
-            _field = _field.replace('{{field-value}}',record.recordtypename);
+            var recordTypeName;
             
-            return _field;
+            if(isNew){
+                recordTypeName = record.recordtypename;
+            } else {
+                recordTypeName = refValue.Name || '';
+            }
+            
+            fieldTemplate = templates.field_readonly;
+            fieldHTML = fieldTemplate.replace('{{field-label}}',fieldLabel);
+            fieldHTML = fieldHTML.replace('{{field-value}}',recordTypeName);
+            
+            return fieldHTML;
         }
+        
+        if((isFieldReadOnly && fieldType != 'address') || fieldName == 'ForecastCategoryName'){
+            fieldTemplate = templates.field_readonly;
+            if(fieldValue != '' && fieldValue != undefined){
+                if(fieldType == 'reference'){
+                     var _ref_value = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + fieldReferenceTos[0] + '&id=' + refValue.Id + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + refValue.Name + '</a>';
 
-        if(isFieldRequired || fieldName == 'OwnerId'){
-            fieldLabel = '<span style="color:crimson">*</span>' + fieldLabel;
-        } else {
-            fieldLabel = '<span>&nbsp;</span>' + fieldLabel;
-        }
+                    fieldHTML = fieldTemplate.replace('{{field-label}}',fieldLabel);
+                    fieldHTML = fieldHTML.replace('{{field-value}}',_ref_value);
+                    return fieldHTML;
+                } else if(fieldType == 'datetime'){
+                    var _datetime_value = TimezoneDatabase.formatDatetimeToLocal(fieldValue, timezone);
+                    _datetime_value = _datetime_value.replace('T',' ');
+                    
+                    fieldHTML = fieldTemplate.replace('{{field-label}}',fieldLabel);
+                    fieldHTML = fieldHTML.replace('{{field-value}}', _datetime_value);
+                    
+                    return fieldHTML;
+                }
+            } else {
+                fieldHTML = fieldTemplate.replace('{{field-label}}',fieldLabel);
+                fieldHTML = fieldHTML.replace('{{field-value}}',fieldValue || '<br/>');
+                
+                return fieldHTML;
+            }
+        } 
+        
+        var requiredLabel = '<span>&nbsp;</span>';
+        if((isFieldRequired && (isWelinkLayout || isFieldEditable)) || fieldName == 'OwnerId'){
+            requiredLabel = '<span style="color:crimson">*</span>';
+        } 
+        fieldLabel = requiredLabel + fieldLabel;
 
         switch(fieldType){
             case 'reference':
-                var _field_template = templates.field_lookup;
-
-                _field = _field_template.replace('{{input-label}}',fieldLabel);
-
-                if(fieldName == 'OwnerId'){
-                    _field = _field.replace('{{input-value}}',context.user_fullname);
-                    _field = _field.replace('{{input-value-hidden}}',context.user_id);
-                } else {
-                    _field = _field.replace('{{input-value}}','');
-                    _field = _field.replace('{{input-value-hidden}}','');
-                }
-
+                fieldTemplate = templates.field_lookup;
+                
                 var field_ref_type = fieldReferenceTos[0];
                 field_ref_type = field_ref_type == 'Group'?fieldReferenceTos[1]:field_ref_type;
-
-                _field = _field.replace('{{reference-sobject-type}}',field_ref_type);
-
-                _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
+                fieldHTML = fieldTemplate.replace('{{reference-sobject-type}}',field_ref_type);
+                
+                if(refValue != undefined){
+                    fieldHTML = fieldHTML.replace('{{input-value}}',refValue.Name);
+                    fieldHTML = fieldHTML.replace('{{input-value-hidden}}',refValue.Id);
+                } else if(fieldName == 'OwnerId'){
+                    fieldHTML = fieldHTML.replace('{{input-value}}',context.user_fullname);
+                    fieldHTML = fieldHTML.replace('{{input-value-hidden}}',context.user_id);
+                } else{
+                    fieldHTML = fieldHTML.replace('{{input-value}}','');
+                    fieldHTML = fieldHTML.replace('{{input-value-hidden}}','');
+                }
                 break;
             case 'multipicklist':
                 var _select_template = templates.field_multipicklist_select;
-                _field = _select_template.replace('{{input-label}}',fieldLabel);
-                _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
+                fieldHTML = _select_template;
                 
                 var _option_template = templates.option;
                 var _options = '';
+                
+                var _multipicklist_value = [];
+                if(fieldValue != null){
+                    _multipicklist_value = fieldValue.split(';');
+                }
                 
                 for(var i = 0; i < fieldPicklistValues.length; i++){
                     var _option = _option_template.replace('{{option-label}}',fieldPicklistValues[i].label);
                     _option = _option.replace('{{option-value}}',fieldPicklistValues[i].value);
                     
-                    _option = _option.replace('{{option-selected}}','');
+                    for(var j = 0; j < _multipicklist_value.length; j++){
+                        if(_multipicklist_value[j] == fieldPicklistValues[i].value){
+                            _option = _option.replace('{{option-selected}}','selected');
+                            break;
+                        }
+                    }
                     
+                    _option = _option.replace('{{option-selected}}','');
                     _options += _option;
                 }
-                
-                _field = _field.replace('{{options}}',_options);
+                fieldHTML = fieldHTML.replace('{{options}}',_options);
                 break;
             case 'encryptedstring':
-                _field = '';
+                fieldHTML = '';
                 break;
             case 'datetime':
-                var _field_template = templates.jqm_textinput.replace(/{{input-type}}/g,'datetime-local');
-                _field = _field_template.replace('{{input-label}}',fieldLabel);
-                _field = _field.replace('{{input-value}}','');
-                _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
+                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'datetime-local');
+                
+                if(fieldValue != null){
+                    fieldValue = TimezoneDatabase.formatDatetimeToLocal(fieldValue, timezone);
+                } else {
+                    fieldValue = '';
+                }
+                
+                fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue);
                 break;
             case 'picklist':
                 var _select_template = templates.field_picklist_select;
-                _field = _select_template.replace('{{input-label}}',fieldLabel);
-                _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
+                fieldHTML = _select_template;
                 
                 var _option_template = templates.option;
                 var _options = '';
@@ -290,12 +335,16 @@ var initRecordNew = function(){
                 }
                 
                 for(var i = 0; i < fieldPicklistValues.length; i++){
-                    if(!fieldPicklistValues[i].active)
+                    var isSelected = (isNew && fieldPicklistValues[i].defaultValue) || (isUpdate && fieldValue == fieldPicklistValues[i].value);
+                    
+                    if(!fieldPicklistValues[i].active){
                         continue;
+                    }
+                    
                     var _option = _option_template.replace('{{option-label}}',fieldPicklistValues[i].label);
                     _option = _option.replace('{{option-value}}',fieldPicklistValues[i].value);
                     
-                    if(fieldPicklistValues[i].defaultValue){
+                    if(isSelected){
                         _option = _option.replace('{{option-selected}}','selected');
                     } else {
                         _option = _option.replace('{{option-selected}}','');
@@ -304,39 +353,74 @@ var initRecordNew = function(){
                     _options += _option;
                 }
                 
-                _field = _field.replace('{{options}}',_options);
+                fieldHTML = fieldHTML.replace('{{options}}',_options);
                 break;
             case 'boolean':
-                var _field_template = templates.checkboxradio;
-                _field = _field_template.replace('{{input-label}}',fieldLabel);
-                _field = _field.replace('{{input-value}}','');
-                _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
+                fieldTemplate = templates.checkboxradio;
+                fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 
-                _field = _field.replace('{{input-checked}}','');
-                //_field += '<br/>';
+                if(fieldValue){
+                    fieldHTML = fieldHTML.replace('{{input-checked}}','checked');
+                } else {
+                    fieldHTML = fieldHTML.replace('{{input-checked}}','');
+                }
+                break;
+            case 'date':
+                var date_value = fieldValue;
+                if(date_value != '' && date_value != null){
+                    date_value = TimezoneDatabase.formatDateToLocal(date_value, timezone);
+                }
+                
+                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'date');
+                fieldHTML = fieldTemplate.replace('{{input-value}}',date_value || '');
                 break;
             case 'address':
-                _field = FieldRenderer.processAddressField({}, fieldComponents, fieldName);
-                
+                fieldHTML = FieldRenderer.processAddressField(fieldValue || {}, fieldComponents || [], fieldName);
                 break;
             case 'geolocation':
-                var _field_template = templates.field_readonly;
-                _field = _field_template.replace('{{field-label}}',fieldLabel);
-                _field = _field.replace('{{field-value}}','');
+                fieldTemplate = templates.field_readonly;
+                fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 break;
             case 'location':
-                var _field_template = templates.field_readonly;
-                _field = _field_template.replace('{{field-label}}',fieldLabel);
-                _field = _field.replace('{{field-value}}','');
+                fieldTemplate = templates.field_readonly;
+                fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
+                break;
+            case 'email':
+            case 'url':
+                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,fieldType);
+                fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
+                break;
+            case 'percent':
+            case 'currency':
+            case 'double':
+                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
+                fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
+                break;
+                break;
+            case 'string':
+                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
+                fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
+                break;
+            case 'phone':
+                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'tel');
+                fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
+                break;
+            case 'textarea':
+                fieldTemplate = templates.jqm_textarea;
+                fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 break;
             default:
-                var _field_template = field_templates[fieldType] || templates.jqm_textinput.replace(/{{input-type}}/g,'text');
-                _field = _field_template.replace('{{input-label}}',fieldLabel);
-                _field = _field.replace('{{input-value}}','');
-                _field = _field.replace(/{{input-id}}/g,'record-field-' + fieldName);
+                if(fieldValue == null || fieldValue == undefined){
+                    fieldValue = '';
+                }
+                
+                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
+                fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue);
         }
-
-        return _field;// + '<br/>';
+        
+        fieldHTML = fieldHTML.replace('{{input-label}}',fieldLabel);
+        fieldHTML = fieldHTML.replace(/{{input-id}}/g,'record-field-' + fieldName);
+        return fieldHTML;// + '<br/>';
     }
 
     function renderLayout(){
@@ -353,7 +437,7 @@ var initRecordNew = function(){
             for(var i = 0; i < _processed.length;i++){
                 var _fields = '';
                 for(var j = 0; j < _processed[i].fields.length; j++){
-                    _fields += processFieldsDisplay(_processed[i].fields[j].field, null, true);
+                    _fields += processFieldsDisplay(_processed[i].fields[j].field, null, 'new', true);
                 }
                 
                 if(_processed[i].editHeading && _processed[i].fields.length > 0){
@@ -374,7 +458,7 @@ var initRecordNew = function(){
             for(var i = 0; i < _processed.length;i++){
                 var _fields = '';
                 for(var j = 0; j < _processed[i].rows.length; j++){
-                    _fields += processFieldsDisplay(null, _processed[i].rows[j], false);
+                    _fields += processFieldsDisplay(null, _processed[i].rows[j], 'new', false);
                 }
                 
                 if(_processed[i].useHeading && _processed[i].rows.length > 0){
