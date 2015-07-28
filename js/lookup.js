@@ -3,17 +3,17 @@ var Lookup = {
         processing.page_scroll_y = window.scrollY;
         
         $j.mobile.pageContainer.pagecontainer('change','#lookup-search-page',{transition:'none',changeHash:false});
-        View.animateLoading(context.labels.loading,'lookup-search-page');
+        View.animateLoading(Context.labels.loading,'lookup-search-page');
         var field_name = triggered_element.id.substr(13);
         var ref_type = document.querySelector('#' + triggered_element.id + '-sobject-type').value;
 
         document.querySelector('#jqm-lookup-header-right-button')['href'] = 'javascript:Lookup.search("' + field_name + '","' + ref_type + '","' + target_page_id + '")';
         document.querySelector('#jqm-lookup-header-left-button')['href'] = 'javascript:Lookup.cancel("' + field_name + '","' + target_page_id + '")';
 
-        document.querySelector('#jqm-lookup-header-right-button').innerHTML = context.labels.search;
-        document.querySelector('#jqm-lookup-header-left-button').innerHTML = context.labels.cancel;
+        document.querySelector('#jqm-lookup-header-right-button').innerHTML = Context.labels.search;
+        document.querySelector('#jqm-lookup-header-left-button').innerHTML = Context.labels.cancel;
 
-        document.querySelector('#lookup-record-list').innerHTML = '<div style="text-align:center;padding:10px;">' + context.labels.search_tip + '</div>';
+        document.querySelector('#lookup-record-list').innerHTML = '<div style="text-align:center;padding:10px;">' + Context.labels.search_tip + '</div>';
 
         document.querySelector('#lookup-search-box').parentNode.style.marginTop = '3px';
         document.querySelector('#lookup-search-box').parentNode.style.marginBottom = '3px';
@@ -28,7 +28,7 @@ var Lookup = {
 
                 var record_items = '';
                 for(var i = 0; i < lookup_recentlyviewed.length; i++){
-                    var record_item = templates.lookup_field;
+                    var record_item = Templates.lookup_field;
                     record_item = record_item.replace(/{{jqm-page}}/g,target_page_id);
                     record_item = record_item.replace(/{{record-name}}/g,lookup_recentlyviewed[i].Name);
                     record_item = record_item.replace(/{{field-name}}/g,field_name);
@@ -39,7 +39,7 @@ var Lookup = {
                 }
 
                 if(record_items == ''){
-                    record_items = '<div style="text-align:center;padding:10px;">' + context.labels.search_tip + '</div>';
+                    record_items = '<div style="text-align:center;padding:10px;">' + Context.labels.search_tip + '</div>';
                 }
                 
                 document.querySelector('#lookup-record-list').innerHTML = record_items;
@@ -52,7 +52,7 @@ var Lookup = {
     },
 
     search:function(field_name, ref_type, target_page_id){
-        View.animateLoading(context.labels.loading,'lookup-search-page');
+        View.animateLoading(Context.labels.loading,'lookup-search-page');
         var keyword = document.querySelector('#lookup-search-box').value;
         
         Ajax.get(
@@ -63,7 +63,7 @@ var Lookup = {
                 var _record_items = '';
                 var _lookup_records_length = _lookup_records.length;// > 10?10:_lookup_records.length;
                 for(var i = 0; i < _lookup_records_length; i++){
-                    var _record_item = templates.lookup_field;
+                    var _record_item = Templates.lookup_field;
                     _record_item = _record_item.replace(/{{jqm-page}}/g,target_page_id);
                     _record_item = _record_item.replace(/{{record-name}}/g,_lookup_records[i].Name);
                     _record_item = _record_item.replace(/{{field-name}}/g,field_name);
@@ -74,7 +74,7 @@ var Lookup = {
                 }
 
                 if(_record_items == ''){
-                    _record_items = '<div style="text-align:center;padding:10px;">' + context.labels.no_record + '</div>';
+                    _record_items = '<div style="text-align:center;padding:10px;">' + Context.labels.no_record + '</div>';
                 }
                 
                 document.querySelector('#lookup-record-list').innerHTML = _record_items;

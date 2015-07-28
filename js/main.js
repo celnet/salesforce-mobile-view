@@ -38,9 +38,9 @@ var getParams = function(){
     }
 
     if(/Android/i.test(navigator.userAgent)){
-        context.device_type = 'Android';
+        Context.device_type = 'Android';
     } else if(/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        context.device_type = 'iPhone';
+        Context.device_type = 'iPhone';
     }
 };
 
@@ -50,7 +50,7 @@ var UserAction = {
     }, // loading
 
     newRecord:function(current_jqm_page_id){
-        View.animateLoading(context.labels.loading,current_jqm_page_id);
+        View.animateLoading(Context.labels.loading,current_jqm_page_id);
         window.history.pushState('DPRecordNew','DPRecordNew','DP?mode=new&sobject=' + sobject.name);
         route();
     }, // no loading
@@ -60,19 +60,19 @@ var UserAction = {
     }, // loading
 
     viewRecord:function(current_jqm_page_id){
-        View.animateLoading(context.labels.loading, current_jqm_page_id);
+        View.animateLoading(Context.labels.loading, current_jqm_page_id);
         window.history.pushState('DPRecordView','DPRecordView','DP?mode=view&sobject=' + sobject.name + '&id=' + record.id + '&listviewid=' + params.listviewid);
         route();
     }, // loading
 
     viewList:function(current_jqm_page_id){
-        View.animateLoading(context.labels.loading, current_jqm_page_id);
+        View.animateLoading(Context.labels.loading, current_jqm_page_id);
         window.history.pushState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=' + params.listviewid);
         route();
     }, // loading
 
     editRecord:function(current_jqm_page_id){
-        View.animateLoading(context.labels.loading, current_jqm_page_id);
+        View.animateLoading(Context.labels.loading, current_jqm_page_id);
         window.history.pushState('DPRecordEdit','DPRecordEdit','DP?mode=edit&sobject=' + sobject.name + '&id=' + record.id + '&listviewid=' + params.listviewid);
         route();
     }, // no loading
@@ -89,12 +89,6 @@ var UserAction = {
 };
 
     var 
-        Templates = {
-
-        },
-
-        context = Context,
-
         View = {
             fieldEdit:function(){
 
@@ -106,7 +100,7 @@ var UserAction = {
 
             animateLoading:function(loading_text, jqm_page_id){
                 document.querySelector('#' + jqm_page_id).classList.add('ui-state-disabled');
-                var loading_image_src = context.welink_logo_src;
+                var loading_image_src = Context.images.welink_logo;
                 
                 $j.mobile.loading( 'show', {
                     text: loading_text,

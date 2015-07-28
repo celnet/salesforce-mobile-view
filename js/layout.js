@@ -14,7 +14,7 @@ var FieldRenderer = {
         }
 
         var _field = '';
-        var _field_template = templates.field_username;
+        var _field_template = Templates.field_username;
 
         _field = _field_template.replace('{{lastname-value}}',allfields.LastName || '');
         _field = _field.replace('{{lastname-label}}',name_labels.lastname);
@@ -81,7 +81,7 @@ var FieldRenderer = {
         };
 
         var _field = '';
-        var _field_template = templates.field_address;
+        var _field_template = Templates.field_address;
 
         _field = _field_template.replace(/{{address-country-id}}/g,'record-field-' + address_apinames.country);
         _field = _field.replace('{{country-label}}',address_labels.country);
@@ -126,7 +126,7 @@ var FieldRenderer = {
             isFieldRequired,
             isFieldEditable,
             isFieldReadOnly,
-            timezone = context.timezone;
+            timezone = Context.timezone;
         
         if(isWelinkLayout){
             fieldLabel = sobject.fields[fieldName].describe.label;
@@ -189,7 +189,7 @@ var FieldRenderer = {
                 }
             }
             
-            fieldTemplate = templates.field_readonly;
+            fieldTemplate = Templates.field_readonly;
             fieldHTML = fieldTemplate.replace('{{field-label}}',fieldLabel);
             fieldHTML = fieldHTML.replace('{{field-value}}',recordTypeName);
             
@@ -197,7 +197,7 @@ var FieldRenderer = {
         }
         
         if((isFieldReadOnly && fieldType != 'address') || fieldName == 'ForecastCategoryName'){
-            fieldTemplate = templates.field_readonly;
+            fieldTemplate = Templates.field_readonly;
             if(fieldValue != '' && fieldValue != undefined){
                 if(fieldType == 'reference'){
                      var _ref_value = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + fieldReferenceTos[0] + '&id=' + refValue.Id + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + refValue.Name + '</a>';
@@ -235,7 +235,7 @@ var FieldRenderer = {
 
         switch(fieldType){
             case 'reference':
-                fieldTemplate = templates.field_lookup;
+                fieldTemplate = Templates.field_lookup;
                 
                 var field_ref_type = fieldReferenceTos[0];
                 field_ref_type = field_ref_type == 'Group'?fieldReferenceTos[1]:field_ref_type;
@@ -245,18 +245,18 @@ var FieldRenderer = {
                     fieldHTML = fieldHTML.replace('{{input-value}}',refValue.Name);
                     fieldHTML = fieldHTML.replace('{{input-value-hidden}}',refValue.Id);
                 } else if(fieldName == 'OwnerId'){
-                    fieldHTML = fieldHTML.replace('{{input-value}}',context.user_fullname);
-                    fieldHTML = fieldHTML.replace('{{input-value-hidden}}',context.user_id);
+                    fieldHTML = fieldHTML.replace('{{input-value}}',Context.user_fullname);
+                    fieldHTML = fieldHTML.replace('{{input-value-hidden}}',Context.user_id);
                 } else{
                     fieldHTML = fieldHTML.replace('{{input-value}}','');
                     fieldHTML = fieldHTML.replace('{{input-value-hidden}}','');
                 }
                 break;
             case 'multipicklist':
-                var _select_template = templates.field_multipicklist_select;
+                var _select_template = Templates.field_multipicklist_select;
                 fieldHTML = _select_template;
                 
-                var _option_template = templates.option;
+                var _option_template = Templates.option;
                 var _options = '';
                 
                 var _multipicklist_value = [];
@@ -284,7 +284,7 @@ var FieldRenderer = {
                 fieldHTML = '';
                 break;
             case 'datetime':
-                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'datetime-local');
+                fieldTemplate = Templates.jqm_textinput.replace(/{{input-type}}/g,'datetime-local');
                 
                 if(fieldValue != null){
                     fieldValue = TimezoneDatabase.formatDatetimeToLocal(fieldValue, timezone);
@@ -295,13 +295,13 @@ var FieldRenderer = {
                 fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue);
                 break;
             case 'picklist':
-                var _select_template = templates.field_picklist_select;
+                var _select_template = Templates.field_picklist_select;
                 fieldHTML = _select_template;
                 
-                var _option_template = templates.option;
+                var _option_template = Templates.option;
                 var _options = '';
                 
-                var _noselect_option = _option_template.replace('{{option-label}}','--' + context.labels.select_none + '--');
+                var _noselect_option = _option_template.replace('{{option-label}}','--' + Context.labels.select_none + '--');
                 _noselect_option = _noselect_option.replace('{{option-value}}','--None--');
                 _noselect_option = _noselect_option.replace('{{option-selected}}','');
 
@@ -331,7 +331,7 @@ var FieldRenderer = {
                 fieldHTML = fieldHTML.replace('{{options}}',_options);
                 break;
             case 'boolean':
-                fieldTemplate = templates.checkboxradio;
+                fieldTemplate = Templates.checkboxradio;
                 fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 
                 if(fieldValue){
@@ -346,7 +346,7 @@ var FieldRenderer = {
                     date_value = TimezoneDatabase.formatDateToLocal(date_value, timezone);
                 }
                 
-                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'date');
+                fieldTemplate = Templates.jqm_textinput.replace(/{{input-type}}/g,'date');
                 fieldHTML = fieldTemplate.replace('{{input-value}}',date_value || '');
                 break;
             case 'address':
@@ -354,31 +354,31 @@ var FieldRenderer = {
                 break;
             case 'geolocation':
             case 'location':
-                fieldTemplate = templates.field_geolocation;
+                fieldTemplate = Templates.field_geolocation;
                 fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 break;
             case 'email':
             case 'url':
-                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,fieldType);
+                fieldTemplate = Templates.jqm_textinput.replace(/{{input-type}}/g,fieldType);
                 fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 break;
             case 'percent':
             case 'currency':
             case 'double':
-                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
+                fieldTemplate = Templates.jqm_textinput.replace(/{{input-type}}/g,'text');
                 fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 break;
                 break;
             case 'string':
-                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
+                fieldTemplate = Templates.jqm_textinput.replace(/{{input-type}}/g,'text');
                 fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 break;
             case 'phone':
-                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'tel');
+                fieldTemplate = Templates.jqm_textinput.replace(/{{input-type}}/g,'tel');
                 fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 break;
             case 'textarea':
-                fieldTemplate = templates.jqm_textarea;
+                fieldTemplate = Templates.jqm_textarea;
                 fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 break;
             default:
@@ -386,7 +386,7 @@ var FieldRenderer = {
                     fieldValue = '';
                 }
                 
-                fieldTemplate = templates.jqm_textinput.replace(/{{input-type}}/g,'text');
+                fieldTemplate = Templates.jqm_textinput.replace(/{{input-type}}/g,'text');
                 fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue);
         }
         
@@ -396,8 +396,8 @@ var FieldRenderer = {
     },
     
     processLayoutDisplay:function(processedLayout, welinkProcessedLayout, newOrUpdate, isWelinkLayout){
-        var section_template = templates.section;
-        var section_template_without_heading = templates.section_without_heading;
+        var section_template = Templates.section;
+        var section_template_without_heading = Templates.section_without_heading;
         var layoutDisplay = '';
         
         if(isWelinkLayout){

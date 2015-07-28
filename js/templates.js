@@ -1,6 +1,6 @@
 var getTemplates = function(){
     //alert(window.location.search);
-    templates = {
+    Templates = {
         // ListView
         listview_page_structure:document.querySelector('#template-listview-page-structure').text,
         listview_select:document.querySelector('#template-listview-select').text,

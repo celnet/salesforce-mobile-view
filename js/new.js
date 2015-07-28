@@ -51,7 +51,7 @@ var initRecordNew = function(){
         var recordtype_options = '';
         var has_default = false;
         for (var i = 0; i < recordtype_mappings.length - 1; i++) {
-            var option = templates.option.replace('{{option-label}}',recordtype_mappings[i].name).replace('{{option-value}}',recordtype_mappings[i].recordTypeId);
+            var option = Templates.option.replace('{{option-label}}',recordtype_mappings[i].name).replace('{{option-value}}',recordtype_mappings[i].recordTypeId);
             if(record.recordtypeid != '' && record.recordtypeid != 'pending select'){
                 if(recordtype_mappings[i].recordTypeId == record.recordtypeid){
 
@@ -67,10 +67,10 @@ var initRecordNew = function(){
         };
 
         if(!has_default){
-            recordtype_options = '<option value="--None--">--' + context.labels.select_none + '--</option>' + recordtype_options;
+            recordtype_options = '<option value="--None--">--' + Context.labels.select_none + '--</option>' + recordtype_options;
         }
 
-        var recordtype_select = templates.recordtype_select.replace('{{options}}',recordtype_options).replace('{{label}}',context.labels.select_recordtype);
+        var recordtype_select = Templates.recordtype_select.replace('{{options}}',recordtype_options).replace('{{label}}',Context.labels.select_recordtype);
         document.querySelector('#field-container').innerHTML = recordtype_select;
 
         $j('select').selectmenu();
@@ -86,7 +86,7 @@ var initRecordNew = function(){
         var recordtype_options = document.querySelectorAll('#recordtype option');
         for(var i = 0; i < recordtype_options.length; i++){
             if(recordtype_options[i].selected && recordtype_options[i].value != '--None--'){
-                View.animateLoading(context.labels.loading,'jqm-record');
+                View.animateLoading(Context.labels.loading,'jqm-record');
                 document.querySelector('#jqm-header-left-button').href='javascript:RecordNew.renderRecordTypeSelect()';
                 document.querySelector('#jqm-header-right-button').href = 'javascript:UserAction.saveRecord()';
                 record.recordtypeid = recordtype_options[i].value;

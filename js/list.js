@@ -31,7 +31,7 @@ var initListView = function(){
     }
 
     function handleDescribe(){
-        document.querySelector('#jqm-page-title').innerHTML = context.labels.listview;
+        document.querySelector('#jqm-page-title').innerHTML = Context.labels.listview;
         document.title = sobject.describe.label;
         document.querySelector('title').innerHTML = sobject.describe.label;
         
@@ -94,7 +94,7 @@ var initListView = function(){
     }
 
     function viewRecord(record_id){
-        View.animateLoading(context.labels.loading,'jqm-list');
+        View.animateLoading(Context.labels.loading,'jqm-list');
         window.history.pushState('DPRecordView','DPRecordView','DP?mode=view&sobject=' + sobject.name + '&id=' + record_id + '&listviewid=' + params.listviewid);
         route();
     }
@@ -118,7 +118,7 @@ var initListView = function(){
             if(AjaxResponses.recentlyviewedwithfields != null){
                 renderRecentlyViewedList();
             } else {
-                View.animateLoading(context.labels.loading, 'jqm-list');
+                View.animateLoading(Context.labels.loading, 'jqm-list');
                 AjaxPools.retrieveRecentlyViewed(sobject.name, function(){
                     sobject.recentlyviewed = AjaxResponses.recentlyviewedwithfields;
 
@@ -133,7 +133,7 @@ var initListView = function(){
 
             window.history.replaceState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=' + selected_option_id);
             
-            View.animateLoading(context.labels.loading,'jqm-list');
+            View.animateLoading(Context.labels.loading,'jqm-list');
             
             AjaxPools.retrieveSelectedListView(sobject.name, selected_option_id, function(){
                 
@@ -154,7 +154,7 @@ var initListView = function(){
 
     function renderListViewSelects(){
         var options = '';
-        var option_template = templates.option;
+        var option_template = Templates.option;
 
         for (var i = 0; i < sobject.ordered_listviews.length; i++) {
             var option = option_template.replace('{{option-value}}',sobject.ordered_listviews[i].id).replace('{{option-label}}',sobject.ordered_listviews[i].label);
@@ -166,7 +166,7 @@ var initListView = function(){
             }
         };
 
-        var listview_select = templates.listview_select.replace('{{select-listview}}',context.labels.select_listview);
+        var listview_select = Templates.listview_select.replace('{{select-listview}}',Context.labels.select_listview);
         options = listview_select.replace('{{options}}',options);
         document.querySelector('#listview-picklist').innerHTML = options;
         
@@ -175,12 +175,12 @@ var initListView = function(){
 
     function renderRecentlyViewedList(){
         var listitems = '';
-        var listitem_template = templates.listview_resultitem;
+        var listitem_template = Templates.listview_resultitem;
         
         var listview_results = sobject.recentlyviewed.records; 
         
         if(listview_results == undefined || listview_results.length == 0){
-            document.querySelector('#listview-resultlist').innerHTML = templates.listview_result_noitem.replace('{{no-record}}',context.labels.no_record);
+            document.querySelector('#listview-resultlist').innerHTML = Templates.listview_result_noitem.replace('{{no-record}}',Context.labels.no_record);
             return;
         }
 
@@ -190,7 +190,7 @@ var initListView = function(){
             listitems += listitem_template.replace('{{itemname}}',listview_results[i].Name || '').replace('{{record-id}}',listview_results[i].Id).replace('{{itemfields}}',_fields);
         };
         
-        listitems = templates.listview_resultlist.replace('{{items}}',listitems);
+        listitems = Templates.listview_resultlist.replace('{{items}}',listitems);
         document.querySelector('#listview-resultlist').innerHTML = listitems;
 
         $j('ul').listview();
@@ -199,12 +199,12 @@ var initListView = function(){
     function renderListViewResultList(display_number){
         var _res = listview.queryresult;
         var listitems = '';
-        var listitem_template = templates.listview_resultitem;
+        var listitem_template = Templates.listview_resultitem;
         var recordType = listview.recordType;
         
         
         if(_res.records == undefined || _res.records.length == 0){
-            document.querySelector('#listview-resultlist').innerHTML = templates.listview_result_noitem.replace('{{no-record}}',context.labels.no_record);
+            document.querySelector('#listview-resultlist').innerHTML = Templates.listview_result_noitem.replace('{{no-record}}',Context.labels.no_record);
             
             return;
         }
@@ -245,7 +245,7 @@ var initListView = function(){
                             //_record_val = formatDatetimeString(_record_val, 'datetime');
                             //console.log('&*&*&*&*&*&*&*&*&*&*&*&*&*&');
                             //console.log(_record_val);
-                            _record_val = TimezoneDatabase.formatDatetimeToLocal(_record_val, context.timezone);
+                            _record_val = TimezoneDatabase.formatDatetimeToLocal(_record_val, Context.timezone);
                             _record_val = _record_val.replace('T',' ');
                             break;
                         case undefined:
@@ -299,11 +299,11 @@ var initListView = function(){
             listitems += '<li data-icon="false">';
             listitems += '<a href="javascript:ListView.renderListViewResultList(' + (display_number + 25) +');">';
             listitems += '<div style="font-weight:normal;"><h1 style="margin-top:0px;text-align:center;">';
-            listitems += context.labels.more;
+            listitems += Context.labels.more;
             listitems += '</h1></div></a></li>';
         }
 
-        listitems = templates.listview_resultlist.replace('{{items}}',listitems);
+        listitems = Templates.listview_resultlist.replace('{{items}}',listitems);
         document.querySelector('#listview-resultlist').innerHTML = listitems;
 
         $j('ul').listview();
@@ -370,7 +370,7 @@ var initListView = function(){
                 var label_font_end = '';
 
                 if(_field_value != null && _field_value.length == 28 && _field_value.indexOf('000+0000') > 0){
-                    _field_value = TimezoneDatabase.formatDatetimeToLocal(_field_value, context.timezone).replace('T',' ');
+                    _field_value = TimezoneDatabase.formatDatetimeToLocal(_field_value, Context.timezone).replace('T',' ');
                 }
 
                 // 不显示字段标签，只显示字段值

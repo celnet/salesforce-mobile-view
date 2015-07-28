@@ -1,7 +1,7 @@
 var Ajax = {
     remoting:function(action,params,success,failure){
         Visualforce.remoting.Manager.invokeAction(
-            context.remote_action,
+            Context.remote_action,
             action,
             params,
             function(result, event){
@@ -18,7 +18,7 @@ var Ajax = {
     },
 
     ajax:function(method, endpoint, data, success, failure){
-        endpoint = '/services/data/v' + context.api_version + endpoint + (endpoint.indexOf('?') > -1?'&':'?') + '_t=' + new Date().getTime();
+        endpoint = '/services/data/v' + Context.api_version + endpoint + (endpoint.indexOf('?') > -1?'&':'?') + '_t=' + new Date().getTime();
 
         var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 
@@ -32,7 +32,7 @@ var Ajax = {
                     success();
                 } else {
                     if(params.retry == 'true'){
-                        //alert(context.labels.error);
+                        //alert(Context.labels.error);
                     } else if (method == 'GET'){
                         //window.location.replace(window.location.href + '&retry=true');
                     } else if (failure){
@@ -49,20 +49,20 @@ var Ajax = {
         xmlhttp.ontimeout = function(){
             if(method == 'GET') {
                 if(params.retry == 'true'){
-                    alert(context.labels.close);
+                    alert(Context.labels.close);
                 } else {
-                    alert(context.labels.retry);
+                    alert(Context.labels.retry);
                     window.location.replace(window.location.href + '&retry=true');
                 }
             } else {
-                alert(context.labels.retry);
+                alert(Context.labels.retry);
                 View.stopLoading('jqm-record');
             }
         };
         xmlhttp.open(method, endpoint, true);
         xmlhttp.setRequestHeader('Content-Type', 'application/json');
-        xmlhttp.setRequestHeader('Authorization', 'Bearer ' + context.session_id);
-        xmlhttp.timeout = context.timeout_amount;
+        xmlhttp.setRequestHeader('Authorization', 'Bearer ' + Context.session_id);
+        xmlhttp.timeout = Context.timeout_amount;
         
         if(data){
             xmlhttp.send(JSON.stringify(data));
@@ -82,7 +82,7 @@ var AjaxPools = (function(){
      */
      
     var retrieveSobjectRelatedByBatchRequest = function(sobjectName, callbackFunction){
-        var version_number = 'v' + context.api_version;
+        var version_number = 'v' + Context.api_version;
         var reqBody = {
             batchRequests:[
                 {
@@ -237,7 +237,7 @@ var AjaxPools = (function(){
      */
     var retrieveRecord = function(sobjectName, recordId, callbackFunction){
         var refSoql = getReferenceFields(sobjectName, recordId);
-        var version_number = 'v' + context.api_version;
+        var version_number = 'v' + Context.api_version;
         var reqBody = {
             batchRequests:[
                 {

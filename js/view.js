@@ -21,13 +21,13 @@ var initRecordView = function(){
              View.stopLoading('jqm-record');
         });
     }
-
-    function displayLayout(){
+    
+    function displayLayout(processedLayout, welinkProcessedLayout, isWelinkLayout){
 
         var _p_tmp = record.processed;
-        var section_template = templates.view_section;
-        var section_template_without_heading = templates.view_section_without_heading;
-        var field_template = templates.field_view_readonly;
+        var section_template = Templates.view_section;
+        var section_template_without_heading = Templates.view_section_without_heading;
+        var field_template = Templates.field_view_readonly;
 
         var record_display = '';
         
@@ -72,30 +72,23 @@ var initRecordView = function(){
                         break;
                     case 'boolean':
                         if(fieldValue){
-                            fieldValue = '<img src="/img/checkbox_checked.gif" alt="true"/>';
+                            fieldValue = '<img src="' + Context.images.checkbox_checked + '" alt="true"/>';
                         } else {
-                            fieldValue = '<img src="/img/checkbox_unchecked.gif" alt="false" />';
+                            fieldValue = '<img src="' + Context.images.checkbox_unchecked + '" alt="false" />';
                         }
                         break;
                     case 'datetime':
                         if(fieldValue != null){
-                            //fieldValue = fieldValue.substring(0,10) + ' ' +  fieldValue.substring(11,16);
-                            //alert(fieldValue);
-                            //alert(context.timezone);
-
-                            fieldValue = TimezoneDatabase.formatDatetimeToLocal(fieldValue, context.timezone);
+                            fieldValue = TimezoneDatabase.formatDatetimeToLocal(fieldValue, Context.timezone);
                             fieldValue = fieldValue.replace('T',' ');
-                            //alert(fieldValue);
                         }
                         break;
                     case 'date':
                         if(fieldValue != null){
-                            fieldValue = TimezoneDatabase.formatDateToLocal(fieldValue, context.timezone);
+                            fieldValue = TimezoneDatabase.formatDateToLocal(fieldValue, Context.timezone);
                         }
                         break;
                     case 'address':
-                        console.log(fieldValue);
-                        console.log('address..............');
                         if(fieldValue != null){
                             fieldValue = (fieldValue.country || '') + ' ' + (fieldValue.state || '') + ' ' + (fieldValue.city || '') + ' ' + (fieldValue.stateCode || '') + ' ' + (fieldValue.street || '');
                         }
@@ -112,18 +105,16 @@ var initRecordView = function(){
                 _fields += _field;
             }
             
+            var section;
             if(_p_tmp[i].useHeading){
-                var _section = section_template;
-                _section = _section.replace('{{fields}}',_fields);
-                _section = _section.replace('{{section-number}}','section-' + i);
-                _section = _section.replace('{{section-title}}', _p_tmp[i].heading);
-                record_display += _section;
+                section = section_template.replace('{{section-title}}', _p_tmp[i].heading);
             } else {
-                var _section = section_template_without_heading;
-                _section = _section.replace('{{fields}}',_fields);
-                _section = _section.replace('{{section-number}}','section-' + i);
-                record_display += _section;
+                section = section_template_without_heading;
             }
+            
+            section = section.replace('{{fields}}',_fields);
+            section = section.replace('{{section-number}}','section-' + i);
+            record_display += section;
         }
         
         document.querySelector('#field-container').innerHTML = record_display;
@@ -157,9 +148,9 @@ var initRecordView = function(){
 
     function displayWelinkLayout(){
         
-        var section_template = templates.view_section;
-        var section_template_without_heading = templates.view_section_without_heading;
-        var field_template = templates.field_view_readonly;
+        var section_template = Templates.view_section;
+        var section_template_without_heading = Templates.view_section_without_heading;
+        var field_template = Templates.field_view_readonly;
         
         var record_display = '';
         var _p_tmp = record.welink_processed;
@@ -216,16 +207,16 @@ var initRecordView = function(){
                         if(fieldValue != null){
                             //fieldValue = fieldValue.substring(0,10) + ' ' +  fieldValue.substring(11,16);
                             //alert(fieldValue);
-                            //alert(context.timezone);
+                            //alert(Context.timezone);
 
-                            fieldValue = TimezoneDatabase.formatDatetimeToLocal(fieldValue, context.timezone);
+                            fieldValue = TimezoneDatabase.formatDatetimeToLocal(fieldValue, Context.timezone);
                             fieldValue = fieldValue.replace('T',' ');
                             //alert(fieldValue);
                         }
                         break;
                     case 'date':
                         if(fieldValue != null){
-                            fieldValue = TimezoneDatabase.formatDateToLocal(fieldValue, context.timezone);
+                            fieldValue = TimezoneDatabase.formatDateToLocal(fieldValue, Context.timezone);
                         }
                         break;
                     case 'address':

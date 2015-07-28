@@ -53,14 +53,14 @@ var RecordForm = {
                     if(form_inputs[i].value == ''){
                         field_value = '';
                     } else {
-                        field_value = TimezoneDatabase.formatDatetimeToUTC(form_inputs[i].value, context.timezone) + ':00';
+                        field_value = TimezoneDatabase.formatDatetimeToUTC(form_inputs[i].value, Context.timezone) + ':00';
                     }
                     break;
                 case 'date':
                     if(form_inputs[i].value == ''){
                         field_value = null;
                     } else {
-                        field_value = TimezoneDatabase.formatDateToUTC(form_inputs[i].value, context.timezone);
+                        field_value = TimezoneDatabase.formatDateToUTC(form_inputs[i].value, Context.timezone);
                     }
                     break;
                 case '':
@@ -126,7 +126,7 @@ var RecordForm = {
     },
 
     save:function(form_dataset){
-        View.animateLoading(context.labels.saving,'jqm-record');
+        View.animateLoading(Context.labels.saving,'jqm-record');
 
         // presume new
         var method = 'POST';

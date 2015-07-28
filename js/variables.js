@@ -44,7 +44,7 @@ listview = {
     queryresult:{}
 },
 
-templates = {},
+Templates = {},
 
 AjaxResponses = {
     has_retrieved_sobject_related:false,
