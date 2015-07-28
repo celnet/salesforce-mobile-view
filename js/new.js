@@ -139,7 +139,7 @@ var initRecordNew = function(){
             record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
         }
     }
-    
+/*
     function processFieldsDisplay(fieldName, layoutItem, newOrUpdate, isWelinkLayout){
         var sobjectsWithCompoundNames = ['user','contact','lead'],
             isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase()) > 0,
@@ -422,7 +422,7 @@ var initRecordNew = function(){
         fieldHTML = fieldHTML.replace(/{{input-id}}/g,'record-field-' + fieldName);
         return fieldHTML;// + '<br/>';
     }
-
+*/
     function renderLayout(){
         
         var section_template = templates.section;
@@ -437,7 +437,7 @@ var initRecordNew = function(){
             for(var i = 0; i < _processed.length;i++){
                 var _fields = '';
                 for(var j = 0; j < _processed[i].fields.length; j++){
-                    _fields += processFieldsDisplay(_processed[i].fields[j].field, null, 'new', true);
+                    _fields += FieldRenderer.processFieldDisplay(_processed[i].fields[j].field, null, 'new', true);
                 }
                 
                 if(_processed[i].editHeading && _processed[i].fields.length > 0){
@@ -458,7 +458,7 @@ var initRecordNew = function(){
             for(var i = 0; i < _processed.length;i++){
                 var _fields = '';
                 for(var j = 0; j < _processed[i].rows.length; j++){
-                    _fields += processFieldsDisplay(null, _processed[i].rows[j], 'new', false);
+                    _fields += FieldRenderer.processFieldDisplay(null, _processed[i].rows[j], 'new', false);
                 }
                 
                 if(_processed[i].useHeading && _processed[i].rows.length > 0){

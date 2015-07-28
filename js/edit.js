@@ -54,7 +54,7 @@ var initRecordEdit = function(){
         displayLayout();
         View.stopLoading('jqm-record');
     }
-    
+ /*
     function processFieldsDisplay(fieldName, layoutItem, isWelinkLayout){
         var sobjectsWithCompoundNames = ['user','contact','lead'],
             isCompoundName = sobjectsWithCompoundNames.indexOf(sobject.name.toLowerCase()) > 0,
@@ -312,7 +312,7 @@ var initRecordEdit = function(){
         fieldHTML = fieldHTML.replace(/{{input-id}}/g,'record-field-' + fieldName);
         return fieldHTML;// + '<br/>';
     }
-    
+*/
     function displayLayout(){
         var section_template = templates.section;
         var section_template_without_heading = templates.section_without_heading;
