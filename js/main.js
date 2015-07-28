@@ -1637,5 +1637,57 @@ var FieldRenderer = {
         fieldHTML = fieldHTML.replace('{{input-label}}',fieldLabel);
         fieldHTML = fieldHTML.replace(/{{input-id}}/g,'record-field-' + fieldName);
         return fieldHTML;
+    },
+    
+    processLayoutDisplay:function(processedLayout, welinkProcessedLayout, newOrUpdate, isWelinkLayout){
+        var section_template = templates.section;
+        var section_template_without_heading = templates.section_without_heading;
+        var layoutDisplay = '';
+        
+        if(isWelinkLayout){
+            var wpl = welinkProcessedLayout;
+            for (var i = 0; i < wpl.length; i++) {
+                if(wpl[i].fields.length > 0){
+                    var fields = '';
+                    for (var j = 0; j < wpl[i].fields.length; j++) {
+                        fields += FieldRenderer.processFieldDisplay(wpl[i].fields[j].field, null, newOrUpdate, true);
+                    };
+                    
+                    var section;
+                    if(wpl[i].editHeading && wpl[i].fields.length > 0){
+                        section = section_template.replace('{{section-title}}', wpl[i].label);
+                    } else {
+                        section = section_template_without_heading;
+                    }
+                    
+                    section = section.replace('{{fields}}',fields);
+                    section = section.replace('{{section-number}}','section-' + i);
+                    layoutDisplay += section;
+                }
+            };
+        } else {
+            var pl = processedLayout;
+            for (var i = 0; i < pl.length; i++) {
+                if(pl[i].rows.length > 0){
+                    var fields = '';
+                    for(var j = 0; j < pl[i].rows.length; j++){
+                        fields += FieldRenderer.processFieldDisplay(null, pl[i].rows[j], newOrUpdate, false);
+                    }
+                    
+                    var section;
+                    if(pl[i].useHeading && pl[i].rows.length > 0){
+                        section = section_template.replace('{{fields}}',fields);
+                    } else {
+                        section = section_template_without_heading;
+                    }
+                    
+                    section = section.replace('{{section-number}}','section-' + i);
+                    section = section.replace('{{section-title}}', pl[i].heading);
+                    layoutDisplay += section;
+                }
+            }
+        }
+        
+        return layoutDisplay;
     }
 };
