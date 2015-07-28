@@ -28,11 +28,11 @@ var initRecordEdit = function(){
         } else {
             record.processed = AjaxHandlers.layout(record.layout.editLayoutSections);
         }
-
-        displayLayout(record.processed, record.welink_processed, 'update', (sobject.welink_layout != null));
+        
+        FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'update', (sobject.welink_layout != null));
         View.stopLoading('jqm-record');
     }
-    
+    /*
     function displayLayout(processedLayout, welinkProcessedLayout, newOrUpdate, isWelinkLayout){
         var record_display = FieldRenderer.processLayoutDisplay(processedLayout, welinkProcessedLayout, newOrUpdate, isWelinkLayout);
         
@@ -52,7 +52,7 @@ var initRecordEdit = function(){
         
         Styles.styleEdit();
     }
-
+*/
     return {
         retrieveSobjectData:retrieveSobjectData
     };
