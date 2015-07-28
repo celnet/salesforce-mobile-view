@@ -34,7 +34,7 @@ var initRecordView = function(){
         var fieldValue = record.detail[fieldName];
         var fieldReferenceTos = fieldDescribe.referenceTo;
         var refValue = record.references[fieldName];
-        var currencyIsoCode = fieldValue.CurrencyIsoCode || '';
+        var currencyIsoCode = record.detail.CurrencyIsoCode || '';
         var field_template = Templates.field_view_readonly;
         
         var _field = field_template.replace('{{field-label}}',fieldLabel);
