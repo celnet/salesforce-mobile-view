@@ -1426,7 +1426,11 @@ var FieldRenderer = {
             if(isNew){
                 recordTypeName = record.recordtypename;
             } else {
-                recordTypeName = refValue.Name || '';
+                if(refValue != null){
+                    recordTypeName = refValue.Name;
+                } else {
+                    recordTypeName = '';
+                }
             }
             
             fieldTemplate = templates.field_readonly;
