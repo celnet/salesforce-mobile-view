@@ -187,7 +187,7 @@ var initListView = function(){
         
         for (var i = listview_results.length - 1; i >= 0; i--) {
             var _fields = getRecentlyViewedItemContent(listview_results[i]);
-            listitems += listitem_template.replace('{{itemname}}',listview_results[i].Name || '').replace('{{record-id}}',listview_results[i].Id).replace('{{itemfields}}',_fields);
+            listitems += listitem_template.replace('{{itemname}}',listview_results[i].Name || '').replace('{{record-id}}',listview_results[i].Id).replace('{{itemfields}}',_fields).replace('{{sobject-name}}',sobject.name).replace('{{jqm-page-id}}','jqm-list');
         };
         
         listitems = Templates.listview_resultlist.replace('{{items}}',listitems);
@@ -291,7 +291,7 @@ var initListView = function(){
             __fields += '</table>';
             console.log(__fields);
             
-            listitems += listitem_template.replace('{{itemname}}',recordValue.Name || '').replace('{{record-id}}',recordValue.Id).replace('{{itemfields}}',__fields);
+            listitems += listitem_template.replace('{{itemname}}',recordValue.Name || '').replace('{{record-id}}',recordValue.Id).replace('{{itemfields}}',__fields).replace('{{sobject-name}}',sobject.name).replace('{{jqm-page-id}}','jqm-list');
             
         }
 
