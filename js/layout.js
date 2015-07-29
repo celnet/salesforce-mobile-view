@@ -533,14 +533,17 @@ var FieldRenderer = {
         if(fieldValue != null)
         switch(fieldType){
             case 'reference':
-                if(refValue[fieldName] != null){
-                    fieldValue = refValue[fieldName].Name || '';
-                } else {
-                    fieldValue = '';
+                var refName;
+                var refId;
+                if(refValue != null){
+                    refName = refValue.Name;
+                    refId = refValue.Id;
                 }
                 
                 if(setup_objects.indexOf(fieldReferenceTos[0]) < 0 || fieldReferenceTos[0] == 'User'){
-                    fieldValue = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + fieldReferenceTos[0] + '&id=' + fieldValue + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + fieldValue + '</a>';
+                    fieldValue = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + fieldReferenceTos[0] + '&id=' + refId + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + refName + '</a>';
+                } else {
+                    fieldValue = refName;
                 }
                 break;
             case 'phone':

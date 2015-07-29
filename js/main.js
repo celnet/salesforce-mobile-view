@@ -64,13 +64,7 @@ var UserAction = {
         window.history.pushState('DPRecordView','DPRecordView','DP?mode=view&sobject=' + sobjectName + '&id=' + recordId + '&listviewid=' + params.listviewid);
         route();
     }, // loading
-/*
-    viewRecord:function(current_jqm_page_id){
-        View.animateLoading(Context.labels.loading, current_jqm_page_id);
-        window.history.pushState('DPRecordView','DPRecordView','DP?mode=view&sobject=' + sobject.name + '&id=' + record.id + '&listviewid=' + params.listviewid);
-        route();
-    }, // loading
-*/
+    
     viewList:function(current_jqm_page_id){
         View.animateLoading(Context.labels.loading, current_jqm_page_id);
         window.history.pushState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=' + params.listviewid);
