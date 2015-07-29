@@ -2,9 +2,8 @@ var initListView = function(){
 
     function retrieveSobjectData(){
         handleDescribe();
-        handleListViews();
-        sobject.search_layout_fields = AjaxResponses.searchlayout[0].searchColumns;
-        handleMetadata();
+        var searchLayoutFields = AjaxResponses.searchlayout[0].searchColumns;
+        handleOrderedListViews();
 
         if(params.listviewid != 'recentlyviewed'){
             AjaxPools.retrieveSelectedListView(sobject.name, params.listviewid, function(){
@@ -20,7 +19,7 @@ var initListView = function(){
                 View.stopLoading('jqm-list');
             });
         } else {
-            AjaxPools.retrieveRecentlyViewed(sobject.name, function(){
+            AjaxPools.retrieveRecentlyViewed(searchLayoutFields, sobject.name, function(){
                 sobject.recentlyviewed = AjaxResponses.recentlyviewedwithfields;
 
                 renderListViewSelects();
@@ -45,20 +44,18 @@ var initListView = function(){
         }).appendTo($body);
     }
 
-    function handleListViews(){
-        sobject.listviews = AjaxResponses.listviews;
-        for (var i = 0; i < sobject.listviews.listviews.length; i++) {
-            sobject.listviewsmap[sobject.listviews.listviews[i].id] = sobject.listviews.listviews[i];
+    function handleOrderedListViews(){
+        var listviewsMap = {};
+        for (var i = 0; i < AjaxResponses.listviews.listviews.length; i++) {
+            listviewsMap[AjaxResponses.listviews.listviews[i].id] = AjaxResponses.listviews.listviews[i];
         };
-    }
-
-    function handleMetadata(){
+        
         var orderedListviews = AjaxResponses.orderedListviews;
 
         sobject.ordered_listviews = [];
         
         if(orderedListviews == null){
-            sobject.ordered_listviews = sobject.listviews.listviews;
+            sobject.ordered_listviews = AjaxResponses.listviews.listviews;
             return;
         }
         
@@ -82,21 +79,15 @@ var initListView = function(){
             }
         };
 
-        for (var i = 0; i < sobject.listviews.listviews.length; i++) {
-            if(ordered_listview_ids.indexOf(sobject.listviews.listviews[i].id) < 0){
-                ordered_listview_ids.push(sobject.listviews.listviews[i].id);
+        for (var i = 0; i < AjaxResponses.listviews.listviews.length; i++) {
+            if(ordered_listview_ids.indexOf(AjaxResponses.listviews.listviews[i].id) < 0){
+                ordered_listview_ids.push(AjaxResponses.listviews.listviews[i].id);
             }
         };
 
         for (var i = 0; i < ordered_listview_ids.length; i++) {
-            sobject.ordered_listviews.push(sobject.listviewsmap[ordered_listview_ids[i]]);
+            sobject.ordered_listviews.push(listviewsMap[ordered_listview_ids[i]]);
         };
-    }
-
-    function viewRecord(record_id){
-        View.animateLoading(Context.labels.loading,'jqm-list');
-        window.history.pushState('DPRecordView','DPRecordView','DP?mode=view&sobject=' + sobject.name + '&id=' + record_id + '&listviewid=' + params.listviewid);
-        route();
     }
 
     function selectListView(){
@@ -121,8 +112,7 @@ var initListView = function(){
                 View.animateLoading(Context.labels.loading, 'jqm-list');
                 AjaxPools.retrieveRecentlyViewed(sobject.name, function(){
                     sobject.recentlyviewed = AjaxResponses.recentlyviewedwithfields;
-
-                    //renderListViewSelects();
+                    
                     renderRecentlyViewedList();
                     View.stopLoading('jqm-list');
                 });
@@ -147,8 +137,6 @@ var initListView = function(){
                 renderListViewResultList(25);
                 View.stopLoading('jqm-list');
             });
-            
-            //retrieveSelectListView(selected_option_id);
         }
     }
 
@@ -235,16 +223,9 @@ var initListView = function(){
                                 _record_val = recordValue['CurrencyIsoCode'] + ' ' + _record_val;
                             }
                             break;
-                        case 'date':
-                            //console.log(_record_val + 'fadfafafda');
-                            //_record_val = formatDatetimeString(_record_val, 'date');
-                            //console.log(_record_val);
+                        case 'date': // date 暂不转换时区
                             break;
-                        case 'datetime': 
-                            //console.log(_record_val + 'fdfadfasfadsfa');
-                            //_record_val = formatDatetimeString(_record_val, 'datetime');
-                            //console.log('&*&*&*&*&*&*&*&*&*&*&*&*&*&');
-                            //console.log(_record_val);
+                        case 'datetime':  // datetime 转换时区
                             _record_val = TimezoneDatabase.formatDatetimeToLocal(_record_val, Context.timezone);
                             _record_val = _record_val.replace('T',' ');
                             break;
@@ -308,78 +289,42 @@ var initListView = function(){
 
         $j('ul').listview();
     }
-
-    // 'Mon Jun 18 00:00:00 GMT 2012' to '2012-06-18' or '2012-06-18 00:00:00'
-    function formatDatetimeString(origin_string, date_or_datetime){
-        var months = {
-            'Jan':'01',
-            'Feb':'02',
-            'Mar':'03',
-            'Apr':'04',
-            'May':'05',
-            'Jun':'06',
-            'Jul':'07',
-            'Aug':'08',
-            'Sep':'09',
-            'Oct':'10',
-            'Nov':'11',
-            'Dec':'12'
-        };
-
-        var 
-            _year = origin_string.substring(24,28),
-            _month = months[origin_string.substring(4,7)],
-            _date = origin_string.substring(8,10),
-            _time = origin_string.substring(11,19);
-
-        switch(date_or_datetime){
-            case 'date':
-                return _year + '-' + _month + '-' + _date;
-                break;
-            case 'datetime':
-                return _year + '-' + _month + '-' + _date + ' ' + _time;
-                break;
-            default: 
-                console.log('test');
-        }
-    }
-
+    
     function getRecentlyViewedItemContent(_item){
+        var searchLayoutFields = AjaxResponses.searchlayout[0].searchColumns;
         var _counter = 0;
         var _fields = '<p style="font-size:1em;">';
         
-        for (var i = 0; i < sobject.search_layout_fields.length; i++) {
-            if(sobject.search_layout_fields[i].name != 'Name' && _counter < 4){
-                var _field_label = sobject.search_layout_fields[i].label;
-                var _field_value = '';
+        for (var i = 0; i < searchLayoutFields.length; i++) {
+            if(searchLayoutFields[i].name != 'Name' && _counter < 4){
+                var fieldLabel = searchLayoutFields[i].label; // 暂不用，只显示字段值不显示标签
+                var fieldValue = '';
 
-                if(sobject.search_layout_fields[i].name.indexOf('.') > 0){
-                    var _name = sobject.search_layout_fields[i].name.split('.');
+                if(searchLayoutFields[i].name.indexOf('.') > 0){ // lookup field
+                    var _name = searchLayoutFields[i].name.split('.');
                     
                     if(_item[_name[0]] != null)
-                    _field_value = _item[_name[0]][_name[1]];
+                    fieldValue = _item[_name[0]][_name[1]];
                 } else {
-                    var _field_name = sobject.search_layout_fields[i].name;
+                    var _field_name = searchLayoutFields[i].name;
                     if(_field_name.indexOf('toLabel') >= 0){
                         _field_name = _field_name.substring(8,_field_name.length - 1);
                     }
-                    _field_value = _item[_field_name] || '';
+                    fieldValue = _item[_field_name] || '';
                 }
 
                 var label_font = '';
                 var label_font_end = '';
-
-                if(_field_value != null && _field_value.length == 28 && _field_value.indexOf('000+0000') > 0){
-                    _field_value = TimezoneDatabase.formatDatetimeToLocal(_field_value, Context.timezone).replace('T',' ');
+                
+                if(fieldValue != null && fieldValue.length == 28 && fieldValue.indexOf('000+0000') > 0){
+                    fieldValue = TimezoneDatabase.formatDatetimeToLocal(fieldValue, Context.timezone).replace('T',' ');
                 }
 
                 // 不显示字段标签，只显示字段值
                 switch(_counter){
                     case 0:
                         var cell0 = '';
-                        //cell0 += label_font + _field_label + label_font_end;
-                        //cell0 += ': ';
-                        cell0 += _field_value || '';
+                        cell0 += fieldValue || '';
                         _fields += cell0;
                         break;
                     case 1:
@@ -387,10 +332,8 @@ var initListView = function(){
                         if(_fields != '<p style="font-size:1em;">'){
                             cell1 = ' | ';
                         }
-
-                        //cell1 += label_font + _field_label + label_font_end;
-                        //cell1 += ': ';
-                        cell1 += _field_value || '';
+                        
+                        cell1 += fieldValue || '';
                         _fields += cell1 == ' | '?'':cell1;
                         break;
                     case 2:
@@ -398,16 +341,12 @@ var initListView = function(){
                         if(_fields != '<p style="font-size:1em;">'){
                             cell2 = '</p><p style="font-size:1em;">';
                         } 
-                        //cell2 += label_font + _field_label + label_font_end;
-                        //cell2 += ': ';
-                        cell2 += _field_value || '';
+                        cell2 += fieldValue || '';
                         _fields += cell2;
                         break;
                     case 3: 
                         var cell3 = ' | ';
-                        //cell3 += label_font + _field_label + label_font_end;
-                        //cell3 += ': ';
-                        cell3 += _field_value || '';
+                        cell3 += fieldValue || '';
                         _fields += cell3 == ' | '?'':cell3;
                         break;
                     default: console.log(_counter);
@@ -424,7 +363,6 @@ var initListView = function(){
     return {
         retrieveSobjectData:retrieveSobjectData,
         renderListViewResultList:renderListViewResultList,
-        viewRecord:viewRecord,
         selectListView:selectListView
     }
 

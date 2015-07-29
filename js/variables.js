@@ -13,11 +13,8 @@ sobject ={
     name: '', // sobject api name
     describe: {},// sobject describe
     fields: {},// field api name : describe infomation
-    listviews: {},// sobject listviews
-    listviewsmap: {},
     ordered_listviews:[],
     recentlyviewed: {},// sobject recentlyviewed (TODO: order)
-    search_layout_fields:[],
     welink_layout: {},
     has_welink_layout: false
 },
@@ -35,7 +32,8 @@ record = {
     welink_edit:{},
     recordtypeid:'', // user select
     recordtypename:'',
-    selected_recordtype_detail:{}
+    selected_recordtype_detail:{},
+    isWelinkLayout:false
 },
 
 listview = {

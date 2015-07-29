@@ -27,7 +27,7 @@ var Remoting = (function(){
                         welinkStorage['welink_' + sobjectName + '_orderedlistviews'] = JSON.stringify(result.listviewsMetadata);
                         AjaxResponses.orderedListviews = result.listviewsMetadata;
                     } else {
-                        sobject.ordered_listviews = sobject.listviews.listviews;
+                        sobject.ordered_listviews = AjaxResponses.listviews.listviews;
                     }
                     
                     if(result.businessprocessesMetadata != null){
@@ -54,7 +54,7 @@ var Remoting = (function(){
                 callbackFunction();
             },
             function(result, event){
-                sobject.ordered_listviews = sobject.listviews.listviews;
+                sobject.ordered_listviews = AjaxResponses.listviews.listviews;
                 welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
                 AjaxResponses.has_retrieved_sobject_related = true;
                 callbackFunction();

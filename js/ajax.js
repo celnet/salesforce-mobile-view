@@ -1,23 +1,4 @@
 var Ajax = {
-    /*
-    remoting:function(action,params,success,failure){
-        Visualforce.remoting.Manager.invokeAction(
-            Context.remote_action,
-            action,
-            params,
-            function(result, event){
-                if(event.status){
-                    success(result);
-                } else {
-                    if(failure){
-                        failure(result, event);
-                    }
-                }
-            },
-            {escape:false}
-        );
-    },
-*/
     ajax:function(method, endpoint, data, success, failure){
         endpoint = '/services/data/v' + Context.api_version + endpoint + (endpoint.indexOf('?') > -1?'&':'?') + '_t=' + new Date().getTime();
 
@@ -185,54 +166,7 @@ var AjaxPools = (function(){
             }
         );
     };
-    /*
-    var retrieveSobjectRelatedMetadata = function(sobjectName, callbackFunction){
-        Ajax.remoting(
-            'retrieveSobjectRelated',
-            [sobjectName],
-            function(result){
-                if(result != null){
-                    if(result.listviewsMetadata != null){
-                        welinkStorage['welink_' + sobjectName + '_orderedlistviews'] = JSON.stringify(result.listviewsMetadata);
-                        AjaxResponses.orderedListviews = result.listviewsMetadata;
-                    } else {
-                        sobject.ordered_listviews = sobject.listviews.listviews;
-                    }
-                    
-                    if(result.businessprocessesMetadata != null){
-                        welinkStorage['welink_' + sobjectName + '_recordtype'] = JSON.stringify(result.recordtypesMetadata);
-                        AjaxResponses.recordtype = result.recordtypesMetadata;
-                    };
-                    if(result.recordtypesMetadata != null){
-                        AjaxResponses.businessprocess = result.businessprocessesMetadata;
-                        welinkStorage['welink_' + sobjectName + '_businessprocess'] = JSON.stringify(result.businessprocessesMetadata);
-                    };
-                    
-                    if(result.recordtypeLayouts != null){
-                        var welinkLayouts = {};
-                        for(var property in result.recordtypeLayouts){
-                            welinkLayouts[property] = JSON.parse(window.decodeURIComponent(window.atob(result.recordtypeLayouts[property]).replace(/spaceescaper/g,' ')));
-                        };
-                        AjaxResponses.welinklayouts = welinkLayouts;
-                        welinkStorage['welink_' + sobjectName + '_welinklayouts'] = JSON.stringify(welinkLayouts);
-                    };
-                }
-                
-                welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
-                AjaxResponses.has_retrieved_sobject_related = true;
-                callbackFunction();
-            },
-            function(result, event){
-                console.log(result);
-                console.log(event);
-                sobject.ordered_listviews = sobject.listviews.listviews;
-                welinkStorage['welink_' + sobjectName + '_hasRetrievedSobjectRelated'] = 'true';
-                AjaxResponses.has_retrieved_sobject_related = true;
-                callbackFunction();
-            }
-        );
-    };
-    */
+    
     /**
      * Record Related
      */
@@ -312,13 +246,13 @@ var AjaxPools = (function(){
     /**
      * RecentlyViewed Related
      */
-    var constructSoqlStatement = function(recentlyViewedIds){
+    var constructSoqlStatement = function(searchLayoutFields, recentlyViewedIds){
         var fields = '';
 
-        for (var i = 0; i < sobject.search_layout_fields.length; i++) {
-            if(sobject.search_layout_fields[i].name != 'Name'){
+        for (var i = 0; i < searchLayoutFields.length; i++) {
+            if(searchLayoutFields[i].name != 'Name'){
                 fields += ',';
-                fields += sobject.search_layout_fields[i].name;
+                fields += searchLayoutFields[i].name;
             }
         };
 
@@ -339,7 +273,7 @@ var AjaxPools = (function(){
         return soql;
     };
     
-    var retrieveRecentlyViewed = function(sobjectName, doFinish){
+    var retrieveRecentlyViewed = function(searchLayoutFields, sobjectName, doFinish){
         Ajax.get(
             '/query?q=' + window.encodeURIComponent("Select Id From RecentlyViewed Where Type='" + sobjectName + "'"),
             function(response){
@@ -353,14 +287,14 @@ var AjaxPools = (function(){
                     recentlyViewedIds = recentlyViewedIds.substring(0,recentlyViewedIds.length - 1);
                 } 
         
-                retrieveRecentlyViewedwithFields(recentlyViewedIds, doFinish);
+                retrieveRecentlyViewedwithFields(searchLayoutFields, recentlyViewedIds, doFinish);
             }
         );
     };
 
-    var retrieveRecentlyViewedwithFields = function(recentlyViewedIds, doFinish){
+    var retrieveRecentlyViewedwithFields = function(searchLayoutFields, recentlyViewedIds, doFinish){
         Ajax.get(
-            '/query?q=' + window.encodeURIComponent(constructSoqlStatement(recentlyViewedIds)), 
+            '/query?q=' + window.encodeURIComponent(constructSoqlStatement(searchLayoutFields, recentlyViewedIds)), 
             function(response){
                 AjaxResponses.recentlyviewedwithfields = response;
                 doFinish();
@@ -443,8 +377,8 @@ var AjaxPools = (function(){
             retrieveRecord(sobjectName, recordId, callbackFunction);
         },
 
-        retrieveRecentlyViewed:function(sobjectName, callbackFunction){
-            retrieveRecentlyViewed(sobjectName, callbackFunction);
+        retrieveRecentlyViewed:function(searchLayoutFields, sobjectName, callbackFunction){
+            retrieveRecentlyViewed(searchLayoutFields, sobjectName, callbackFunction);
         },
 
         retrieveSelectedListView:function(sobjectName, listviewId, callbackFunction){
