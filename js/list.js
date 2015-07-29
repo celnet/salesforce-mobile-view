@@ -1,9 +1,9 @@
 var initListView = function(){
 
     function retrieveSobjectData(){
-        handleDescribe();
+        View.setTitle(Context.labels.listview, sobject.describe.label);
         var searchLayoutFields = AjaxResponses.searchlayout[0].searchColumns;
-        handleOrderedListViews();
+        AjaxHandlers.handleOrderedListViews();
 
         if(params.listviewid != 'recentlyviewed'){
             AjaxPools.retrieveSelectedListView(sobject.name, params.listviewid, function(){
@@ -27,67 +27,6 @@ var initListView = function(){
                 View.stopLoading('jqm-list');
             });
         } 
-    }
-
-    function handleDescribe(){
-        document.querySelector('#jqm-page-title').innerHTML = Context.labels.listview;
-        document.title = sobject.describe.label;
-        document.querySelector('title').innerHTML = sobject.describe.label;
-        
-        var $body = $j('body');
-        document.title = sobject.describe.label;
-
-        var $iframe = $j('<iframe src="/favicon.ico"></iframe>').on('load', function() {
-            setTimeout(function() {
-                $iframe.off('load').remove();
-            }, 0)
-        }).appendTo($body);
-    }
-
-    function handleOrderedListViews(){
-        var listviewsMap = {};
-        for (var i = 0; i < AjaxResponses.listviews.listviews.length; i++) {
-            listviewsMap[AjaxResponses.listviews.listviews[i].id] = AjaxResponses.listviews.listviews[i];
-        };
-        
-        var orderedListviews = AjaxResponses.orderedListviews;
-
-        sobject.ordered_listviews = [];
-        
-        if(orderedListviews == null){
-            sobject.ordered_listviews = AjaxResponses.listviews.listviews;
-            return;
-        }
-        
-        var ordered_listview_ids = [];
-
-        for (var i = 0; i < orderedListviews.filteredByMy.length; i++) {
-            if(orderedListviews.filteredByMy[i] != ''){
-                ordered_listview_ids.push(orderedListviews.filteredByMy[i]);
-            }
-        };
-
-        for (var i = 0; i < orderedListviews.visibleToMe.length; i++) {
-            if(orderedListviews.visibleToMe[i] != ''){
-                ordered_listview_ids.push(orderedListviews.visibleToMe[i]);
-            }
-        };
-
-        for (var i = 0; i < orderedListviews.createdByMe.length; i++) {
-            if(orderedListviews.createdByMe[i] != ''){
-                ordered_listview_ids.push(orderedListviews.createdByMe[i]);
-            }
-        };
-
-        for (var i = 0; i < AjaxResponses.listviews.listviews.length; i++) {
-            if(ordered_listview_ids.indexOf(AjaxResponses.listviews.listviews[i].id) < 0){
-                ordered_listview_ids.push(AjaxResponses.listviews.listviews[i].id);
-            }
-        };
-
-        for (var i = 0; i < ordered_listview_ids.length; i++) {
-            sobject.ordered_listviews.push(listviewsMap[ordered_listview_ids[i]]);
-        };
     }
 
     function selectListView(){

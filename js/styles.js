@@ -1,5 +1,27 @@
 var Styles = {
-    tunePageStyle:function(){
+    styleJqmPage:function(){
+        $j('#jqm-list').page({theme:'b'});
+        $j('#jqm-record').page({theme:'b'});
+        $j('#lookup-search-page').page({theme:'b'});
+
+        // fix header 
+        document.querySelector('#jqm-header').style.position = 'fixed';
+        document.querySelector('#jqm-header').classList.remove('slidedown');
+
+        if(params.mode == 'edit' || params.mode == 'new'){
+            document.querySelector('#lookup-search-page').style.position = 'fixed';
+            document.querySelector('#lookup-search-page').classList.remove('slidedown');
+        }
+    },
+    
+    styleJQMPage:function(headerConfig){
+        document.querySelector('#jqm-header-left-button')['href'] = headerConfig.left.href;
+        document.querySelector('#jqm-header-right-button')['href'] = headerConfig.right.href;
+        document.querySelector('#jqm-header-left-button').innerHTML = headerConfig.left.text;
+        document.querySelector('#jqm-header-right-button').innerHTML = headerConfig.right.text;
+        document.querySelector('#jqm-header-left-button').classList.add(headerConfig.left.iconClass);
+        document.querySelector('#jqm-header-right-button').classList.add(headerConfig.right.iconClass);
+        
         $j('#jqm-list').page({theme:'b'});
         $j('#jqm-record').page({theme:'b'});
         $j('#lookup-search-page').page({theme:'b'});
