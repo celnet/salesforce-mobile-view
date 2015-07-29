@@ -36,13 +36,13 @@ var initRecordNew = function(){
                 break;
             case '': // has no record type, direct to next step
                 getLayoutByRecordType('');
-                renderLayout(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
+                FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
                 break;
             default: // has given record type, direct to next step
                 AjaxHandlers.recordTypes();
                 AjaxHandlers.businessProcesses();
                 getLayoutByRecordType(record.recordtypeid);
-                renderLayout(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
+                FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
         }
     }
 
@@ -79,7 +79,6 @@ var initRecordNew = function(){
         document.querySelector('#jqm-header-left-button').href = 'javascript:UserAction.cancel()';
         View.stopLoading('jqm-record');
         document.querySelector('#jqm-header-right-button').href = 'javascript:RecordNew.selectRecordType()';
-        //document.querySelector('#recordtype').addEventListener('change',selectRecordType);
     }
 
     function selectRecordType(){
@@ -95,7 +94,7 @@ var initRecordNew = function(){
                 AjaxHandlers.recordTypes();
                 AjaxHandlers.businessProcesses();
                 getLayoutByRecordType(record.recordtypeid);
-                renderLayout(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
+                FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
                 View.stopLoading('jqm-record');
             }
         }
@@ -115,7 +114,7 @@ var initRecordNew = function(){
             record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
         }
     }
-
+/*
     function renderLayout(processedLayout, welinkProcessedLayout, newOrUpdate, isWelinkLayout){
         var record_display = FieldRenderer.processLayoutDisplay(processedLayout, welinkProcessedLayout, newOrUpdate, isWelinkLayout);
         document.querySelector('#field-container').innerHTML = record_display;
@@ -126,7 +125,7 @@ var initRecordNew = function(){
         
         Styles.styleEdit();
     }
-
+*/
     return {
         retrieveSobjectData:retrieveSobjectData,
         selectRecordType:selectRecordType,
