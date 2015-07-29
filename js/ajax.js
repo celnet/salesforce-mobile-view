@@ -181,7 +181,7 @@ var AjaxPools = (function(){
             function(response){
                 welinkStorage['welink_' + sobjectName + '_listviews'] = JSON.stringify(response);
                 AjaxResponses.listviews = response;
-                Remoting.retrieveSobjectRelatedMetadata(sobjectName, doFinish);
+                Remoting.retrieveSobjectRelated(sobjectName, doFinish);
             }
         );
     };
