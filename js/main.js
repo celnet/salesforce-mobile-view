@@ -97,19 +97,6 @@ var UserAction = {
             fieldView:function(){
 
             },
-            
-            setTitle:function(jqmTitle, docTitle){
-                document.querySelector('#jqm-page-title').innerHTML = jqmTitle;
-                
-                var $body = $j('body');
-                document.title = docTitle;
-            
-                var $iframe = $j('<iframe src="/favicon.ico"></iframe>').on('load', function() {
-                    setTimeout(function() {
-                        $iframe.off('load').remove();
-                    }, 0)
-                }).appendTo($body);
-            },
 
             animateLoading:function(loading_text, jqm_page_id){
                 document.querySelector('#' + jqm_page_id).classList.add('ui-state-disabled');

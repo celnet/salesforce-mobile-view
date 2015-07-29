@@ -568,55 +568,10 @@ var AjaxHandlers = (function(){
         }
     };
     
-    var handleOrderedListViews = function(){
-        var listviewsMap = {};
-        for (var i = 0; i < AjaxResponses.listviews.listviews.length; i++) {
-            listviewsMap[AjaxResponses.listviews.listviews[i].id] = AjaxResponses.listviews.listviews[i];
-        };
-        
-        var orderedListviews = AjaxResponses.orderedListviews;
-
-        sobject.ordered_listviews = [];
-        
-        if(orderedListviews == null){
-            sobject.ordered_listviews = AjaxResponses.listviews.listviews;
-            return;
-        }
-        
-        var ordered_listview_ids = [];
-
-        for (var i = 0; i < orderedListviews.filteredByMy.length; i++) {
-            if(orderedListviews.filteredByMy[i] != ''){
-                ordered_listview_ids.push(orderedListviews.filteredByMy[i]);
-            }
-        };
-
-        for (var i = 0; i < orderedListviews.visibleToMe.length; i++) {
-            if(orderedListviews.visibleToMe[i] != ''){
-                ordered_listview_ids.push(orderedListviews.visibleToMe[i]);
-            }
-        };
-
-        for (var i = 0; i < orderedListviews.createdByMe.length; i++) {
-            if(orderedListviews.createdByMe[i] != ''){
-                ordered_listview_ids.push(orderedListviews.createdByMe[i]);
-            }
-        };
-
-        for (var i = 0; i < AjaxResponses.listviews.listviews.length; i++) {
-            if(ordered_listview_ids.indexOf(AjaxResponses.listviews.listviews[i].id) < 0){
-                ordered_listview_ids.push(AjaxResponses.listviews.listviews[i].id);
-            }
-        };
-
-        for (var i = 0; i < ordered_listview_ids.length; i++) {
-            sobject.ordered_listviews.push(listviewsMap[ordered_listview_ids[i]]);
-        };
-    };
-    
     var processRecordRelated = function(){
         record.detail = AjaxResponses.record;
-        View.setTitle(record.detail.Name || '', sobject.describe.label);
+        document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
+        document.title = sobject.describe.label;
     
         if(AjaxResponses.welinklayout != null){
             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
@@ -634,7 +589,6 @@ var AjaxHandlers = (function(){
         recordTypes:handleRecordTypes,
         businessProcesses:handleBusinessProcesses,
         handleReferenceFields:handleReferenceFields,
-        processRecordRelated:processRecordRelated,
-        handleOrderedListViews:handleOrderedListViews
+        processRecordRelated:processRecordRelated
     };
 })();

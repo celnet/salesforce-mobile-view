@@ -21,22 +21,16 @@ var route = function(){
 
 var renderRecordEdit = function(){
     document.querySelector('body').innerHTML = Templates.record_page_structure + Templates.page_lookup;
-    
-    var headerConfig = {
-        left:{
-            href:'javascript:UserAction.cancel()',
-            text:Context.labels.cancel,
-            iconClass:'ui-icon-back'
-        },
-        right:{
-            href:'javascript:UserAction.saveRecord()',
-            text:Context.labels.save,
-            iconClass:'ui-icon-check'
-        }
-    };
+
+    document.querySelector('#jqm-header-left-button')['href'] = 'javascript:UserAction.cancel()';
+    document.querySelector('#jqm-header-right-button')['href'] = 'javascript:UserAction.saveRecord()';
+    document.querySelector('#jqm-header-left-button').innerHTML = Context.labels.cancel;
+    document.querySelector('#jqm-header-right-button').innerHTML = Context.labels.save;
+    document.querySelector('#jqm-header-left-button').classList.add('ui-icon-back');
+    document.querySelector('#jqm-header-right-button').classList.add('ui-icon-check');
 
     $j.mobile.initializePage();
-    Styles.styleJQMPage(headerConfig);
+    Styles.tunePageStyle();
 
     View.animateLoading(Context.labels.loading,'jqm-record');
     AjaxPools.retrieveSobjectRelated(sobject.name, function(){
@@ -63,22 +57,15 @@ var renderListView = function(){
     ListView = initListView();
 
     document.querySelector('body').innerHTML = Templates.listview_page_structure;
-    
-    var headerConfig = {
-        left:{
-            href:'',
-            text:'',
-            iconClass:''
-        },
-        right:{
-            href:"javascript:UserAction.newRecord('jqm-list')",
-            text:'',
-            iconClass:'ui-icon-plus'
-        }
-    };
+
+    document.querySelector('#jqm-header-left-button')['href'] = '';
+    document.querySelector('#jqm-header-right-button')['href'] = "javascript:UserAction.newRecord('jqm-list')";
+
+    document.querySelector('#jqm-header-left-button').innerHTML = '';
+    document.querySelector('#jqm-header-right-button').innerHTML = '';
 
     $j.mobile.initializePage();
-    Styles.styleJQMPage(headerConfig);
+    Styles.tunePageStyle();
 
     View.animateLoading(Context.labels.loading,'jqm-list');
     AjaxPools.retrieveSobjectRelated(sobject.name, function(){
@@ -94,22 +81,16 @@ var renderRecordNew = function(){
     
     document.querySelector('#jqm-page-title').innerHTML = Context.labels.new;
     document.title = sobject.describe.label;
-    
-    var headerConfig = {
-        left:{
-            href:'javascript:UserAction.cancel()',
-            text:Context.labels.cancel,
-            iconClass:'ui-icon-back'
-        },
-        right:{
-            href:"javascript:UserAction.saveRecord()",
-            text:Context.labels.save,
-            iconClass:'ui-icon-check'
-        }
-    };
+    document.querySelector('#jqm-header-left-button')['href'] = 'javascript:UserAction.cancel()';
+    document.querySelector('#jqm-header-right-button')['href'] = 'javascript:UserAction.saveRecord()';
+    document.querySelector('#jqm-header-left-button').innerHTML = Context.labels.cancel;
+    document.querySelector('#jqm-header-right-button').innerHTML = Context.labels.save;
+    document.querySelector('#jqm-header-left-button').classList.add('ui-icon-back');
+    document.querySelector('#jqm-header-right-button').classList.add('ui-icon-check');
+
     
     $j.mobile.initializePage();
-    Styles.styleJQMPage(headerConfig);
+    Styles.tunePageStyle();
     
     View.animateLoading(Context.labels.loading,'jqm-record');
     AjaxPools.retrieveSobjectRelated(sobject.name, function(){
@@ -120,39 +101,27 @@ var renderRecordNew = function(){
 
 var renderRecordView = function(){
     document.querySelector('body').innerHTML = Templates.record_page_structure;
-    
-    var headerConfig = {
-        left:{
-            href:"javascript:UserAction.viewList('jqm-record')",
-            text:Context.labels.list,
-            iconClass:'ui-icon-bars'
-        },
-        right:{
-            href:"javascript:UserAction.editRecord('jqm-record')",
-            text:Context.labels.edit,
-            iconClass:'ui-icon-edit'
-        }
-    };
-    
+
+    document.querySelector('#jqm-header-left-button')['href'] = "javascript:UserAction.viewList('jqm-record')";
+    document.querySelector('#jqm-header-right-button')['href'] = "javascript:UserAction.editRecord('jqm-record')";
+    document.querySelector('#jqm-header-left-button').innerHTML = Context.labels.list;
+    document.querySelector('#jqm-header-right-button').innerHTML = Context.labels.edit;
+    document.querySelector('#jqm-header-left-button').classList.add('ui-icon-bars');
+    document.querySelector('#jqm-header-right-button').classList.add('ui-icon-edit');
+
     if(params.crossref == 'true'){
-        headerConfig.left = {
-            href:"javascript:window.history.back()",
-            text:Context.labels.back,
-            iconClass:'ui-icon-back'
-        };
+        document.querySelector('#jqm-header-left-button').href = 'javascript:window.history.back()';
+        document.querySelector('#jqm-header-left-button').innerHTML = Context.labels.back;
+        document.querySelector('#jqm-header-left-button').classList.remove('ui-icon-bars');
+        document.querySelector('#jqm-header-left-button').classList.add('ui-icon-back');
     }
 
     if(setup_objects.indexOf(sobject.name) > 0){
-        //$j('#jqm-header-right-button').remove();
-        headerConfig.right = {
-            href:"",
-            text:'',
-            iconClass:''
-        };
+        $j('#jqm-header-right-button').remove();
     }
 
     $j.mobile.initializePage();
-    Styles.styleJQMPage(headerConfig);
+    Styles.tunePageStyle();
 
     View.animateLoading(Context.labels.loading,'jqm-record');
 
