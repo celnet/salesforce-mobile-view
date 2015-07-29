@@ -1,7 +1,7 @@
 var initListView = function(){
 
     function retrieveSobjectData(){
-        handleDescribe();
+        View.setTitle(Context.labels.listview, sobject.describe.label);
         var searchLayoutFields = AjaxResponses.searchlayout[0].searchColumns;
         handleOrderedListViews();
 
@@ -27,21 +27,6 @@ var initListView = function(){
                 View.stopLoading('jqm-list');
             });
         } 
-    }
-
-    function handleDescribe(){
-        document.querySelector('#jqm-page-title').innerHTML = Context.labels.listview;
-        document.title = sobject.describe.label;
-        document.querySelector('title').innerHTML = sobject.describe.label;
-        
-        var $body = $j('body');
-        document.title = sobject.describe.label;
-
-        var $iframe = $j('<iframe src="/favicon.ico"></iframe>').on('load', function() {
-            setTimeout(function() {
-                $iframe.off('load').remove();
-            }, 0)
-        }).appendTo($body);
     }
 
     function handleOrderedListViews(){
