@@ -634,12 +634,27 @@ var AjaxHandlers = (function(){
         }
     };
     
+    var processRecordRelated = function(){
+        record.detail = AjaxResponses.record;
+        document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
+        document.title = sobject.describe.label;
+    
+        if(AjaxResponses.welinklayout != null){
+            sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
+            record.welink_processed = AjaxHandlers.welinklayout();
+        } else {
+            record.layout = AjaxResponses.layout;
+            record.processed = AjaxHandlers.layout(record.layout.detailLayoutSections);
+        }
+    };
+    
     return {
         describe:handleDescribe,
         welinklayout:handleWelinkLayout,
         layout:handleLayout,
         recordTypes:handleRecordTypes,
         businessProcesses:handleBusinessProcesses,
-        handleReferenceFields:handleReferenceFields
+        handleReferenceFields:handleReferenceFields,
+        processRecordRelated:processRecordRelated
     };
 })();

@@ -20,8 +20,6 @@ var route = function(){
 };
 
 var renderRecordEdit = function(){
-    RecordEdit = initRecordEdit();
-
     document.querySelector('body').innerHTML = Templates.record_page_structure + Templates.page_lookup;
 
     document.querySelector('#jqm-header-left-button')['href'] = 'javascript:UserAction.cancel()';
@@ -37,7 +35,21 @@ var renderRecordEdit = function(){
     View.animateLoading(Context.labels.loading,'jqm-record');
     AjaxPools.retrieveSobjectRelated(sobject.name, function(){
         AjaxHandlers.describe();
-        RecordEdit.retrieveSobjectData();
+        
+        if(AjaxResponses.has_retrieved_record_related){
+            AjaxHandlers.processRecordRelated();
+        
+            FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'update', (sobject.welink_layout != null));
+            View.stopLoading('jqm-record');
+        } else {
+            AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
+                AjaxHandlers.handleReferenceFields(sobject.name, record.id);
+                AjaxHandlers.processRecordRelated();
+        
+                FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'update', (sobject.welink_layout != null));
+                View.stopLoading('jqm-record');
+            });
+        }
     });
 };
 
@@ -117,18 +129,7 @@ var renderRecordView = function(){
         AjaxHandlers.describe();
         AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
             AjaxHandlers.handleReferenceFields(sobject.name, record.id);
-            
-            record.detail = AjaxResponses.record;
-            document.querySelector('#jqm-page-title').innerHTML = record.detail.Name || '';
-            document.title = sobject.describe.label;
-
-            if(AjaxResponses.welinklayout != null){
-                sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
-                record.welink_processed = AjaxHandlers.welinklayout();
-            } else {
-                record.layout = AjaxResponses.layout;
-                record.processed = AjaxHandlers.layout(record.layout.detailLayoutSections);
-            }
+            AjaxHandlers.processRecordRelated();
             
             FieldRenderer.processViewLayoutDisplay(record.processed, record.welink_processed, (AjaxResponses.welinklayout != null));
             View.stopLoading('jqm-record');

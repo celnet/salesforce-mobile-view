@@ -114,18 +114,7 @@ var initRecordNew = function(){
             record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
         }
     }
-/*
-    function renderLayout(processedLayout, welinkProcessedLayout, newOrUpdate, isWelinkLayout){
-        var record_display = FieldRenderer.processLayoutDisplay(processedLayout, welinkProcessedLayout, newOrUpdate, isWelinkLayout);
-        document.querySelector('#field-container').innerHTML = record_display;
-        
-        $j('input[type="search"]').bind('click',function(){
-            Lookup.popup(this,'jqm-record');
-        });
-        
-        Styles.styleEdit();
-    }
-*/
+    
     return {
         retrieveSobjectData:retrieveSobjectData,
         selectRecordType:selectRecordType,
