@@ -1,4 +1,5 @@
 var Ajax = {
+    /*
     remoting:function(action,params,success,failure){
         Visualforce.remoting.Manager.invokeAction(
             Context.remote_action,
@@ -16,7 +17,7 @@ var Ajax = {
             {escape:false}
         );
     },
-
+*/
     ajax:function(method, endpoint, data, success, failure){
         endpoint = '/services/data/v' + Context.api_version + endpoint + (endpoint.indexOf('?') > -1?'&':'?') + '_t=' + new Date().getTime();
 
@@ -180,11 +181,11 @@ var AjaxPools = (function(){
             function(response){
                 welinkStorage['welink_' + sobjectName + '_listviews'] = JSON.stringify(response);
                 AjaxResponses.listviews = response;
-                retrieveSobjectRelatedMetadata(sobjectName, doFinish);
+                Remoting.retrieveSobjectRelatedMetadata(sobjectName, doFinish);
             }
         );
     };
-    
+    /*
     var retrieveSobjectRelatedMetadata = function(sobjectName, callbackFunction){
         Ajax.remoting(
             'retrieveSobjectRelated',
@@ -231,7 +232,7 @@ var AjaxPools = (function(){
             }
         );
     };
-    
+    */
     /**
      * Record Related
      */
