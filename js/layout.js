@@ -331,7 +331,7 @@ var FieldRenderer = {
                 fieldHTML = fieldHTML.replace('{{options}}',_options);
                 break;
             case 'boolean':
-                fieldTemplate = Templates.checkboxradio;
+                fieldTemplate = Templates.jqm_checkboxradio;
                 fieldHTML = fieldTemplate.replace('{{input-value}}',fieldValue || '');
                 
                 if(fieldValue){
