@@ -491,7 +491,7 @@ var FieldRenderer = {
             for(var i = 0; i < pl.length;i++){
                 var fields = '';
                 for(var j = 0; j < pl[i].rows.length; j++){
-                    fields += FieldRenderer.processViewFieldDisplay(pl[i].rows[j].layoutComponents[0].details.Name,pl[i].rows[j].layoutComponents[0],false);
+                    fields += FieldRenderer.processViewFieldDisplay(pl[i].rows[j].layoutComponents[0].details.name,pl[i].rows[j].layoutComponents[0],false);
                 }
                 
                 var section;
