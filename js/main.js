@@ -3,13 +3,13 @@ window.addEventListener('DOMContentLoaded', function(){
     getBaseState();
     
     if(window.location.search.indexOf('sobject') < 0){
-        window.history.replaceState('ListView','ListView','DP?mode=list&sobject=Opportunity&listviewid=recentlyviewed');
+        window.history.replaceState('ListView','ListView',Context.baseState + '?mode=list&sobject=Opportunity&listviewid=recentlyviewed');
         route();
     } else if(window.location.search.indexOf('sobject') > -1 && window.location.search.indexOf('mode') < 0){
-        window.history.replaceState('DPListView','DPListView','DP' + window.location.search + '&mode=list');
+        window.history.replaceState('DPListView','DPListView',Context.baseState + window.location.search + '&mode=list');
         route();
     } else if(window.location.search.indexOf('mode=list') > -1 && window.location.search.indexOf('listviewid') < 0){
-        window.history.replaceState('ListView','ListView','DP' + window.location.search + '&listviewid=recentlyviewed');
+        window.history.replaceState('ListView','ListView',Context.baseState + window.location.search + '&listviewid=recentlyviewed');
         route();
     } else {
         route();
@@ -26,6 +26,7 @@ window.onpopstate = function(event){
 
 var getBaseState = function(){
     var pathname = window.location.pathname;
+    Context.pathname = pathname;
     if(pathname != undefined){
         var pathnames = pathname.split('/');
         if(pathnames.length > 0){
@@ -62,7 +63,7 @@ var UserAction = {
 
     newRecord:function(current_jqm_page_id){
         View.animateLoading(Context.labels.loading,current_jqm_page_id);
-        window.history.pushState('DPRecordNew','DPRecordNew','DP?mode=new&sobject=' + sobject.name);
+        window.history.pushState('DPRecordNew','DPRecordNew',Context.baseState + '?mode=new&sobject=' + sobject.name);
         route();
     }, // no loading
 
@@ -72,19 +73,19 @@ var UserAction = {
     
     viewRecord:function(jqmPageId, sobjectName, recordId){
         View.animateLoading(Context.labels.loading, jqmPageId);
-        window.history.pushState('DPRecordView','DPRecordView','DP?mode=view&sobject=' + sobjectName + '&id=' + recordId + '&listviewid=' + params.listviewid);
+        window.history.pushState('DPRecordView','DPRecordView',Context.baseState + '?mode=view&sobject=' + sobjectName + '&id=' + recordId + '&listviewid=' + params.listviewid);
         route();
     }, // loading
     
     viewList:function(current_jqm_page_id){
         View.animateLoading(Context.labels.loading, current_jqm_page_id);
-        window.history.pushState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=' + params.listviewid);
+        window.history.pushState('DPListView','DPListView',Context.baseState + '?mode=list&sobject=' + sobject.name + '&listviewid=' + params.listviewid);
         route();
     }, // loading
 
     editRecord:function(current_jqm_page_id){
         View.animateLoading(Context.labels.loading, current_jqm_page_id);
-        window.history.pushState('DPRecordEdit','DPRecordEdit','DP?mode=edit&sobject=' + sobject.name + '&id=' + record.id + '&listviewid=' + params.listviewid);
+        window.history.pushState('DPRecordEdit','DPRecordEdit',Context.baseState + '?mode=edit&sobject=' + sobject.name + '&id=' + record.id + '&listviewid=' + params.listviewid);
         route();
     }, // no loading
 

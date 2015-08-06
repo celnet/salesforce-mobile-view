@@ -144,7 +144,7 @@ var RecordForm = {
             function(response){
                 var recordid = params.mode=='edit'?record.id:response.id;
 
-                window.history.replaceState('DPRecordView','DPRecordView','DP?mode=view&sobject=' + sobject.name + '&id=' + recordid + '&listviewid=' + params.listviewid);
+                window.history.replaceState('DPRecordView','DPRecordView',Context.baseState + '?mode=view&sobject=' + sobject.name + '&id=' + recordid + '&listviewid=' + params.listviewid);
                 route();
             },
             function(responseJSON){

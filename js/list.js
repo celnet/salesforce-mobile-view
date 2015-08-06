@@ -89,7 +89,7 @@ var initListView = function(){
 
         if(selected_option_id == 'chooselistview'){
             params.listviewid = 'recentlyviewed';
-            window.history.replaceState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=recentlyviewed');
+            window.history.replaceState('DPListView','DPListView',Context.baseState + '?mode=list&sobject=' + sobject.name + '&listviewid=recentlyviewed');
             
             if(AjaxResponses.recentlyviewedwithfields != null){
                 renderRecentlyViewedList();
@@ -106,7 +106,7 @@ var initListView = function(){
             selected_option_id = selected_option_id.substr(0,15);
             params.listviewid = selected_option_id;
 
-            window.history.replaceState('DPListView','DPListView','DP?mode=list&sobject=' + sobject.name + '&listviewid=' + selected_option_id);
+            window.history.replaceState('DPListView','DPListView',Context.baseState + '?mode=list&sobject=' + sobject.name + '&listviewid=' + selected_option_id);
             
             View.animateLoading(Context.labels.loading,'jqm-list');
             

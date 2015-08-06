@@ -200,7 +200,7 @@ var FieldRenderer = {
             fieldTemplate = Templates.field_readonly;
             if(fieldValue != '' && fieldValue != undefined){
                 if(fieldType == 'reference'){
-                     var _ref_value = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + fieldReferenceTos[0] + '&id=' + refValue.Id + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + refValue.Name + '</a>';
+                     var _ref_value = '<a data-role="none" data-ajax="false" href="' + Context.pathname + '?mode=view&sobject=' + fieldReferenceTos[0] + '&id=' + refValue.Id + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + refValue.Name + '</a>';
 
                     fieldHTML = fieldTemplate.replace('{{field-label}}',fieldLabel);
                     fieldHTML = fieldHTML.replace('{{field-value}}',_ref_value);
@@ -541,7 +541,7 @@ var FieldRenderer = {
                 }
                 
                 if(setup_objects.indexOf(fieldReferenceTos[0]) < 0 || fieldReferenceTos[0] == 'User'){
-                    fieldValue = '<a data-role="none" data-ajax="false" href="/apex/DP?mode=view&sobject=' + fieldReferenceTos[0] + '&id=' + refId + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + refName + '</a>';
+                    fieldValue = '<a data-role="none" data-ajax="false" href="' + Context.pathname + '?mode=view&sobject=' + fieldReferenceTos[0] + '&id=' + refId + '&crossref=true' + '&listviewid=' + params.listviewid + '">' + refName + '</a>';
                 } else {
                     fieldValue = refName;
                 }
