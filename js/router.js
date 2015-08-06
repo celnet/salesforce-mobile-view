@@ -63,6 +63,8 @@ var renderListView = function(){
 
     document.querySelector('#jqm-header-left-button').innerHTML = '';
     document.querySelector('#jqm-header-right-button').innerHTML = '';
+    
+    document.querySelector('#jqm-header-right-button').classList.add('ui-icon-plus');
 
     $j.mobile.initializePage();
     Styles.tunePageStyle();

@@ -199,7 +199,7 @@ var AjaxPools = (function(){
                     recordTypeId = 'norecordtype';
                 }
                 
-                if(AjaxResponses.welinklayouts[recordTypeId] != null){
+                if(AjaxResponses.welinklayouts != null && AjaxResponses.welinklayouts[recordTypeId] != null){
                     AjaxResponses.welinklayout = AjaxResponses.welinklayouts[recordTypeId];
                 } else {
                     AjaxResponses.layout = AjaxResponses.layoutsMapping[recordTypeId];

@@ -183,7 +183,7 @@ var RecordForm = {
             }
             
         }else {
-            alert(JSON.stringify(responseJSON));
+            console.log(responseJSON);
         }
         
         View.stopLoading('jqm-record');

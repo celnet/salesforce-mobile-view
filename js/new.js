@@ -37,6 +37,7 @@ var initRecordNew = function(){
             case '': // has no record type, direct to next step
                 getLayoutByRecordType('');
                 FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
+                View.stopLoading('jqm-record');
                 break;
             default: // has given record type, direct to next step
                 AjaxHandlers.recordTypes();
@@ -104,7 +105,7 @@ var initRecordNew = function(){
         if(recordTypeId == null || recordTypeId == ''){
             recordTypeId = 'norecordtype';
         }
-        if(AjaxResponses.welinklayouts[recordTypeId] != null){
+        if(AjaxResponses.welinklayouts != null && AjaxResponses.welinklayouts[recordTypeId] != null){
             AjaxResponses.welinklayout = AjaxResponses.welinklayouts[recordTypeId];
             sobject.welink_layout = AjaxResponses.welinklayout.Metadata;
             record.welink_processed = AjaxHandlers.welinklayout();
