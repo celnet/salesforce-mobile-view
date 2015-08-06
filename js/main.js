@@ -1,5 +1,6 @@
 window.addEventListener('DOMContentLoaded', function(){
     getTemplates();
+    getBaseState();
     
     if(window.location.search.indexOf('sobject') < 0){
         window.history.replaceState('ListView','ListView','DP?mode=list&sobject=Opportunity&listviewid=recentlyviewed');
@@ -21,6 +22,16 @@ var RecordNew,RecordEdit,RecordView,ListView;
 window.onpopstate = function(event){
     route();
     event.preventDefault();
+};
+
+var getBaseState = function(){
+    var pathname = window.location.pathname;
+    if(pathname != undefined){
+        var pathnames = pathname.split('/');
+        if(pathnames.length > 0){
+            Context.baseState = pathnames[pathnames.length - 1];
+        }
+    }
 };
 
 var getParams = function(){
