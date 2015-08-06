@@ -1,6 +1,6 @@
 var Remoting = (function () {
     var retrieveSobjectRelatedMetadata = function (sobjectName, callbackFunction) {
-        result = '<%=responseFromServer %>';
+        result = AspContext.resultFromServer;
         result = window.atob(result);
         if (result != null) {
             if (result.listviewsMetadata != null) {
