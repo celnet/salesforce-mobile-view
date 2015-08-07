@@ -432,13 +432,13 @@ var FieldRenderer = {
                     
                     var section;
                     if(pl[i].useHeading && pl[i].rows.length > 0){
-                        section = section_template.replace('{{fields}}',fields);
+                        section = section.replace('{{section-title}}', pl[i].heading);
                     } else {
                         section = section_template_without_heading;
                     }
                     
                     section = section.replace('{{section-number}}','section-' + i);
-                    section = section.replace('{{section-title}}', pl[i].heading);
+                    section = section_template.replace('{{fields}}',fields);
                     layoutDisplay += section;
                 }
             }
