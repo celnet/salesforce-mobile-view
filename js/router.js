@@ -36,17 +36,20 @@ var renderRecordEdit = function(){
     AjaxPools.retrieveSobjectRelated(sobject.name, function(){
         AjaxHandlers.describe();
         
+        var jsonWelinkLayout = JSON.stringify(sobject.welink_layout);
+        var isWelinkLayout = jsonWelinkLayout != undefined && jsonWelinkLayout != 'null' && jsonWelinkLayout != '{}';
+        
         if(AjaxResponses.has_retrieved_record_related){
             AjaxHandlers.processRecordRelated();
         
-            FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'update', (sobject.welink_layout != null));
+            FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'update', isWelinkLayout);
             View.stopLoading('jqm-record');
         } else {
             AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
                 AjaxHandlers.handleReferenceFields(sobject.name, record.id);
                 AjaxHandlers.processRecordRelated();
         
-                FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'update', (sobject.welink_layout != null));
+                FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'update', isWelinkLayout);
                 View.stopLoading('jqm-record');
             });
         }
