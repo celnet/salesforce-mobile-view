@@ -365,9 +365,12 @@ var AjaxPools = (function(){
                 
                 callbackFunction();
                 
-                retrieveSobjectRelatedByBatchRequest(sobjectName, function(){
-                    console.log("has refreshed");
-                });
+                if(!Context.hasRefreshedLocalStorage){
+                    retrieveSobjectRelatedByBatchRequest(sobjectName, function(){
+                        Context.hasRefreshedLocalStorage = true;
+                        console.log("has refreshed");
+                    });
+                }
             } else {
                 retrieveSobjectRelatedByBatchRequest(sobjectName, callbackFunction);
             }
