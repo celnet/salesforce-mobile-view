@@ -1,6 +1,7 @@
 var Ajax = {
     ajax:function(method, endpoint, data, success, failure){
-        endpoint = '/services/data/v' + Context.api_version + endpoint + (endpoint.indexOf('?') > -1?'&':'?') + '_t=' + new Date().getTime();
+        var baseUrl = Context.base_url || '';
+        endpoint = baseUrl + '/services/data/v' + Context.api_version + endpoint + (endpoint.indexOf('?') > -1?'&':'?') + '_t=' + new Date().getTime();
 
         var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 
