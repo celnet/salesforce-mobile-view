@@ -148,6 +148,11 @@ var FieldRenderer = {
             isFieldReadOnly = !isFieldEditable;
         }
         
+        // 若为 geolocation 字段，不显示
+        if(fieldName.indexOf('__s') >= 0){
+            return '';
+        }
+        
         fieldLabel += ':';
         
         if(sobject.fields[fieldName] == undefined){
