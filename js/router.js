@@ -42,14 +42,14 @@ var renderRecordEdit = function(){
         if(AjaxResponses.has_retrieved_record_related){
             AjaxHandlers.processRecordRelated();
         
-            FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'update', isWelinkLayout);
+            FieldRenderer.processLayoutDisplay(record.edit_processed, record.welink_processed, 'update', isWelinkLayout);
             View.stopLoading('jqm-record');
         } else {
             AjaxPools.retrieveRecordRelated(sobject.name, record.id, function(){
                 AjaxHandlers.handleReferenceFields(sobject.name, record.id);
                 AjaxHandlers.processRecordRelated();
         
-                FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'update', isWelinkLayout);
+                FieldRenderer.processLayoutDisplay(record.edit_processed, record.welink_processed, 'update', isWelinkLayout);
                 View.stopLoading('jqm-record');
             });
         }
@@ -136,7 +136,7 @@ var renderRecordView = function(){
             AjaxHandlers.handleReferenceFields(sobject.name, record.id);
             AjaxHandlers.processRecordRelated();
             
-            FieldRenderer.processViewLayoutDisplay(record.processed, record.welink_processed, (AjaxResponses.welinklayout != null));
+            FieldRenderer.processViewLayoutDisplay(record.view_processed, record.welink_processed, (AjaxResponses.welinklayout != null));
             View.stopLoading('jqm-record');
         });
     });

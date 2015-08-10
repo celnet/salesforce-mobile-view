@@ -554,7 +554,7 @@ var AjaxHandlers = (function(){
             record.welink_processed = AjaxHandlers.welinklayout();
         } else {
             record.layout = AjaxResponses.layout;
-            record.processed = AjaxHandlers.layout(record.layout.detailLayoutSections);
+            record.view_processed = AjaxHandlers.layout(record.layout.detailLayoutSections);
         }
     };
     
