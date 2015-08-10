@@ -322,6 +322,7 @@ var AjaxPools = (function(){
         Ajax.get(
             '/query/?q=' + window.encodeURIComponent(queryString), 
             function(response){
+                AjaxResponses.listviews[listviewId] = AjaxResponses.listviews[listviewId] || {};
                 AjaxResponses.listviews[listviewId].result = response;
 
                 callbackFunction();
