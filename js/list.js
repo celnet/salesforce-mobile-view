@@ -130,9 +130,12 @@ var initListView = function(){
         var option_template = Templates.option;
 
         for (var i = 0; i < sobject.ordered_listviews.length; i++) {
-            var option = option_template.replace('{{option-value}}',sobject.ordered_listviews[i].id).replace('{{option-label}}',sobject.ordered_listviews[i].label);
+            if(sobject.ordered_listviews[i] != null && sobject.ordered_listviews[i].id != null){
+                var listviewId = sobject.ordered_listviews[i].id;
+            }
+            var option = option_template.replace('{{option-value}}',listviewId).replace('{{option-label}}',sobject.ordered_listviews[i].label);
 
-            if(params.listviewid == sobject.ordered_listviews[i].id.substring(0,15)){
+            if(params.listviewid == listviewId.substring(0,15)){
                 options += option.replace('{{option-selected}}','selected');
             } else {
                 options += option.replace('{{option-selected}}','');
