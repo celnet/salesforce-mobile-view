@@ -133,7 +133,9 @@ var initListView = function(){
             if(sobject.ordered_listviews[i] == null || sobject.ordered_listviews[i].id == null){
                 continue;
             }
-            var option = option_template.replace('{{option-value}}',listviewId).replace('{{option-label}}',sobject.ordered_listviews[i].label);
+            var listviewId = sobject.ordered_listviews[i].id;
+            var listviewLabel = sobject.ordered_listviews[i].label;
+            var option = option_template.replace('{{option-value}}',listviewId).replace('{{option-label}}',listviewLabel);
 
             if(params.listviewid == listviewId.substring(0,15)){
                 options += option.replace('{{option-selected}}','selected');
