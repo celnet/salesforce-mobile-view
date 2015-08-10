@@ -130,8 +130,8 @@ var initListView = function(){
         var option_template = Templates.option;
 
         for (var i = 0; i < sobject.ordered_listviews.length; i++) {
-            if(sobject.ordered_listviews[i] != null && sobject.ordered_listviews[i].id != null){
-                var listviewId = sobject.ordered_listviews[i].id;
+            if(sobject.ordered_listviews[i] == null || sobject.ordered_listviews[i].id == null){
+                continue;
             }
             var option = option_template.replace('{{option-value}}',listviewId).replace('{{option-label}}',sobject.ordered_listviews[i].label);
 
