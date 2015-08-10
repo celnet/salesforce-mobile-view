@@ -1,7 +1,12 @@
 var Remoting = (function () {
     var retrieveSobjectRelatedMetadata = function (sobjectName, callbackFunction) {
         result = AspContext.resultFromServer;
-        result = JSON.parse(window.atob(result));
+        if(result == null || result == ''){
+            result = null;
+        } else {
+            result = JSON.parse(window.atob(result));
+        }
+        
         if (result != null) {
             if (result.listviewsMetadata != null) {
                 welinkStorage['welink_' + sobjectName + '_orderedlistviews'] = JSON.stringify(result.listviewsMetadata);
