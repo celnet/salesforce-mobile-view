@@ -1,4 +1,8 @@
 window.addEventListener('DOMContentLoaded', function(){
+    if(welinkStorage.clear != null){
+        welinkStorage.clear();
+    } 
+    
     getTemplates();
     getBaseState();
     
