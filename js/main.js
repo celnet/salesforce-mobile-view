@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', function(){
         window.history.replaceState('ListView','ListView',Context.baseState + '?mode=list&sobject=Opportunity&listviewid=recentlyviewed');
         route();
     } else if(window.location.search.indexOf('sobject') > -1 && window.location.search.indexOf('mode') < 0){
-        window.history.replaceState('DPListView','DPListView',Context.baseState + window.location.search + '&mode=list');
+        window.history.replaceState('ListView','ListView',Context.baseState + window.location.search + '&mode=list');
         route();
     } else if(window.location.search.indexOf('mode=list') > -1 && window.location.search.indexOf('listviewid') < 0){
         window.history.replaceState('ListView','ListView',Context.baseState + window.location.search + '&listviewid=recentlyviewed');

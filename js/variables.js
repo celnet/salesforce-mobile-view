@@ -16,7 +16,10 @@ sobject ={
     ordered_listviews:[],
     recentlyviewed: {},// sobject recentlyviewed (TODO: order)
     welink_layout: {},
-    has_welink_layout: false
+    has_welink_layout: false,
+    
+    hasRecordType:false,
+    defaultRecordType:{}
 },
 
 record = {
@@ -26,6 +29,8 @@ record = {
     references:{},
     ref_fields:[],
     processed:[],
+    view_processed:[],
+    edit_processed:[],
     welink_processed:[],
     welink_required:{},
     welink_readonly:{},

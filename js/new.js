@@ -1,35 +1,89 @@
 var initRecordNew = function(){
     function retrieveSobjectData(){
         handleSobjectLayouts();
-        checkRecordType();
+        //checkRecordType();
     }
     
     function handleSobjectLayouts(){
-        var response = AjaxResponses.layouts;
-        var recordtype_mappings = response.recordTypeMappings;
+        var layoutsResponse = AjaxResponses.layouts;
+        
+        if(layoutsResponse.layouts != null && layoutsResponse.layouts.length > 0){
+            // 判断条件没有文档参考，凭感觉认为 layouts 为空，则有 Record Type
+            sobject.hasRecordType = false;
+        } else {
+            sobject.hasRecordType = true;
+            for(var i = 0; i < layoutsResponse.recordTypeMappings.length; i++){
+                if(layoutsResponse.recordTypeMappings[i].defaultRecordTypeMapping){
+                    sobject.defaultRecordType = layoutsResponse.recordTypeMappings[i];
+                    break;
+                }
+            }
+        }
+        
+        if(sobject.hasRecordType){
+            if(params.recordtypeid === '' && layoutsResponse.recordTypeSelectorRequired.length > 0 && layoutsResponse.recordTypeSelectorRequired[0]){
+                renderRecordTypeSelect();
+            } else {
+                record.recordtypeid = params.recordtypeid || sobject.defaultRecordType.recordTypeId;
+                AjaxHandlers.recordTypes();
+                AjaxHandlers.businessProcesses();
+                getLayoutByRecordType(record.recordtypeid);
+                FieldRenderer.processLayoutDisplay(record.edit_processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
+            }
+        } else {
+            sobject.layout = layoutsResponse.layouts[0];
+            record.edit_processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);
+            
+            getLayoutByRecordType('');
+            FieldRenderer.processLayoutDisplay(record.edit_processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
+            View.stopLoading('jqm-record');
+        }
+        /*
         switch(true){
-            case (response.layouts != null && response.layouts.length > 0):
+            case (layoutsResponse.layouts != null && layoutsResponse.layouts.length > 0):
                 console.log('no recordtype, no recordtype select needed');
-                sobject.layout = response.layouts[0];
+                sobject.layout = layoutsResponse.layouts[0];
                 record.processed = AjaxHandlers.layout(sobject.layout.editLayoutSections);//processLayoutSection();
+                
+                getLayoutByRecordType('');
+                FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
+                View.stopLoading('jqm-record');
+                
                 break;
-            case (response.recordTypeSelectorRequired.length > 0 && !response.recordTypeSelectorRequired[0]):
+            case (layoutsResponse.recordTypeSelectorRequired.length > 0 && !layoutsResponse.recordTypeSelectorRequired[0]):
                 console.log('use default recordtype, no recordtype select needed');
-                for(i = 0; i < recordtype_mappings.length; i++){
-                    if(recordtype_mappings[i].defaultRecordTypeMapping){
-                        record.recordtypeid = recordtype_mappings[i].recordTypeId;
-                        record.recordtypename = recordtype_mappings[i].name;
+                for(i = 0; i < layoutsResponse.recordTypeMappings.length; i++){
+                    if(layoutsResponse.recordTypeMappings[i].defaultRecordTypeMapping){
+                        record.recordtypeid = layoutsResponse.recordTypeMappings[i].recordTypeId;
+                        record.recordtypename = layoutsResponse.recordTypeMappings[i].name;
                         break;
                     }
                 }
+                
+                AjaxHandlers.recordTypes();
+                AjaxHandlers.businessProcesses();
+                getLayoutByRecordType(record.recordtypeid);
+                FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
+                
                 break;
             default:
                 console.log('has recordtypes, recordtype select needed');
                 record.recordtypeid = 'pending select';
+                renderRecordTypeSelect();
         }
+        */
     }
-    
+    /*
     function checkRecordType(){
+        
+        if(sobject.hasRecordType){
+            
+        } else {
+            getLayoutByRecordType('');
+            FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
+            View.stopLoading('jqm-record');
+        }
+        
         switch(record.recordtypeid){
             case 'pending select': // has record types pending selection
                 renderRecordTypeSelect();
@@ -46,7 +100,7 @@ var initRecordNew = function(){
                 FieldRenderer.processLayoutDisplay(record.processed, record.welink_processed, 'new', (record.welink_processed != null && record.welink_processed.length > 0));
         }
     }
-
+*/
     function renderRecordTypeSelect(){
         var recordtype_mappings = AjaxResponses.layouts.recordTypeMappings;
         var recordtype_options = '';
