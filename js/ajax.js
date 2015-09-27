@@ -584,6 +584,7 @@ var AjaxHandlers = (function(){
         } else {
             record.layout = AjaxResponses.layout;
             record.view_processed = AjaxHandlers.layout(record.layout.detailLayoutSections);
+            record.edit_processed = AjaxHandlers.layout(record.layout.editLayoutSections);
         }
     };
     
